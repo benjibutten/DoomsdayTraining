@@ -2,193 +2,384 @@
 
 <PageTitle>Steg-för-steg-träning – Doomsday-Algoritmen</PageTitle>
 
-<div class="page-header">
-    <h1>🧩 Steg-för-steg-träning</h1>
-    <p>Välj vilket delmoment du vill öva på, och träna tills det sitter!</p>
-</div>
+<MudText Typo="Typo.h4" GutterBottom="true">🧩 Steg-för-steg-träning</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">Välj vilket delmoment du vill öva på, och träna tills det sitter!</MudText>
 
-<div class="card">
-    <div class="card-header-custom">⚙️ Välj övning</div>
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-3">⚙️ Välj övning</MudText>
     <div class="d-flex gap-2 flex-wrap">
-        <button class="btn @(mode == TrainingMode.CenturyAnchor ? "btn-primary" : "btn-outline-primary")"
-                @onclick="() => SetMode(TrainingMode.CenturyAnchor)">
-            🏛️ Sekelankare
-        </button>
-        <button class="btn @(mode == TrainingMode.YearDoomsday ? "btn-primary" : "btn-outline-primary")"
-                @onclick="() => SetMode(TrainingMode.YearDoomsday)">
-            📅 Årets Doomsday
-        </button>
-        <button class="btn @(mode == TrainingMode.MonthDoomsday ? "btn-primary" : "btn-outline-primary")"
-                @onclick="() => SetMode(TrainingMode.MonthDoomsday)">
-            📋 Månadsdatum
-        </button>
+        <MudButton Variant="@(mode == TrainingMode.CenturyAnchor ? Variant.Filled : Variant.Outlined)"
+                   Color="Color.Primary" OnClick="() => SetMode(TrainingMode.CenturyAnchor)"
+                   StartIcon="@Icons.Material.Filled.AccountBalance" Size="Size.Small">Sekelankare</MudButton>
+        <MudButton Variant="@(mode == TrainingMode.YearDoomsday ? Variant.Filled : Variant.Outlined)"
+                   Color="Color.Primary" OnClick="() => SetMode(TrainingMode.YearDoomsday)"
+                   StartIcon="@Icons.Material.Filled.CalendarMonth" Size="Size.Small">Årets Doomsday</MudButton>
+        <MudButton Variant="@(mode == TrainingMode.MonthDoomsday ? Variant.Filled : Variant.Outlined)"
+                   Color="Color.Primary" OnClick="() => SetMode(TrainingMode.MonthDoomsday)"
+                   StartIcon="@Icons.Material.Filled.ListAlt" Size="Size.Small">Månadsdatum</MudButton>
+        <MudButton Variant="@(mode == TrainingMode.FullAlgorithm ? Variant.Filled : Variant.Outlined)"
+                   Color="Color.Secondary" OnClick="() => SetMode(TrainingMode.FullAlgorithm)"
+                   StartIcon="@Icons.Material.Filled.Route" Size="Size.Small">Hela algoritmen</MudButton>
     </div>
-</div>
+</MudPaper>
 
 @if (mode != TrainingMode.None)
 {
-    <!-- Statistik -->
-    <div class="stats-bar">
-        <div class="stat-item">
-            <div class="stat-value">@answered</div>
-            <div class="stat-label">Svar</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value text-success-custom">@correct</div>
-            <div class="stat-label">Rätt</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value">@(answered > 0 ? $"{(int)(correct * 100.0 / answered)}%" : "–")</div>
-            <div class="stat-label">Träffsäkerhet</div>
-        </div>
-    </div>
+    <MudGrid Spacing="2" Class="mb-3">
+        <MudItem xs="4" sm="2">
+            <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                <MudText Typo="Typo.h5">@answered</MudText>
+                <MudText Typo="Typo.caption">SVAR</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4" sm="2">
+            <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                <MudText Typo="Typo.h5" Color="Color.Success">@correct</MudText>
+                <MudText Typo="Typo.caption">RÄTT</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4" sm="2">
+            <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                <MudText Typo="Typo.h5">@(answered > 0 ? $"{(int)(correct * 100.0 / answered)}%" : "–")</MudText>
+                <MudText Typo="Typo.caption">TRÄFFSÄKERHET</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 
-    <div class="streak">
-        @foreach (var r in streak.TakeLast(20))
-        {
-            <div class="streak-dot @(r ? "correct" : "incorrect")"></div>
-        }
-    </div>
+    @if (streak.Count > 0)
+    {
+        <div class="d-flex gap-1 flex-wrap mb-3">
+            @foreach (var r in streak.TakeLast(20))
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Circle" Size="Size.Small"
+                         Color="@(r ? Color.Success : Color.Error)" />
+            }
+        </div>
+    }
 }
 
 @* ──── SEKELANKARE-ÖVNING ──── *@
 @if (mode == TrainingMode.CenturyAnchor)
 {
-    <div class="flashcard fade-in" @key="questionKey">
-        <div style="font-size: 1rem; color: var(--text-muted);">Vilket sekelankare har...</div>
-        <div class="flashcard-date">@(centuryYear)-talet</div>
+    <MudPaper Elevation="4" Class="pa-4 pa-sm-6 text-center mx-auto mb-4" Style="max-width:520px; border-radius:16px;" @key="questionKey">
+        <MudText Typo="Typo.body2" Class="mb-1">Vilket sekelankare har...</MudText>
+        <MudText Typo="Typo.h3" Color="Color.Primary" Class="mb-3">@(centuryYear)-talet</MudText>
 
         @if (hasAnswered)
         {
             @if (wasCorrect)
             {
-                <div class="success-box">✅ Rätt! @centuryYear-talet har ankardagen <strong>@centuryCorrectAnswer</strong>.</div>
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">
+                    ✅ Rätt! @centuryYear-talet har ankardagen <strong>@centuryCorrectAnswer</strong>.
+                </MudAlert>
             }
             else
             {
-                <div class="danger-box">❌ Fel. Du svarade @centuryUserAnswer. Rätt svar: <strong>@centuryCorrectAnswer</strong>.</div>
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-3">
+                    ❌ Fel. Du svarade @centuryUserAnswer. Rätt svar: <strong>@centuryCorrectAnswer</strong>.
+                </MudAlert>
             }
-            <div class="weekday-grid" style="margin-top: 1rem;">
+            <MudGrid Spacing="2" Justify="Justify.Center" Class="mb-3">
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
-                    var cssClass = "weekday-btn";
-                    if (day == centuryCorrectAnswer) cssClass += " correct";
-                    else if (day == centuryUserAnswer && !wasCorrect) cssClass += " incorrect";
-                    <button class="@cssClass" disabled>@day</button>
+                    var color = day == centuryCorrectAnswer ? Color.Success
+                              : (day == centuryUserAnswer && !wasCorrect) ? Color.Error
+                              : Color.Default;
+                    var variant = (day == centuryCorrectAnswer || (day == centuryUserAnswer && !wasCorrect)) ? Variant.Filled : Variant.Outlined;
+                    <MudItem xs="4" sm="3">
+                        <MudButton FullWidth="true" Variant="@variant" Color="@color" Disabled="true" Size="Size.Small">@day</MudButton>
+                    </MudItem>
                 }
-            </div>
-            <button class="btn btn-primary mt-2" @onclick="NextQuestion">Nästa →</button>
+            </MudGrid>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextQuestion" EndIcon="@Icons.Material.Filled.ArrowForward">Nästa</MudButton>
         }
         else
         {
-            <div class="weekday-grid" style="margin-top: 1.5rem;">
+            <MudGrid Spacing="2" Justify="Justify.Center">
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
                     var d = day;
-                    <button class="weekday-btn" @onclick="() => AnswerCentury(d)">@d</button>
+                    <MudItem xs="4" sm="3">
+                        <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => AnswerCentury(d)" Size="Size.Small">@d</MudButton>
+                    </MudItem>
                 }
-            </div>
+            </MudGrid>
         }
-    </div>
+    </MudPaper>
 }
 
 @* ──── ÅRETS DOOMSDAY-ÖVNING ──── *@
 @if (mode == TrainingMode.YearDoomsday)
 {
-    <div class="flashcard fade-in" @key="questionKey">
-        <div style="font-size: 1rem; color: var(--text-muted);">Vilken veckodag är Doomsday för år...</div>
-        <div class="flashcard-date">@yearToGuess</div>
-        <div class="flashcard-hint">
-            Sekelankare: <span class="badge-weekday">@yearCenturyAnchor</span>
-        </div>
+    <MudPaper Elevation="4" Class="pa-4 pa-sm-6 text-center mx-auto mb-4" Style="max-width:520px; border-radius:16px;" @key="questionKey">
+        <MudText Typo="Typo.body2" Class="mb-1">Vilken veckodag är Doomsday för år...</MudText>
+        <MudText Typo="Typo.h3" Color="Color.Primary" Class="mb-2">@yearToGuess</MudText>
+        <MudText Typo="Typo.body2" Class="mb-3">Sekelankare: <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">@yearCenturyAnchor</MudChip></MudText>
 
         @if (hasAnswered)
         {
             @if (wasCorrect)
             {
-                <div class="success-box">✅ Rätt! Doomsday @yearToGuess = <strong>@yearCorrectAnswer</strong>.</div>
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">
+                    ✅ Rätt! Doomsday @yearToGuess = <strong>@yearCorrectAnswer</strong>.
+                </MudAlert>
             }
             else
             {
-                <div class="danger-box">❌ Fel. Du svarade @yearUserAnswer. Rätt: <strong>@yearCorrectAnswer</strong>.</div>
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-3">
+                    ❌ Fel. Du svarade @yearUserAnswer. Rätt: <strong>@yearCorrectAnswer</strong>.
+                </MudAlert>
             }
 
-            <div class="weekday-grid" style="margin-top: 1rem;">
+            <MudGrid Spacing="2" Justify="Justify.Center" Class="mb-3">
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
-                    var cssClass = "weekday-btn";
-                    if (day == yearCorrectAnswer) cssClass += " correct";
-                    else if (day == yearUserAnswer && !wasCorrect) cssClass += " incorrect";
-                    <button class="@cssClass" disabled>@day</button>
+                    var color = day == yearCorrectAnswer ? Color.Success
+                              : (day == yearUserAnswer && !wasCorrect) ? Color.Error
+                              : Color.Default;
+                    var variant = (day == yearCorrectAnswer || (day == yearUserAnswer && !wasCorrect)) ? Variant.Filled : Variant.Outlined;
+                    <MudItem xs="4" sm="3">
+                        <MudButton FullWidth="true" Variant="@variant" Color="@color" Disabled="true" Size="Size.Small">@day</MudButton>
+                    </MudItem>
                 }
-            </div>
+            </MudGrid>
 
-            <div class="tip-box" style="text-align: left; margin-top: 1rem;">
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-3 text-left">
                 <strong>Beräkning:</strong> y = @(yearToGuess % 100) →
                 @(yearToGuess % 100) ÷ 12 = @(yearToGuess % 100 / 12) rest @(yearToGuess % 100 % 12) →
                 @(yearToGuess % 100 % 12) ÷ 4 = @(yearToGuess % 100 % 12 / 4) →
                 @((int)yearCenturyAnchor) + @(yearToGuess % 100 / 12) + @(yearToGuess % 100 % 12) + @(yearToGuess % 100 % 12 / 4) = @((int)yearCenturyAnchor + yearToGuess % 100 / 12 + yearToGuess % 100 % 12 + yearToGuess % 100 % 12 / 4)
                 → mod 7 = @((int)yearCorrectAnswer) = @yearCorrectAnswer
-            </div>
-            <button class="btn btn-primary mt-2" @onclick="NextQuestion">Nästa →</button>
+            </MudAlert>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextQuestion" EndIcon="@Icons.Material.Filled.ArrowForward">Nästa</MudButton>
         }
         else
         {
-            <div class="weekday-grid" style="margin-top: 1.5rem;">
+            <MudGrid Spacing="2" Justify="Justify.Center">
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
                     var d = day;
-                    <button class="weekday-btn" @onclick="() => AnswerYear(d)">@d</button>
+                    <MudItem xs="4" sm="3">
+                        <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => AnswerYear(d)" Size="Size.Small">@d</MudButton>
+                    </MudItem>
                 }
-            </div>
+            </MudGrid>
         }
-    </div>
+    </MudPaper>
 }
 
 @* ──── MÅNADSDATUM-ÖVNING ──── *@
 @if (mode == TrainingMode.MonthDoomsday)
 {
-    <div class="flashcard fade-in" @key="questionKey">
-        <div style="font-size: 1rem; color: var(--text-muted);">Vilket datum är Doomsday i...</div>
-        <div class="flashcard-date">@monthInfo!.MonthName</div>
-        @if (monthIsLeapYear && (monthInfo.Month == 1 || monthInfo.Month == 2))
+    <MudPaper Elevation="4" Class="pa-4 pa-sm-6 text-center mx-auto mb-4" Style="max-width:520px; border-radius:16px;" @key="questionKey">
+        <MudText Typo="Typo.body2" Class="mb-1">Vilket datum är Doomsday i...</MudText>
+        <MudText Typo="Typo.h3" Color="Color.Primary" Class="mb-2">@monthInfo!.MonthName</MudText>
+        @if (monthIsLeapYear && (monthInfo!.Month == 1 || monthInfo.Month == 2))
         {
-            <div class="flashcard-hint">(skottår)</div>
+            <MudText Typo="Typo.body2" Class="mb-3">(skottår)</MudText>
         }
-        else if (!monthIsLeapYear && (monthInfo.Month == 1 || monthInfo.Month == 2))
+        else if (!monthIsLeapYear && (monthInfo!.Month == 1 || monthInfo.Month == 2))
         {
-            <div class="flashcard-hint">(vanligt år)</div>
+            <MudText Typo="Typo.body2" Class="mb-3">(vanligt år)</MudText>
         }
 
         @if (hasAnswered)
         {
             @if (wasCorrect)
             {
-                <div class="success-box">✅ Rätt! Doomsday i @monthInfo.MonthName = den <strong>@monthCorrectDay:e</strong>.</div>
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">
+                    ✅ Rätt! Doomsday i @monthInfo!.MonthName = den <strong>@monthCorrectDay:e</strong>.
+                </MudAlert>
             }
             else
             {
-                <div class="danger-box">❌ Fel. Du svarade @monthUserDay. Rätt: den <strong>@monthCorrectDay:e</strong>.</div>
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-3">
+                    ❌ Fel. Du svarade @monthUserDay. Rätt: den <strong>@monthCorrectDay:e</strong>.
+                </MudAlert>
             }
-            <div class="tip-box" style="text-align: left;">@monthInfo.Mnemonic</div>
-            <button class="btn btn-primary mt-2" @onclick="NextQuestion">Nästa →</button>
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-3 text-left">@monthInfo!.Mnemonic</MudAlert>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextQuestion" EndIcon="@Icons.Material.Filled.ArrowForward">Nästa</MudButton>
         }
         else
         {
-            <div class="mt-3">
-                <label class="form-label fw-semibold">Dag i månaden:</label>
-                <div class="d-flex gap-2 align-items-center">
-                    <input type="number" class="form-control" @bind="monthUserDay" min="1" max="31"
-                           style="max-width: 100px;" @onkeydown="HandleMonthKeyDown" />
-                    <button class="btn btn-primary" @onclick="AnswerMonth">Svara</button>
-                </div>
+            <div class="d-flex gap-2 align-center justify-center mt-3">
+                <MudNumericField @bind-Value="monthUserDay" Label="Dag i månaden" Variant="Variant.Outlined"
+                                 Min="1" Max="31" Style="max-width:120px;"
+                                 Immediate="true" OnKeyDown="HandleMonthKeyDown" />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AnswerMonth" Class="align-self-center">Svara</MudButton>
             </div>
         }
-    </div>
+    </MudPaper>
+}
+
+@* ──── HELA ALGORITMEN-ÖVNING ──── *@
+@if (mode == TrainingMode.FullAlgorithm)
+{
+    <MudPaper Elevation="4" Class="pa-4 pa-sm-6 mx-auto mb-4" Style="max-width:600px; border-radius:16px;" @key="questionKey">
+        <MudText Typo="Typo.body2" Class="text-center mb-1">Beräkna veckodagen för...</MudText>
+        <MudText Typo="Typo.h4" Color="Color.Primary" Class="text-center mb-4" Style="font-variant-numeric: tabular-nums;">
+            @fullDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))
+        </MudText>
+
+        @* Progressindikator *@
+        <div class="d-flex gap-2 mb-4 justify-center">
+            @for (var s = 0; s < 4; s++)
+            {
+                var stepNum = s;
+                var isActive = fullStep == stepNum;
+                var isDone = fullStep > stepNum || fullCompleted;
+                var hasError = fullStepErrors.ContainsKey(stepNum);
+                var stepLabel = GetStepLabel(stepNum);
+                <MudChip T="string" Size="Size.Small"
+                         Color="@(hasError ? Color.Error : isDone ? Color.Success : isActive ? Color.Primary : Color.Default)"
+                         Variant="@(isActive || isDone ? Variant.Filled : Variant.Outlined)">
+                    @(stepNum + 1). @stepLabel
+                </MudChip>
+            }
+        </div>
+
+        @* Steg 1: Sekelankare *@
+        @if (fullStep == 0 && !fullCompleted)
+        {
+            <MudText Typo="Typo.body1" Class="mb-3">Vilket sekelankare (veckodag) har <strong>@(fullDate.Year / 100 * 100)-talet</strong>?</MudText>
+            <MudGrid Spacing="2" Justify="Justify.Center">
+                @foreach (Weekday day in Enum.GetValues<Weekday>())
+                {
+                    var d = day;
+                    var isSelected = fullStepCenturyAnswer == d;
+                    <MudItem xs="4" sm="3">
+                        <MudButton FullWidth="true"
+                                   Variant="@(isSelected ? Variant.Filled : Variant.Outlined)"
+                                   Color="@(isSelected ? Color.Primary : Color.Default)"
+                                   OnClick="() => fullStepCenturyAnswer = d"
+                                   Size="Size.Small">@d</MudButton>
+                    </MudItem>
+                }
+            </MudGrid>
+            @if (fullStepErrors.ContainsKey(0))
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mt-2">@fullStepErrors[0]</MudAlert>
+            }
+            <div class="text-center mt-3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitFullStep"
+                           EndIcon="@Icons.Material.Filled.ArrowForward">Nästa steg</MudButton>
+            </div>
+        }
+
+        @* Steg 2: Årets Doomsday *@
+        @if (fullStep == 1 && !fullCompleted)
+        {
+            <MudText Typo="Typo.body1" Class="mb-2">
+                Sekelankare: <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">@fullCenturyCorrect</MudChip>
+            </MudText>
+            <MudText Typo="Typo.body1" Class="mb-3">Vilken veckodag är Doomsday för år <strong>@fullDate.Year</strong>?</MudText>
+            <MudGrid Spacing="2" Justify="Justify.Center">
+                @foreach (Weekday day in Enum.GetValues<Weekday>())
+                {
+                    var d = day;
+                    var isSelected = fullStepYearAnswer == d;
+                    <MudItem xs="4" sm="3">
+                        <MudButton FullWidth="true"
+                                   Variant="@(isSelected ? Variant.Filled : Variant.Outlined)"
+                                   Color="@(isSelected ? Color.Primary : Color.Default)"
+                                   OnClick="() => fullStepYearAnswer = d"
+                                   Size="Size.Small">@d</MudButton>
+                    </MudItem>
+                }
+            </MudGrid>
+            @if (fullStepErrors.ContainsKey(1))
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mt-2">@fullStepErrors[1]</MudAlert>
+            }
+            <div class="text-center mt-3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitFullStep"
+                           EndIcon="@Icons.Material.Filled.ArrowForward">Nästa steg</MudButton>
+            </div>
+        }
+
+        @* Steg 3: Månadsdatum *@
+        @if (fullStep == 2 && !fullCompleted)
+        {
+            <MudText Typo="Typo.body1" Class="mb-2">
+                Årets Doomsday: <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">@fullYearCorrect</MudChip>
+            </MudText>
+            <MudText Typo="Typo.body1" Class="mb-3">
+                Vilket datum i <strong>@(new System.Globalization.CultureInfo("sv-SE").DateTimeFormat.GetMonthName(fullDate.Month))</strong>
+                är Doomsday-referensen?
+                @if (fullDate.Month == 1 || fullDate.Month == 2)
+                {
+                    <span> (@(LeapYearChecker.IsLeapYear(fullDate.Year) ? "skottår" : "vanligt år"))</span>
+                }
+            </MudText>
+            <div class="d-flex gap-2 align-center justify-center">
+                <MudNumericField @bind-Value="fullStepMonthDay" Label="Dag" Variant="Variant.Outlined"
+                                 Min="1" Max="31" Style="max-width:120px;" Immediate="true" />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitFullStep"
+                           EndIcon="@Icons.Material.Filled.ArrowForward" Class="align-self-center">Nästa steg</MudButton>
+            </div>
+            @if (fullStepErrors.ContainsKey(2))
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mt-2">@fullStepErrors[2]</MudAlert>
+            }
+        }
+
+        @* Steg 4: Slutgiltig veckodag *@
+        @if (fullStep == 3 && !fullCompleted)
+        {
+            <MudText Typo="Typo.body1" Class="mb-2">
+                Doomsday = <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">@fullYearCorrect</MudChip>,
+                Referensdatum = den <strong>@fullMonthDayCorrect:e</strong>
+            </MudText>
+            <MudText Typo="Typo.body1" Class="mb-3">Vilken veckodag är <strong>@fullDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))</strong>?</MudText>
+            <MudGrid Spacing="2" Justify="Justify.Center">
+                @foreach (Weekday day in Enum.GetValues<Weekday>())
+                {
+                    var d = day;
+                    var isSelected = fullStepFinalAnswer == d;
+                    <MudItem xs="4" sm="3">
+                        <MudButton FullWidth="true"
+                                   Variant="@(isSelected ? Variant.Filled : Variant.Outlined)"
+                                   Color="@(isSelected ? Color.Primary : Color.Default)"
+                                   OnClick="() => fullStepFinalAnswer = d"
+                                   Size="Size.Small">@d</MudButton>
+                    </MudItem>
+                }
+            </MudGrid>
+            @if (fullStepErrors.ContainsKey(3))
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mt-2">@fullStepErrors[3]</MudAlert>
+            }
+            <div class="text-center mt-3">
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="SubmitFullStep"
+                           EndIcon="@Icons.Material.Filled.Check">Kontrollera</MudButton>
+            </div>
+        }
+
+        @if (fullCompleted)
+        {
+            var resultText = $"{fullDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))} är en {fullFinalCorrect}.";
+            <MudAlert Severity="@(fullAllCorrect ? Severity.Success : Severity.Warning)" Variant="Variant.Filled"
+                      Class="mt-4 text-center">
+                @if (fullAllCorrect)
+                {
+                    <strong>🎉 Alla steg rätt!</strong>
+                    <span>@resultText</span>
+                }
+                else
+                {
+                    <strong>Rätt svar:</strong>
+                    <span>@resultText</span>
+                }
+            </MudAlert>
+            <div class="text-center mt-3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextQuestion" EndIcon="@Icons.Material.Filled.ArrowForward">Nytt datum</MudButton>
+            </div>
+        }
+    </MudPaper>
 }
 
 @code {
-    private enum TrainingMode { None, CenturyAnchor, YearDoomsday, MonthDoomsday }
+    private enum TrainingMode { None, CenturyAnchor, YearDoomsday, MonthDoomsday, FullAlgorithm }
 
     private TrainingMode mode = TrainingMode.None;
     private int questionKey;
@@ -216,6 +407,21 @@
     private int monthCorrectDay;
     private int monthUserDay;
 
+    // Full Algorithm
+    private DateOnly fullDate;
+    private int fullStep;
+    private Weekday? fullStepCenturyAnswer;
+    private Weekday? fullStepYearAnswer;
+    private int fullStepMonthDay;
+    private Weekday? fullStepFinalAnswer;
+    private Weekday fullCenturyCorrect;
+    private Weekday fullYearCorrect;
+    private int fullMonthDayCorrect;
+    private Weekday fullFinalCorrect;
+    private bool fullCompleted;
+    private bool fullAllCorrect;
+    private Dictionary<int, string> fullStepErrors = new();
+
     private void SetMode(TrainingMode newMode)
     {
         mode = newMode;
@@ -240,7 +446,7 @@
                 break;
 
             case TrainingMode.YearDoomsday:
-                yearToGuess = _random.Next(1800, 2100);
+                yearToGuess = _random.Next(1800, 2200);
                 yearCenturyAnchor = CenturyAnchorCalculator.Calculate(yearToGuess);
                 yearCorrectAnswer = YearDoomsdayCalculator.Calculate(yearToGuess, yearCenturyAnchor);
                 break;
@@ -251,6 +457,90 @@
                 monthIsLeapYear = _random.Next(2) == 0;
                 monthCorrectDay = MonthDoomsdayProvider.GetDoomsdayForMonth(month, monthIsLeapYear);
                 monthUserDay = 0;
+                break;
+
+            case TrainingMode.FullAlgorithm:
+                fullDate = RandomDateGenerator.Generate(1800, 2199);
+                fullCenturyCorrect = CenturyAnchorCalculator.Calculate(fullDate.Year);
+                fullYearCorrect = YearDoomsdayCalculator.Calculate(fullDate.Year, fullCenturyCorrect);
+                fullMonthDayCorrect = MonthDoomsdayProvider.GetDoomsdayForMonth(fullDate.Month, LeapYearChecker.IsLeapYear(fullDate.Year));
+                fullFinalCorrect = DoomsdayAlgorithm.GetWeekday(fullDate);
+                fullStep = 0;
+                fullStepCenturyAnswer = null;
+                fullStepYearAnswer = null;
+                fullStepMonthDay = 0;
+                fullStepFinalAnswer = null;
+                fullCompleted = false;
+                fullAllCorrect = true;
+                fullStepErrors.Clear();
+                break;
+        }
+    }
+
+    private void SubmitFullStep()
+    {
+        fullStepErrors.Remove(fullStep);
+
+        switch (fullStep)
+        {
+            case 0:
+                if (fullStepCenturyAnswer is null)
+                {
+                    fullStepErrors[0] = "Välj en veckodag.";
+                    return;
+                }
+                if (fullStepCenturyAnswer != fullCenturyCorrect)
+                {
+                    fullStepErrors[0] = $"Fel! Rätt svar: {fullCenturyCorrect}.";
+                    fullAllCorrect = false;
+                }
+                RecordAnswer(fullStepCenturyAnswer == fullCenturyCorrect);
+                fullStep = 1;
+                break;
+
+            case 1:
+                if (fullStepYearAnswer is null)
+                {
+                    fullStepErrors[1] = "Välj en veckodag.";
+                    return;
+                }
+                if (fullStepYearAnswer != fullYearCorrect)
+                {
+                    fullStepErrors[1] = $"Fel! Rätt svar: {fullYearCorrect}.";
+                    fullAllCorrect = false;
+                }
+                RecordAnswer(fullStepYearAnswer == fullYearCorrect);
+                fullStep = 2;
+                break;
+
+            case 2:
+                if (fullStepMonthDay == 0)
+                {
+                    fullStepErrors[2] = "Ange ett datum.";
+                    return;
+                }
+                if (fullStepMonthDay != fullMonthDayCorrect)
+                {
+                    fullStepErrors[2] = $"Fel! Rätt svar: den {fullMonthDayCorrect}:e.";
+                    fullAllCorrect = false;
+                }
+                RecordAnswer(fullStepMonthDay == fullMonthDayCorrect);
+                fullStep = 3;
+                break;
+
+            case 3:
+                if (fullStepFinalAnswer is null)
+                {
+                    fullStepErrors[3] = "Välj en veckodag.";
+                    return;
+                }
+                if (fullStepFinalAnswer != fullFinalCorrect)
+                {
+                    fullStepErrors[3] = $"Fel! Rätt svar: {fullFinalCorrect}.";
+                    fullAllCorrect = false;
+                }
+                RecordAnswer(fullStepFinalAnswer == fullFinalCorrect);
+                fullCompleted = true;
                 break;
         }
     }
@@ -286,4 +576,12 @@
         if (e.Key == "Enter")
             AnswerMonth();
     }
+
+    private static string GetStepLabel(int step) => step switch
+    {
+        0 => "Sekel",
+        1 => "År",
+        2 => "Månad",
+        _ => "Dag"
+    };
 }

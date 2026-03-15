@@ -1,82 +1,20 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">🗓️ Doomsday</a>
-        <button title="Navigeringsmeny" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿<MudNavMenu>
+    <MudText Typo="Typo.caption" Class="px-4 mt-4 mb-1" Style="opacity:0.6; text-transform:uppercase; letter-spacing:0.08em;">Start</MudText>
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Hem</MudNavLink>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
+    <MudText Typo="Typo.caption" Class="px-4 mt-4 mb-1" Style="opacity:0.6; text-transform:uppercase; letter-spacing:0.08em;">Lär dig</MudText>
+    <MudNavLink Href="learn/overview" Icon="@Icons.Material.Filled.MenuBook">Översikt</MudNavLink>
+    <MudNavLink Href="learn/century-anchor" Icon="@Icons.Material.Filled.AccountBalance">Sekelankare</MudNavLink>
+    <MudNavLink Href="learn/year-doomsday" Icon="@Icons.Material.Filled.CalendarMonth">Årets Doomsday</MudNavLink>
+    <MudNavLink Href="learn/month-doomsdays" Icon="@Icons.Material.Filled.ViewList">Månadsdatum</MudNavLink>
+    <MudNavLink Href="learn/final-step" Icon="@Icons.Material.Filled.GpsFixed">Sista steget</MudNavLink>
+    <MudNavLink Href="learn/shortcuts" Icon="@Icons.Material.Filled.Bolt">Genvägar & tips</MudNavLink>
 
-        <div class="nav-section-header">Start</div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="nav-icon">🏠</span> Hem
-            </NavLink>
-        </div>
+    <MudText Typo="Typo.caption" Class="px-4 mt-4 mb-1" Style="opacity:0.6; text-transform:uppercase; letter-spacing:0.08em;">Öva</MudText>
+    <MudNavLink Href="practice/flashcards" Icon="@Icons.Material.Filled.Style">Flashcards</MudNavLink>
+    <MudNavLink Href="practice/step-trainer" Icon="@Icons.Material.Filled.Extension">Steg-för-steg</MudNavLink>
+    <MudNavLink Href="practice/speed-drill" Icon="@Icons.Material.Filled.Speed">Snabbövning</MudNavLink>
 
-        <div class="nav-section-header">Lär dig</div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="learn/overview">
-                <span class="nav-icon">📖</span> Översikt
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="learn/century-anchor">
-                <span class="nav-icon">🏛️</span> Sekelankare
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="learn/year-doomsday">
-                <span class="nav-icon">📅</span> Årets Doomsday
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="learn/month-doomsdays">
-                <span class="nav-icon">📋</span> Månadsdatum
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="learn/final-step">
-                <span class="nav-icon">🎯</span> Sista steget
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="learn/shortcuts">
-                <span class="nav-icon">⚡</span> Genvägar & tips
-            </NavLink>
-        </div>
-
-        <div class="nav-section-header">Öva</div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="practice/flashcards">
-                <span class="nav-icon">🃏</span> Flashcards
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="practice/step-trainer">
-                <span class="nav-icon">🧩</span> Steg-för-steg-träning
-            </NavLink>
-        </div>
-
-        <div class="nav-section-header">Verktyg</div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="calculator">
-                <span class="nav-icon">🔢</span> Kalkylator
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+    <MudText Typo="Typo.caption" Class="px-4 mt-4 mb-1" Style="opacity:0.6; text-transform:uppercase; letter-spacing:0.08em;">Verktyg</MudText>
+    <MudNavLink Href="calculator" Icon="@Icons.Material.Filled.Calculate">Kalkylator</MudNavLink>
+</MudNavMenu>

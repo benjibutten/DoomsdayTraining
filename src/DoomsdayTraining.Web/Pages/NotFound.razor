@@ -1,8 +1,6 @@
 ﻿@page "/not-found"
 @layout MainLayout
 
-<div class="page-header">
-    <h1>🔍 Sidan hittades inte</h1>
-    <p>Sidan du letar efter finns tyvärr inte.</p>
-</div>
-<a href="/" class="btn btn-primary">← Tillbaka till startsidan</a>
+<MudText Typo="Typo.h4" GutterBottom="true">🔍 Sidan hittades inte</MudText>
+<MudText Typo="Typo.body1" Class="mb-4">Sidan du letar efter finns tyvärr inte.</MudText>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/" StartIcon="@Icons.Material.Filled.ArrowBack">Tillbaka till startsidan</MudButton>

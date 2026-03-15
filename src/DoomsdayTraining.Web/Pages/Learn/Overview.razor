@@ -2,111 +2,108 @@
 
 <PageTitle>Översikt – Doomsday-Algoritmen</PageTitle>
 
-<div class="page-header">
-    <h1>📖 Översikt: Doomsday-Algoritmen</h1>
-    <p>En steg-för-steg-guide till hur du räknar ut veckodagen för vilket datum som helst.</p>
-</div>
+<MudText Typo="Typo.h4" GutterBottom="true">📖 Översikt: Doomsday-Algoritmen</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">En steg-för-steg-guide till hur du räknar ut veckodagen för vilket datum som helst.</MudText>
 
-<div class="info-box">
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
     <strong>Vad betyder "Doomsday"?</strong><br />
     Doomsday är inte "undergångsdagen" i det här sammanhanget. Det är ett namn som Conway gav till
     en speciell veckodag som är <em>samma</em> för vissa lättmemorerade datum varje år.
     Till exempel: 4 april, 6 juni, 8 augusti, 10 oktober och 12 december faller <strong>alltid</strong>
     på samma veckodag under ett givet år. Den veckodagen kallas "årets Doomsday".
-</div>
+</MudAlert>
 
-<h2>Grundidén</h2>
-<p>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Grundidén</MudText>
+<MudText Typo="Typo.body1" Class="mb-3">
     Tänk dig att du vill veta vilken veckodag <strong>23 mars 1987</strong> var.
     Algoritmen fungerar ungefär så här i tanken:
-</p>
+</MudText>
 
-<ol style="line-height: 2;">
-    <li>
+<MudList T="string" Dense="true" Class="mb-4">
+    <MudListItem T="string" Icon="@Icons.Material.Filled.LooksOne">
         <strong>Seklet (1900-talet) har ett ankare:</strong> Onsdag.
-        <span class="muted">→ Det här memorerar du.</span>
-    </li>
-    <li>
-        <strong>Året 1987 justerar ankaret:</strong> Genom enkel division hittar vi att
-        Doomsday-veckodagen 1987 är <strong>Lördag</strong>.
-    </li>
-    <li>
+        <MudText Typo="Typo.caption">→ Det här memorerar du.</MudText>
+    </MudListItem>
+    <MudListItem T="string" Icon="@Icons.Material.Filled.LooksTwo">
+        <strong>Året 1987 justerar ankaret:</strong> Genom enkel division hittar vi att Doomsday-veckodagen 1987 är <strong>Lördag</strong>.
+    </MudListItem>
+    <MudListItem T="string" Icon="@Icons.Material.Filled.Looks3">
         <strong>Mars har ett känt Doomsday-datum:</strong> 7 mars = Lördag (i 1987).
-        <span class="muted">→ Det här memorerar du.</span>
-    </li>
-    <li>
+        <MudText Typo="Typo.caption">→ Det här memorerar du.</MudText>
+    </MudListItem>
+    <MudListItem T="string" Icon="@Icons.Material.Filled.Looks4">
         <strong>Räkna från 7 mars till 23 mars:</strong> 23 − 7 = 16 dagar.
         16 mod 7 = 2 dagar framåt. Lördag + 2 = <strong>Måndag</strong>. ✓
-    </li>
-</ol>
+    </MudListItem>
+</MudList>
 
-<div class="success-box">
+<MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-4">
     <strong>Det var allt!</strong> Varje steg är enkelt nog att göra i huvudet.
     Knepet är att memorera några nyckelfakta och öva tills det sitter.
-</div>
+</MudAlert>
 
-<h2>De fyra stegen i detalj</h2>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">De fyra stegen i detalj</MudText>
 
-<div class="step-container">
-    <div class="step-number">1</div>
-    <div class="step-content">
-        <div class="step-title">Bestäm sekelankaret</div>
-        <div class="step-explanation">
-            Varje sekel har en fast "ankardag". Du behöver bara memorera fyra stycken
-            (de upprepas var 400:e år):
+<MudTimeline TimelinePosition="TimelinePosition.Start">
+    <MudTimelineItem Color="Color.Primary">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">1</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-4 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Bestäm sekelankaret</strong></MudText>
+                <MudText Typo="Typo.body2" Class="mt-1" Style="white-space:pre-line;">Varje sekel har en fast "ankardag". Du behöver bara memorera fyra stycken (de upprepas var 400:e år):
 
-            🏛️ 1800-talet → Fredag
-            🏛️ 1900-talet → Onsdag
-            🏛️ 2000-talet → Tisdag
-            🏛️ 2100-talet → Söndag
+🏛️ 1800-talet → Fredag
+🏛️ 1900-talet → Onsdag
+🏛️ 2000-talet → Tisdag
+🏛️ 2100-talet → Söndag
 
-            Minnesregel: <strong>FrOTS</strong> (Fredag, Onsdag, Tisdag, Söndag)
-        </div>
-        <a href="learn/century-anchor" class="btn btn-outline-primary btn-sm mt-2">Lär dig mer →</a>
-    </div>
-</div>
+Minnesregel: <strong>FrOTS</strong> (Fredag, Onsdag, Tisdag, Söndag)</MudText>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="mt-2" Href="learn/century-anchor">Lär dig mer →</MudButton>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+    <MudTimelineItem Color="Color.Primary">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">2</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-4 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Beräkna årets Doomsday</strong></MudText>
+                <MudText Typo="Typo.body2" Class="mt-1">Med "12-metoden" justerar du sekelankaret baserat på de sista två siffrorna i årtalet. Tre enkla divisioner och en addition.</MudText>
+                <MudPaper Elevation="0" Class="pa-2 mt-2" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; text-align:center;">
+                    Sekelankare + (y ÷ 12) + (y mod 12) + (y mod 12 ÷ 4)  (mod 7)
+                </MudPaper>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="mt-2" Href="learn/year-doomsday">Lär dig mer →</MudButton>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+    <MudTimelineItem Color="Color.Primary">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">3</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-4 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Hitta månadens referensdatum</strong></MudText>
+                <MudText Typo="Typo.body2" Class="mt-1">Varje månad har minst ett datum som alltid infaller på årets Doomsday.
+Med enkla minnesregler ("9-till-5 på 7-Eleven") lär du dig dem snabbt.</MudText>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="mt-2" Href="learn/month-doomsdays">Lär dig mer →</MudButton>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+    <MudTimelineItem Color="Color.Primary">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">4</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-4 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Räkna fram till måldatumet</strong></MudText>
+                <MudText Typo="Typo.body2" Class="mt-1">Räkna dagarna från Doomsday-referensen till ditt datum.
+Lägg till skillnaden till veckodagen. Klart!</MudText>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="mt-2" Href="learn/final-step">Lär dig mer →</MudButton>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+</MudTimeline>
 
-<div class="step-container">
-    <div class="step-number">2</div>
-    <div class="step-content">
-        <div class="step-title">Beräkna årets Doomsday</div>
-        <div class="step-explanation">
-            Med "12-metoden" justerar du sekelankaret baserat på de sista
-            två siffrorna i årtalet. Tre enkla divisioner och en addition.
-        </div>
-        <div class="formula">Sekelankare + (y ÷ 12) + (y mod 12) + (y mod 12 ÷ 4)&nbsp;&nbsp;(mod 7)</div>
-        <a href="learn/year-doomsday" class="btn btn-outline-primary btn-sm mt-2">Lär dig mer →</a>
-    </div>
-</div>
-
-<div class="step-container">
-    <div class="step-number">3</div>
-    <div class="step-content">
-        <div class="step-title">Hitta månadens referensdatum</div>
-        <div class="step-explanation">
-            Varje månad har minst ett datum som alltid infaller på årets Doomsday.
-            Med enkla minnesregler ("9-till-5 på 7-Eleven") lär du dig dem snabbt.
-        </div>
-        <a href="learn/month-doomsdays" class="btn btn-outline-primary btn-sm mt-2">Lär dig mer →</a>
-    </div>
-</div>
-
-<div class="step-container">
-    <div class="step-number">4</div>
-    <div class="step-content">
-        <div class="step-title">Räkna fram till måldatumet</div>
-        <div class="step-explanation">
-            Räkna dagarna från Doomsday-referensen till ditt datum.
-            Lägg till skillnaden till veckodagen. Klart!
-        </div>
-        <a href="learn/final-step" class="btn btn-outline-primary btn-sm mt-2">Lär dig mer →</a>
-    </div>
-</div>
-
-<div class="tip-box" style="margin-top: 2rem;">
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mt-4">
     <strong>💡 Rekommenderad inlärningsordning:</strong><br />
-    Börja med <a href="learn/month-doomsdays">Månadsdatumen</a> – de behöver bara memoreras, ingen matematik!
-    Gå sedan till <a href="learn/century-anchor">Sekelankaret</a> (fyra dagar att lära sig).
-    Sist kommer <a href="learn/year-doomsday">Årets Doomsday</a> som kräver lite räkning.
-    När alla bitar sitter, <a href="practice/flashcards">öva med flashcards</a>!
-</div>
+    Börja med <MudLink Href="learn/month-doomsdays">Månadsdatumen</MudLink> – de behöver bara memoreras, ingen matematik!
+    Gå sedan till <MudLink Href="learn/century-anchor">Sekelankaret</MudLink> (fyra dagar att lära sig).
+    Sist kommer <MudLink Href="learn/year-doomsday">Årets Doomsday</MudLink> som kräver lite räkning.
+    När alla bitar sitter, <MudLink Href="practice/flashcards">öva med flashcards</MudLink>!
+</MudAlert>
+

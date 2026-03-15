@@ -2,72 +2,68 @@
 
 <PageTitle>Sekelankaret – Doomsday-Algoritmen</PageTitle>
 
-<div class="page-header">
-    <h1>🏛️ Steg 1: Sekelankaret</h1>
-    <p>Varje sekel har en fast "ankardag" – en veckodag som utgör startpunkten för alla beräkningar.</p>
-</div>
+<MudText Typo="Typo.h4" GutterBottom="true">🏛️ Steg 1: Sekelankaret</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">Varje sekel har en fast "ankardag" – en veckodag som utgör startpunkten för alla beräkningar.</MudText>
 
-<div class="info-box">
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
     <strong>Vad är sekelankaret?</strong><br />
     Om du tar ett "jämnt sekelår" (som 1900 eller 2000) och räknar ut veckodagen för till exempel
     4 april, 6 juni etc. – det blir sekelankaret. Det är startpunkten som vi sedan justerar för
     varje specifikt år.
-</div>
+</MudAlert>
 
-<h2>De fyra sekelankarna</h2>
-<p>Det finns bara fyra att lära sig. De upprepas i en cykel var 400:e år.</p>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">De fyra sekelankarna</MudText>
+<MudText Typo="Typo.body1" Class="mb-3">Det finns bara fyra att lära sig. De upprepas i en cykel var 400:e år.</MudText>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+<MudGrid Spacing="3" Class="mb-4">
     @foreach (var anchor in CenturyAnchorCalculator.GetAllAnchorsInCycle())
     {
-        <div class="anchor-card">
-            <div class="anchor-century">@(anchor.CenturyStart)-talet</div>
-            <div class="anchor-day">@anchor.AnchorDay</div>
-        </div>
+        <MudItem xs="6" sm="3">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column align-center">
+                <MudText Typo="Typo.caption">@(anchor.CenturyStart)-talet</MudText>
+                <MudText Typo="Typo.h5" Color="Color.Secondary" Class="mt-1"><strong>@anchor.AnchorDay</strong></MudText>
+            </MudPaper>
+        </MudItem>
     }
-</div>
+</MudGrid>
 
-<div class="tip-box">
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4">
     <strong>🧠 Minnesregel: "FrOTS"</strong><br />
     <strong>Fr</strong>edag → <strong>O</strong>nsdag → <strong>T</strong>isdag → <strong>S</strong>öndag<br />
     1800 → 1900 → 2000 → 2100<br />
     Säg det högt några gånger: "Frots, Frots, Frots" – och du har dem!
-</div>
+</MudAlert>
 
-<h2>Formeln bakom (för den nyfikne)</h2>
-<p>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Formeln bakom (för den nyfikne)</MudText>
+<MudText Typo="Typo.body1" Class="mb-2">
     Du behöver inte formeln för att använda algoritmen – det räcker att memorera de fyra dagarna.
     Men om du vill förstå matematiken:
-</p>
-<div class="formula">ankardag = (5 × (sekeltal mod 4) + 2) mod 7</div>
-<p>Där "sekeltal" är de första två siffrorna i årtalet (t.ex. 20 för 2000-talet).</p>
+</MudText>
+<MudPaper Elevation="0" Class="pa-3 mb-2" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; text-align:center;">
+    ankardag = (5 × (sekeltal mod 4) + 2) mod 7
+</MudPaper>
+<MudText Typo="Typo.body2" Class="mb-4">Där "sekeltal" är de första två siffrorna i årtalet (t.ex. 20 för 2000-talet).</MudText>
 
-<h2>Testa själv</h2>
-<div class="card">
-    <div class="card-header-custom">🧪 Prova med ett år</div>
-    <p>Skriv in ett årtal så visar vi vilket sekelankare det tillhör och hur beräkningen ser ut:</p>
-    <div class="d-flex gap-2 align-items-end mb-3">
-        <div>
-            <label class="form-label fw-semibold">Årtal</label>
-            <input type="number" class="form-control" @bind="testYear" @bind:event="oninput"
-                   min="1" max="9999" style="max-width: 150px;" />
-        </div>
-    </div>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Testa själv</MudText>
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-2">🧪 Prova med ett år</MudText>
+    <MudText Typo="Typo.body2" Class="mb-3">Skriv in ett årtal så visar vi vilket sekelankare det tillhör och hur beräkningen ser ut:</MudText>
+    <MudNumericField @bind-Value="testYear" Label="Årtal" Min="1" Max="9999" Variant="Variant.Outlined" Style="max-width:200px;" Immediate="true" />
 
     @if (testYear > 0)
     {
         var info = CenturyAnchorCalculator.GetInfo(testYear);
-        <div class="success-box fade-in">
+        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-3">
             <strong>Resultat:</strong> @info.CenturyStart-talet har ankardagen
-            <span class="badge-weekday">@info.AnchorDay</span><br />
-            <span class="muted" style="font-size: 0.9rem;">@info.Explanation</span>
-        </div>
+            <MudChip T="string" Color="Color.Primary" Size="Size.Small">@info.AnchorDay</MudChip><br />
+            <MudText Typo="Typo.caption">@info.Explanation</MudText>
+        </MudAlert>
     }
-</div>
+</MudPaper>
 
 <div class="d-flex gap-2 mt-4">
-    <a href="learn/overview" class="btn btn-outline-primary">← Tillbaka till översikten</a>
-    <a href="learn/year-doomsday" class="btn btn-primary">Steg 2: Årets Doomsday →</a>
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="learn/overview" StartIcon="@Icons.Material.Filled.ArrowBack">Tillbaka till översikten</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="learn/year-doomsday" EndIcon="@Icons.Material.Filled.ArrowForward">Steg 2: Årets Doomsday</MudButton>
 </div>
 
 @code {

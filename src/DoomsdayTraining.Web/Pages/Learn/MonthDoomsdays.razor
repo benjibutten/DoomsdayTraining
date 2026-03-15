@@ -2,89 +2,76 @@
 
 <PageTitle>Månadsdatum – Doomsday-Algoritmen</PageTitle>
 
-<div class="page-header">
-    <h1>📋 Steg 3: Månadens Doomsday-datum</h1>
-    <p>Varje månad har datum som <strong>alltid</strong> infaller på årets Doomsday. Memorera dem!</p>
-</div>
+<MudText Typo="Typo.h4" GutterBottom="true">📋 Steg 3: Månadens Doomsday-datum</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">Varje månad har datum som <strong>alltid</strong> infaller på årets Doomsday. Memorera dem!</MudText>
 
-<div class="info-box">
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
     <strong>Grundidé:</strong><br />
     Om du vet att 2024 har Doomsday = Torsdag, så vet du att 4 april, 6 juni, 8 augusti, 10 oktober
     och 12 december 2024 <em>alla</em> är torsdagar. Från dessa referenspunkter kan du räkna
     till valfritt datum i samma månad.
-</div>
+</MudAlert>
 
-<h2>De tre grupperna</h2>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">De tre grupperna</MudText>
 
-<h3>🟢 Jämna månader (lättast!)</h3>
-<p>
+<MudText Typo="Typo.h6" Class="mt-4 mb-2">🟢 Jämna månader (lättast!)</MudText>
+<MudText Typo="Typo.body1" Class="mb-2">
     April, juni, augusti, oktober och december har alla Doomsday-datum som är
     <strong>samma som månadsnumret</strong>:
-</p>
-<div class="formula">4/4 &nbsp; 6/6 &nbsp; 8/8 &nbsp; 10/10 &nbsp; 12/12</div>
-<div class="tip-box">
-    <strong>💡 Minnesregel:</strong> "Jämn månad = datum lika med månadsnumret."
-    Enklare kan det inte bli!
-</div>
+</MudText>
+<MudPaper Elevation="0" Class="pa-3 mb-2" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; text-align:center; font-size:1.1rem;">
+    4/4 &nbsp; 6/6 &nbsp; 8/8 &nbsp; 10/10 &nbsp; 12/12
+</MudPaper>
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4">
+    <strong>💡 Minnesregel:</strong> "Jämn månad = datum lika med månadsnumret." Enklare kan det inte bli!
+</MudAlert>
 
-<h3>🔵 Udda månader: "9-till-5 på 7-Eleven"</h3>
-<p>
-    De udda månaderna (maj, juli, september, november) har ett fantastiskt minnestrick:
-</p>
-<div class="formula">5/9 &nbsp; 9/5 &nbsp; 7/11 &nbsp; 11/7</div>
-<div class="tip-box">
+<MudText Typo="Typo.h6" Class="mt-4 mb-2">🔵 Udda månader: "9-till-5 på 7-Eleven"</MudText>
+<MudText Typo="Typo.body1" Class="mb-2">De udda månaderna (maj, juli, september, november) har ett fantastiskt minnestrick:</MudText>
+<MudPaper Elevation="0" Class="pa-3 mb-2" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; text-align:center; font-size:1.1rem;">
+    5/9 &nbsp; 9/5 &nbsp; 7/11 &nbsp; 11/7
+</MudPaper>
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4">
     <strong>💡 Minnesregel: "Jag jobbar 9 till 5 på 7-Eleven"</strong><br />
     • <strong>9-to-5:</strong> Maj den 9:e (5/9) och September den 5:e (9/5)<br />
     • <strong>7-Eleven:</strong> Juli den 11:e (7/11) och November den 7:e (11/7)<br />
     Notera mönstret: siffrorna byter plats mellan månad och dag!
-</div>
+</MudAlert>
 
-<h3>🟡 Januari, februari och mars (specialfall)</h3>
+<MudText Typo="Typo.h6" Class="mt-4 mb-2">🟡 Januari, februari och mars (specialfall)</MudText>
 
-<div class="card">
-    <div class="card-header-custom">Januari & Februari</div>
-    <p>
-        Dessa månader påverkas av <strong>skottår</strong>:
-    </p>
-    <table class="doomsday-table">
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-2">Januari &amp; Februari</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">Dessa månader påverkas av <strong>skottår</strong>:</MudText>
+    <MudSimpleTable Dense="true" Hover="true" Elevation="0">
         <thead>
             <tr><th>Månad</th><th>Normalt år</th><th>Skottår</th><th>Regel</th></tr>
         </thead>
         <tbody>
-            <tr>
-                <td>Januari</td>
-                <td><strong>3 januari</strong></td>
-                <td><strong>4 januari</strong></td>
-                <td>Skottår = +1 dag</td>
-            </tr>
-            <tr>
-                <td>Februari</td>
-                <td><strong>28 februari</strong></td>
-                <td><strong>29 februari</strong></td>
-                <td>Alltid sista dagen i februari</td>
-            </tr>
+            <tr><td>Januari</td><td><strong>3 januari</strong></td><td><strong>4 januari</strong></td><td>Skottår = +1 dag</td></tr>
+            <tr><td>Februari</td><td><strong>28 februari</strong></td><td><strong>29 februari</strong></td><td>Alltid sista dagen i februari</td></tr>
         </tbody>
-    </table>
-    <div class="tip-box">
+    </MudSimpleTable>
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-2">
         <strong>💡 Minnesregel:</strong> "Den 3:e jan, den 28:e feb – och en extra vid skottår."
         Eller enklare: <strong>"Sista februari är alltid Doomsday"</strong>.
-    </div>
-</div>
+    </MudAlert>
+</MudPaper>
 
-<div class="card">
-    <div class="card-header-custom">Mars</div>
-    <p>
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-2">Mars</MudText>
+    <MudText Typo="Typo.body1">
         Mars den <strong>7:e</strong> är Doomsday. Men det finns fler:
         <strong>14, 21 och 28 mars</strong> är alla Doomsdays (var 7:e dag).
-    </p>
-    <div class="tip-box">
+    </MudText>
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-2">
         <strong>💡 Alternativt:</strong> "0 mars" = sista februari = också Doomsday!
         Allting i mars som är en multipel av 7 fungerar.
-    </div>
-</div>
+    </MudAlert>
+</MudPaper>
 
-<h2>Alla datum i en tabell</h2>
-<table class="doomsday-table">
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Alla datum i en tabell</MudText>
+<MudSimpleTable Dense="true" Hover="true" Elevation="2">
     <thead>
         <tr><th>Månad</th><th>Doomsday-datum</th><th>Minnesregel</th></tr>
     </thead>
@@ -97,53 +84,53 @@
                     @month.Day:e
                     @if (month.LeapYearDay.HasValue)
                     {
-                        <span class="muted"> (skottår: @(month.LeapYearDay):e)</span>
+                        <MudText Typo="Typo.caption" Inline="true"> (skottår: @(month.LeapYearDay):e)</MudText>
                     }
                 </td>
                 <td>@month.Mnemonic</td>
             </tr>
         }
     </tbody>
-</table>
+</MudSimpleTable>
 
-<h2>Snabbtest: Kan du dem?</h2>
-<div class="card">
-    <div class="card-header-custom">🧪 Vilken dag är Doomsday i...?</div>
-    <div class="d-flex gap-2 align-items-end mb-3">
-        <div>
-            <label class="form-label fw-semibold">Välj månad</label>
-            <select class="form-select" @bind="selectedMonth" style="max-width: 200px;">
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Snabbtest: Kan du dem?</MudText>
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-3">🧪 Vilken dag är Doomsday i...?</MudText>
+    <MudGrid Spacing="2">
+        <MudItem xs="12" sm="4">
+            <MudSelect @bind-Value="selectedMonth" Label="Välj månad" Variant="Variant.Outlined">
                 @for (int m = 1; m <= 12; m++)
                 {
                     var monthInfo = MonthDoomsdayProvider.GetInfoForMonth(m);
-                    <option value="@m">@monthInfo.MonthName</option>
+                    <MudSelectItem Value="@m">@monthInfo.MonthName</MudSelectItem>
                 }
-            </select>
-        </div>
-        <div>
-            <label class="form-label fw-semibold">Skottår?</label>
-            <select class="form-select" @bind="isLeapYear" style="max-width: 120px;">
-                <option value="false">Nej</option>
-                <option value="true">Ja</option>
-            </select>
-        </div>
-        <button class="btn btn-primary" @onclick="ShowAnswer">Visa svar</button>
-    </div>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="3">
+            <MudSelect @bind-Value="isLeapYear" Label="Skottår?" Variant="Variant.Outlined">
+                <MudSelectItem Value="false">Nej</MudSelectItem>
+                <MudSelectItem Value="true">Ja</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="3" Class="d-flex align-end">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ShowAnswer">Visa svar</MudButton>
+        </MudItem>
+    </MudGrid>
 
     @if (showAnswer)
     {
         var info = MonthDoomsdayProvider.GetInfoForMonth(selectedMonth);
         var day = MonthDoomsdayProvider.GetDoomsdayForMonth(selectedMonth, isLeapYear);
-        <div class="success-box fade-in">
+        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-3">
             <strong>@info.MonthName:</strong> Doomsday-datum är den <strong>@day:e</strong><br />
-            <span class="muted">@info.Mnemonic</span>
-        </div>
+            <MudText Typo="Typo.caption">@info.Mnemonic</MudText>
+        </MudAlert>
     }
-</div>
+</MudPaper>
 
 <div class="d-flex gap-2 mt-4">
-    <a href="learn/year-doomsday" class="btn btn-outline-primary">← Steg 2: Årets Doomsday</a>
-    <a href="learn/final-step" class="btn btn-primary">Steg 4: Sista steget →</a>
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="learn/year-doomsday" StartIcon="@Icons.Material.Filled.ArrowBack">Steg 2: Årets Doomsday</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="learn/final-step" EndIcon="@Icons.Material.Filled.ArrowForward">Steg 4: Sista steget</MudButton>
 </div>
 
 @code {

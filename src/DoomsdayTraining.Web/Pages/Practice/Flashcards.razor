@@ -1,152 +1,162 @@
 @page "/practice/flashcards"
+@implements IDisposable
+@inject IJSRuntime JS
 
 <PageTitle>Flashcards – Doomsday-Algoritmen</PageTitle>
 
-<div class="page-header">
-    <h1>🃏 Flashcards – Övningsläge</h1>
-    <p>Ett slumpmässigt datum visas. Räkna ut veckodagen och klicka på ditt svar!</p>
-</div>
+<MudText Typo="Typo.h4" GutterBottom="true">🃏 Flashcards – Övningsläge</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">Ett slumpmässigt datum visas. Räkna ut veckodagen och klicka på ditt svar!</MudText>
 
 @if (!sessionStarted)
 {
-    <div class="card">
-        <div class="card-header-custom">⚙️ Inställningar</div>
-        <div class="row g-3 mb-3">
-            <div class="col-auto">
-                <label class="form-label fw-semibold">Tidsperiod</label>
-                <select class="form-select" @bind="selectedPeriod">
-                    <option value="2000">2000-talet (enklast)</option>
-                    <option value="1900">1900-talet</option>
-                    <option value="all">Alla sekel (1800–2099)</option>
-                </select>
-            </div>
-        </div>
-        <button class="btn btn-accent btn-lg" @onclick="StartSession">
-            🚀 Starta övning
-        </button>
-    </div>
+    <MudPaper Elevation="2" Class="pa-4">
+        <MudText Typo="Typo.h6" Class="mb-3">⚙️ Inställningar</MudText>
+        <MudSelect @bind-Value="selectedPeriod" Label="Tidsperiod" Variant="Variant.Outlined" Style="max-width:300px;" Class="mb-3">
+            <MudSelectItem Value="@("2000")">2000-talet (enklast)</MudSelectItem>
+            <MudSelectItem Value="@("1900")">1900-talet</MudSelectItem>
+            <MudSelectItem Value="@("2100")">2100-talet</MudSelectItem>
+            <MudSelectItem Value="@("all")">Alla sekel (1800–2199)</MudSelectItem>
+        </MudSelect>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large" OnClick="StartSession"
+                   StartIcon="@Icons.Material.Filled.RocketLaunch">Starta övning</MudButton>
+    </MudPaper>
 }
 else
 {
-    <!-- Statistik -->
-    <div class="stats-bar">
-        <div class="stat-item">
-            <div class="stat-value">@totalAnswered</div>
-            <div class="stat-label">Svar</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value text-success-custom">@correctCount</div>
-            <div class="stat-label">Rätt</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value" style="color: var(--danger);">@wrongCount</div>
-            <div class="stat-label">Fel</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value">@(totalAnswered > 0 ? $"{(int)(correctCount * 100.0 / totalAnswered)}%" : "–")</div>
-            <div class="stat-label">Träffsäkerhet</div>
-        </div>
+    <MudGrid Spacing="2" Class="mb-3">
+        <MudItem xs="6" sm="2">
+            <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                <MudText Typo="Typo.h5">@totalAnswered</MudText>
+                <MudText Typo="Typo.caption">SVAR</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="2">
+            <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                <MudText Typo="Typo.h5" Color="Color.Success">@correctCount</MudText>
+                <MudText Typo="Typo.caption">RÄTT</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="2">
+            <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                <MudText Typo="Typo.h5" Color="Color.Error">@wrongCount</MudText>
+                <MudText Typo="Typo.caption">FEL</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="3">
+            <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                <MudText Typo="Typo.h5">@(totalAnswered > 0 ? $"{(int)(correctCount * 100.0 / totalAnswered)}%" : "–")</MudText>
+                <MudText Typo="Typo.caption">TRÄFFSÄKERHET</MudText>
+            </MudPaper>
+        </MudItem>
         @if (averageTime > 0)
         {
-            <div class="stat-item">
-                <div class="stat-value">@averageTime.ToString("F1")s</div>
-                <div class="stat-label">Snitttid</div>
-            </div>
+            <MudItem xs="12" sm="3">
+                <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                    <MudText Typo="Typo.h5">@averageTime.ToString("F1")s</MudText>
+                    <MudText Typo="Typo.caption">SNITTTID</MudText>
+                </MudPaper>
+            </MudItem>
         }
-    </div>
+    </MudGrid>
 
-    <!-- Streak -->
+    @if (currentStreak >= 3)
+    {
+        <MudAlert Severity="Severity.Success" Variant="Variant.Text" Dense="true" Class="mb-2">
+            🔥 @currentStreak rätt i rad!
+        </MudAlert>
+    }
+
     @if (recentResults.Count > 0)
     {
-        <div class="streak">
+        <div class="d-flex gap-1 flex-wrap mb-3">
             @foreach (var r in recentResults.TakeLast(20))
             {
-                <div class="streak-dot @(r ? "correct" : "incorrect")"></div>
+                <MudIcon Icon="@Icons.Material.Filled.Circle" Size="Size.Small"
+                         Color="@(r ? Color.Success : Color.Error)" />
             }
         </div>
     }
 
-    <!-- Flashcard -->
-    <div class="flashcard fade-in" @key="currentDate">
-        <div class="flashcard-date">
+    <MudPaper @ref="_cardRef" Elevation="4" Class="pa-4 pa-sm-6 text-center mx-auto mb-4" Style="max-width:520px; border-radius:16px;" @key="currentDate"
+              @onkeydown="HandleKeyDown" tabindex="0">
+        <MudText Typo="Typo.h4" Class="mud-text-primary mb-2" Style="font-variant-numeric: tabular-nums;">
             @currentDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))
-        </div>
-        <div class="flashcard-hint">Vilken veckodag är detta?</div>
+        </MudText>
+        <MudText Typo="Typo.body2" Class="mb-4">Vilken veckodag är detta? <span style="opacity:0.5;">(tangent 1–7)</span></MudText>
 
         @if (hasAnswered)
         {
-            <div class="weekday-grid" style="margin-top: 1.5rem;">
+            <MudGrid Spacing="2" Justify="Justify.Center" Class="mb-3">
+                @{ var i = 0; }
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
-                    var cssClass = "weekday-btn";
-                    if (day == correctAnswer)
-                        cssClass += " correct";
-                    else if (day == userAnswer && !wasCorrect)
-                        cssClass += " incorrect";
-                    <button class="@cssClass" disabled>@day</button>
+                    i++;
+                    var color = day == correctAnswer ? Color.Success
+                              : (day == userAnswer && !wasCorrect) ? Color.Error
+                              : Color.Default;
+                    var variant = (day == correctAnswer || (day == userAnswer && !wasCorrect)) ? Variant.Filled : Variant.Outlined;
+                    <MudItem xs="4" sm="3">
+                        <MudButton FullWidth="true" Variant="@variant" Color="@color" Disabled="true" Size="Size.Small">@i. @day</MudButton>
+                    </MudItem>
                 }
+            </MudGrid>
+
+            @if (wasCorrect)
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-3 text-left">
+                    <strong>✅ Rätt!</strong> Det är @correctAnswer.
+                    @if (currentTimeTaken > 0)
+                    {
+                        <MudText Typo="Typo.caption" Inline="true"> (@currentTimeTaken.ToString("F1") sekunder)</MudText>
+                    }
+                </MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mt-3 text-left">
+                    <strong>❌ Fel.</strong> Du svarade @userAnswer, men rätt svar är <strong>@correctAnswer</strong>.
+                </MudAlert>
+            }
+
+            <div class="d-flex gap-2 justify-center mt-3 flex-wrap">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextCard" EndIcon="@Icons.Material.Filled.ArrowForward">Nästa (Enter)</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ShowSteps">Visa lösning</MudButton>
             </div>
 
-            <div style="margin-top: 1rem;">
-                @if (wasCorrect)
-                {
-                    <div class="success-box" style="text-align: left;">
-                        <strong>✅ Rätt!</strong> Det är @correctAnswer.
-                        @if (currentTimeTaken > 0)
-                        {
-                            <span class="muted"> (@currentTimeTaken.ToString("F1") sekunder)</span>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="danger-box" style="text-align: left;">
-                        <strong>❌ Fel.</strong> Du svarade @userAnswer, men rätt svar är
-                        <strong>@correctAnswer</strong>.
-                    </div>
-                }
-                <button class="btn btn-primary mt-2" @onclick="NextCard">
-                    Nästa datum →
-                </button>
-                <button class="btn btn-outline-primary mt-2 ms-2" @onclick="ShowSteps">
-                    Visa lösning
-                </button>
-
-                @if (showSolution && currentResult is not null)
-                {
-                    <div class="mt-3 fade-in" style="text-align: left;">
-                        @foreach (var step in currentResult.Steps)
-                        {
-                            <div class="step-container">
-                                <div class="step-number">@step.StepNumber</div>
-                                <div class="step-content">
-                                    <div class="step-title">@step.Title</div>
-                                    <div class="step-explanation">@step.Explanation</div>
-                                    <div class="step-calculation">@step.Calculation</div>
-                                    <div class="step-result">Resultat: @step.Result</div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
+            @if (showSolution && currentResult is not null)
+            {
+                <div class="text-left mt-4">
+                    @foreach (var step in currentResult.Steps)
+                    {
+                        <MudPaper Elevation="1" Class="pa-3 mb-2">
+                            <MudText Typo="Typo.subtitle2"><strong>@step.StepNumber. @step.Title</strong></MudText>
+                            <MudText Typo="Typo.body2" Style="white-space:pre-line;">@step.Explanation</MudText>
+                            <MudPaper Elevation="0" Class="pa-2 mt-1" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; font-size:0.85rem;">@step.Calculation</MudPaper>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary"><strong>Resultat: @step.Result</strong></MudText>
+                        </MudPaper>
+                    }
+                </div>
+            }
         }
         else
         {
-            <div class="weekday-grid" style="margin-top: 1.5rem;">
+            <MudGrid Spacing="2" Justify="Justify.Center">
+                @{ var j = 0; }
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
+                    j++;
                     var d = day;
-                    <button class="weekday-btn" @onclick="() => Answer(d)">@d</button>
+                    <MudItem xs="4" sm="3">
+                        <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => Answer(d)" Size="Size.Small">@j. @d</MudButton>
+                    </MudItem>
                 }
-            </div>
+            </MudGrid>
         }
-    </div>
+    </MudPaper>
 
-    <div class="text-center mt-3">
-        <button class="btn btn-outline-primary btn-sm" @onclick="ResetSession">
-            🔄 Starta om
-        </button>
+    <div class="text-center">
+        <MudButton Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" OnClick="ResetSession"
+                   StartIcon="@Icons.Material.Filled.Refresh">Starta om</MudButton>
     </div>
 }
 
@@ -162,13 +172,48 @@ else
     private DoomsdayResult? currentResult;
     private DateTime questionShownAt;
     private double currentTimeTaken;
+    private MudPaper? _cardRef;
 
     private int totalAnswered;
     private int correctCount;
     private int wrongCount;
     private double totalTime;
+    private int currentStreak;
     private double averageTime => totalAnswered > 0 ? totalTime / totalAnswered : 0;
     private List<bool> recentResults = [];
+
+    private DotNetObjectReference<Flashcards>? _dotNetRef;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+        }
+    }
+
+    public void Dispose()
+    {
+        _dotNetRef?.Dispose();
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (!hasAnswered)
+        {
+            if (int.TryParse(e.Key, out var num) && num >= 1 && num <= 7)
+            {
+                Answer((Weekday)(num - 1));
+            }
+        }
+        else
+        {
+            if (e.Key is "Enter" or " ")
+            {
+                NextCard();
+            }
+        }
+    }
 
     private void StartSession()
     {
@@ -177,6 +222,7 @@ else
         correctCount = 0;
         wrongCount = 0;
         totalTime = 0;
+        currentStreak = 0;
         recentResults.Clear();
         GenerateNewDate();
     }
@@ -187,7 +233,8 @@ else
         {
             "2000" => RandomDateGenerator.GenerateForCentury(2000),
             "1900" => RandomDateGenerator.GenerateForCentury(1900),
-            _ => RandomDateGenerator.Generate()
+            "2100" => RandomDateGenerator.GenerateForCentury(2100),
+            _ => RandomDateGenerator.Generate(1800, 2199)
         };
         correctAnswer = DoomsdayAlgorithm.GetWeekday(currentDate);
         hasAnswered = false;
@@ -207,9 +254,15 @@ else
         totalTime += currentTimeTaken;
 
         if (wasCorrect)
+        {
             correctCount++;
+            currentStreak++;
+        }
         else
+        {
             wrongCount++;
+            currentStreak = 0;
+        }
 
         recentResults.Add(wasCorrect);
     }

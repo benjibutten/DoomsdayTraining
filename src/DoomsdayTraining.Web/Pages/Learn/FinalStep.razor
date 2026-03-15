@@ -2,67 +2,64 @@
 
 <PageTitle>Sista steget – Doomsday-Algoritmen</PageTitle>
 
-<div class="page-header">
-    <h1>🎯 Steg 4: Räkna fram till måldatumet</h1>
-    <p>Det sista och enklaste steget – räkna dagar från Doomsday-referensen till ditt datum.</p>
-</div>
+<MudText Typo="Typo.h4" GutterBottom="true">🎯 Steg 4: Räkna fram till måldatumet</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">Det sista och enklaste steget – räkna dagar från Doomsday-referensen till ditt datum.</MudText>
 
-<div class="info-box">
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
     <strong>Nu har du alla pusselbitar!</strong><br />
     Du vet årets Doomsday-veckodag (från steg 1+2) och du vet Doomsday-referensdatumet
     i den aktuella månaden (från steg 3). Nu räknar du bara avståndet i dagar.
-</div>
+</MudAlert>
 
-<h2>Så här gör du</h2>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Så här gör du</MudText>
 
-<div class="step-container">
-    <div class="step-number">1</div>
-    <div class="step-content">
-        <div class="step-title">Hitta skillnaden i dagar</div>
-        <div class="step-explanation">
-            Räkna hur många dagar det är mellan Doomsday-referensdatumet och ditt måldatum.
+<MudTimeline TimelinePosition="TimelinePosition.Start" Class="mb-4">
+    <MudTimelineItem Color="Color.Primary" Size="Size.Small">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">1</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-3 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Hitta skillnaden i dagar</strong></MudText>
+                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Räkna hur många dagar det är mellan Doomsday-referensdatumet och ditt måldatum.
 
-            Exempel: Doomsday i april = den 4:e. Ditt datum = 19 april.
-            Skillnad: 19 − 4 = 15 dagar framåt.
-        </div>
-    </div>
-</div>
+Exempel: Doomsday i april = den 4:e. Ditt datum = 19 april.
+Skillnad: 19 − 4 = 15 dagar framåt.</MudText>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+    <MudTimelineItem Color="Color.Primary" Size="Size.Small">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">2</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-3 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Förenkla med mod 7</strong></MudText>
+                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Eftersom en vecka har 7 dagar bryr vi oss bara om resten vid division med 7.
 
-<div class="step-container">
-    <div class="step-number">2</div>
-    <div class="step-content">
-        <div class="step-title">Förenkla med mod 7</div>
-        <div class="step-explanation">
-            Eftersom en vecka har 7 dagar bryr vi oss bara om resten vid division med 7.
+Exempel: 15 mod 7 = 1 dag framåt.
+(15 dagar = 2 hela veckor + 1 dag)</MudText>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+    <MudTimelineItem Color="Color.Primary" Size="Size.Small">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">3</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-3 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Räkna fram (eller bak) från Doomsday</strong></MudText>
+                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Lägg till (eller dra ifrån) dagarna till årets Doomsday-veckodag.
 
-            Exempel: 15 mod 7 = 1 dag framåt.
-            (15 dagar = 2 hela veckor + 1 dag)
-        </div>
-    </div>
-</div>
+Exempel: Om Doomsday = Torsdag och vi ska framåt 1 dag:
+Torsdag + 1 = Fredag ✓</MudText>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+</MudTimeline>
 
-<div class="step-container">
-    <div class="step-number">3</div>
-    <div class="step-content">
-        <div class="step-title">Räkna fram (eller bak) från Doomsday</div>
-        <div class="step-explanation">
-            Lägg till (eller dra ifrån) dagarna till årets Doomsday-veckodag.
-
-            Exempel: Om Doomsday = Torsdag och vi ska framåt 1 dag:
-            Torsdag + 1 = Fredag ✓
-        </div>
-    </div>
-</div>
-
-<div class="formula">
+<MudPaper Elevation="0" Class="pa-3 mb-4" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; text-align:center;">
     Veckodag = (Doomsday-veckodag + skillnad) mod 7
-</div>
+</MudPaper>
 
-<h2>Genomgångsexempel</h2>
-
-<div class="card">
-    <div class="card-header-custom">📝 Exempel: 19 april 2024</div>
-    <table class="doomsday-table">
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Genomgångsexempel</MudText>
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-3">📝 Exempel: 19 april 2024</MudText>
+    <MudSimpleTable Dense="true" Hover="true" Elevation="0">
         <thead>
             <tr><th>Steg</th><th>Info</th><th>Resultat</th></tr>
         </thead>
@@ -73,62 +70,70 @@
             <tr><td>Mod 7</td><td>15 mod 7 = 1</td><td><strong>1 dag framåt</strong></td></tr>
             <tr><td>Slutresultat</td><td>Torsdag + 1 dag</td><td><strong>Fredag ✓</strong></td></tr>
         </tbody>
-    </table>
-</div>
+    </MudSimpleTable>
+</MudPaper>
 
-<div class="tip-box">
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4">
     <strong>💡 Tips: Räkna åt båda hållen!</strong><br />
     Om ditt datum ligger nära slutet av månaden, kan det vara lättare att räkna <em>bakåt</em>
-    från nästa månads Doomsday (eller framåt till nästa 7-dagarsperiod). Till exempel:
-    för 2 april kan du räkna 4 − 2 = 2 dagar bakåt från Doomsday istället för att
-    räkna långt framåt.
-</div>
+    från nästa månads Doomsday. Till exempel:
+    för 2 april kan du räkna 4 − 2 = 2 dagar bakåt från Doomsday istället.
+</MudAlert>
 
-<h2>Testa hela algoritmen</h2>
-<div class="card">
-    <div class="card-header-custom">🧪 Prova med ett datum</div>
-    <div class="d-flex gap-2 align-items-end mb-3">
-        <div>
-            <label class="form-label fw-semibold">Datum</label>
-            <input type="date" class="form-control" @bind="testDate" style="max-width: 200px;" />
-        </div>
-        <button class="btn btn-primary" @onclick="ShowResult">Beräkna</button>
-    </div>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Testa hela algoritmen</MudText>
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-3">🧪 Prova med ett datum</MudText>
+    <MudGrid Spacing="2">
+        <MudItem xs="12" sm="4">
+            <MudDatePicker @bind-Date="testDateTime" Label="Datum" Variant="Variant.Outlined" DateFormat="yyyy-MM-dd" />
+        </MudItem>
+        <MudItem xs="12" sm="3" Class="d-flex align-end">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ShowResult">Beräkna</MudButton>
+        </MudItem>
+    </MudGrid>
 
     @if (result is not null)
     {
-        <div class="fade-in">
+        <MudTimeline TimelinePosition="TimelinePosition.Start" Class="mt-3">
             @foreach (var step in result.Steps)
             {
-                <div class="step-container">
-                    <div class="step-number">@step.StepNumber</div>
-                    <div class="step-content">
-                        <div class="step-title">@step.Title</div>
-                        <div class="step-explanation">@step.Explanation</div>
-                        <div class="step-calculation">@step.Calculation</div>
-                        <div class="step-result">Resultat: @step.Result</div>
-                    </div>
-                </div>
+                <MudTimelineItem Color="Color.Primary" Size="Size.Small">
+                    <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">@step.StepNumber</MudAvatar></ItemDot>
+                    <ItemContent>
+                        <MudPaper Elevation="1" Class="pa-3 mb-2">
+                            <MudText Typo="Typo.subtitle1"><strong>@step.Title</strong></MudText>
+                            <MudText Typo="Typo.body2" Style="white-space:pre-line;">@step.Explanation</MudText>
+                            <MudPaper Elevation="0" Class="pa-2 mt-2" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px;">@step.Calculation</MudPaper>
+                            <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mt-1"><strong>Resultat: @step.Result</strong></MudText>
+                        </MudPaper>
+                    </ItemContent>
+                </MudTimelineItem>
             }
-            <div class="success-box" style="font-size: 1.2rem;">
+        </MudTimeline>
+        <MudAlert Severity="Severity.Success" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center" Class="mt-3">
+            <MudText Typo="Typo.h6">
                 <strong>@result.Date.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))</strong>
-                är en <span class="badge-weekday" style="font-size: 1.1rem;">@result.Weekday</span>
-            </div>
-        </div>
+                är en <MudChip T="string" Color="Color.Surface" Size="Size.Small">@result.Weekday</MudChip>
+            </MudText>
+        </MudAlert>
     }
-</div>
+</MudPaper>
 
 <div class="d-flex gap-2 mt-4">
-    <a href="learn/month-doomsdays" class="btn btn-outline-primary">← Steg 3: Månadsdatum</a>
-    <a href="learn/shortcuts" class="btn btn-primary">Genvägar & tips →</a>
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="learn/month-doomsdays" StartIcon="@Icons.Material.Filled.ArrowBack">Steg 3: Månadsdatum</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="learn/shortcuts" EndIcon="@Icons.Material.Filled.ArrowForward">Genvägar & tips</MudButton>
 </div>
 
 @code {
-    private DateOnly testDate = new(2024, 4, 19);
+    private DateTime? testDateTime = new DateTime(2024, 4, 19);
     private DoomsdayResult? result;
 
     private void ShowResult()
     {
-        result = DoomsdayAlgorithm.Calculate(testDate);
+        if (testDateTime.HasValue)
+        {
+            var testDate = DateOnly.FromDateTime(testDateTime.Value);
+            result = DoomsdayAlgorithm.Calculate(testDate);
+        }
     }
 }

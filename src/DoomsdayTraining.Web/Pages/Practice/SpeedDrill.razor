@@ -1,0 +1,253 @@
+@page "/practice/speed-drill"
+@implements IDisposable
+
+<PageTitle>Snabbövning – Doomsday-Algoritmen</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">⏱️ Snabbövning</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">Svara på så många datum som möjligt inom tidsgränsen. Fokus: hastighet!</MudText>
+
+@if (!sessionActive && !sessionFinished)
+{
+    <MudPaper Elevation="2" Class="pa-4">
+        <MudText Typo="Typo.h6" Class="mb-3">⚙️ Inställningar</MudText>
+        <MudGrid Spacing="2">
+            <MudItem xs="12" sm="4">
+                <MudSelect @bind-Value="selectedPeriod" Label="Tidsperiod" Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("2000")">2000-talet</MudSelectItem>
+                    <MudSelectItem Value="@("1900")">1900-talet</MudSelectItem>
+                    <MudSelectItem Value="@("2100")">2100-talet</MudSelectItem>
+                    <MudSelectItem Value="@("all")">Alla sekel (1800–2199)</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudSelect @bind-Value="durationSeconds" Label="Tidsgräns" Variant="Variant.Outlined">
+                    <MudSelectItem Value="30">30 sekunder</MudSelectItem>
+                    <MudSelectItem Value="60">1 minut</MudSelectItem>
+                    <MudSelectItem Value="120">2 minuter</MudSelectItem>
+                    <MudSelectItem Value="300">5 minuter</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large" OnClick="StartSession"
+                   StartIcon="@Icons.Material.Filled.Timer" Class="mt-4">Starta!</MudButton>
+    </MudPaper>
+}
+else if (sessionActive)
+{
+    <MudPaper Elevation="1" Class="pa-3 mb-3">
+        <MudGrid Spacing="2">
+            <MudItem xs="4">
+                <div class="text-center">
+                    <MudText Typo="Typo.h4" Color="@(remainingSeconds <= 10 ? Color.Error : Color.Primary)">@remainingSeconds<span style="font-size:0.6em;">s</span></MudText>
+                    <MudText Typo="Typo.caption">KVAR</MudText>
+                </div>
+            </MudItem>
+            <MudItem xs="4">
+                <div class="text-center">
+                    <MudText Typo="Typo.h4" Color="Color.Success">@correctCount</MudText>
+                    <MudText Typo="Typo.caption">RÄTT</MudText>
+                </div>
+            </MudItem>
+            <MudItem xs="4">
+                <div class="text-center">
+                    <MudText Typo="Typo.h4" Color="Color.Error">@wrongCount</MudText>
+                    <MudText Typo="Typo.caption">FEL</MudText>
+                </div>
+            </MudItem>
+        </MudGrid>
+        <MudProgressLinear Value="@progressPercent" Color="@(remainingSeconds <= 10 ? Color.Error : Color.Primary)" Class="mt-2" />
+    </MudPaper>
+
+    <MudPaper Elevation="4" Class="pa-4 pa-sm-6 text-center mx-auto mb-4" Style="max-width:520px; border-radius:16px;"
+              @onkeydown="HandleKeyDown" tabindex="0" @key="questionKey">
+        <MudText Typo="Typo.h3" Class="mud-text-primary mb-3" Style="font-variant-numeric: tabular-nums;">
+            @currentDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))
+        </MudText>
+        <MudText Typo="Typo.caption" Class="mb-3" Style="opacity:0.5;">Tangent 1–7 för snabbt svar</MudText>
+
+        @if (showFeedback)
+        {
+            <MudText Typo="Typo.h5" Color="@(lastCorrect ? Color.Success : Color.Error)" Class="mb-2">
+                @(lastCorrect ? "✅" : $"❌ {correctAnswer}")
+            </MudText>
+        }
+
+        <MudGrid Spacing="1" Justify="Justify.Center">
+            @{ var n = 0; }
+            @foreach (Weekday day in Enum.GetValues<Weekday>())
+            {
+                n++;
+                var d = day;
+                <MudItem xs="4" sm="3">
+                    <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary"
+                               OnClick="() => Answer(d)" Size="Size.Small" Disabled="showFeedback">@n. @d</MudButton>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudPaper>
+}
+else if (sessionFinished)
+{
+    <MudPaper Elevation="3" Class="pa-6 text-center mx-auto mb-4" Style="max-width:520px; border-radius:16px;">
+        <MudText Typo="Typo.h4" Class="mb-2">🏁 Resultat</MudText>
+        <MudText Typo="Typo.h2" Color="Color.Primary" Class="mb-1">@correctCount</MudText>
+        <MudText Typo="Typo.subtitle1" Class="mb-4">rätt svar på @durationSeconds sekunder</MudText>
+
+        <MudGrid Spacing="2" Justify="Justify.Center" Class="mb-4">
+            <MudItem xs="4">
+                <MudPaper Elevation="1" Class="pa-3 text-center">
+                    <MudText Typo="Typo.h5">@totalAnswered</MudText>
+                    <MudText Typo="Typo.caption">TOTALT</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="4">
+                <MudPaper Elevation="1" Class="pa-3 text-center">
+                    <MudText Typo="Typo.h5">@(totalAnswered > 0 ? $"{(int)(correctCount * 100.0 / totalAnswered)}%" : "–")</MudText>
+                    <MudText Typo="Typo.caption">PRECISION</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="4">
+                <MudPaper Elevation="1" Class="pa-3 text-center">
+                    <MudText Typo="Typo.h5">@(totalAnswered > 0 ? (durationSeconds / (double)totalAnswered).ToString("F1") + "s" : "–")</MudText>
+                    <MudText Typo="Typo.caption">PER FRÅGA</MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        @if (correctCount >= 10)
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">
+                🌟 Fantastiskt! Du börjar bli riktigt snabb!
+            </MudAlert>
+        }
+        else if (correctCount >= 5)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-3">
+                👍 Bra jobbat! Fortsätt öva för att bli ännu snabbare.
+            </MudAlert>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-3">
+                💪 Bra start! Öva på delmomenten i <MudLink Href="practice/step-trainer">steg-för-steg-träningen</MudLink> för att bygga snabbhet.
+            </MudAlert>
+        }
+
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="StartSession"
+                   StartIcon="@Icons.Material.Filled.Replay" Size="Size.Large">Kör igen!</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ResetToSettings" Class="ml-2">Ändra inställningar</MudButton>
+    </MudPaper>
+}
+
+@code {
+    private string selectedPeriod = "2000";
+    private int durationSeconds = 60;
+    private bool sessionActive;
+    private bool sessionFinished;
+    private int questionKey;
+
+    private DateOnly currentDate;
+    private Weekday correctAnswer;
+    private int totalAnswered;
+    private int correctCount;
+    private int wrongCount;
+    private bool showFeedback;
+    private bool lastCorrect;
+
+    private int remainingSeconds;
+    private double progressPercent => durationSeconds > 0 ? remainingSeconds * 100.0 / durationSeconds : 0;
+    private System.Threading.Timer? _timer;
+
+    private void StartSession()
+    {
+        totalAnswered = 0;
+        correctCount = 0;
+        wrongCount = 0;
+        sessionFinished = false;
+        sessionActive = true;
+        remainingSeconds = durationSeconds;
+        showFeedback = false;
+        GenerateNewDate();
+
+        _timer?.Dispose();
+        _timer = new System.Threading.Timer(TimerTick, null, 1000, 1000);
+    }
+
+    private void TimerTick(object? state)
+    {
+        InvokeAsync(() =>
+        {
+            remainingSeconds--;
+            if (remainingSeconds <= 0)
+            {
+                EndSession();
+            }
+            StateHasChanged();
+        });
+    }
+
+    private void EndSession()
+    {
+        _timer?.Dispose();
+        _timer = null;
+        sessionActive = false;
+        sessionFinished = true;
+    }
+
+    private void GenerateNewDate()
+    {
+        currentDate = selectedPeriod switch
+        {
+            "2000" => RandomDateGenerator.GenerateForCentury(2000),
+            "1900" => RandomDateGenerator.GenerateForCentury(1900),
+            "2100" => RandomDateGenerator.GenerateForCentury(2100),
+            _ => RandomDateGenerator.Generate(1800, 2199)
+        };
+        correctAnswer = DoomsdayAlgorithm.GetWeekday(currentDate);
+        showFeedback = false;
+        questionKey++;
+    }
+
+    private async void Answer(Weekday answer)
+    {
+        if (showFeedback || !sessionActive) return;
+
+        totalAnswered++;
+        lastCorrect = answer == correctAnswer;
+
+        if (lastCorrect)
+            correctCount++;
+        else
+            wrongCount++;
+
+        showFeedback = true;
+        StateHasChanged();
+
+        await Task.Delay(lastCorrect ? 300 : 800);
+
+        if (sessionActive)
+        {
+            GenerateNewDate();
+            StateHasChanged();
+        }
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (!showFeedback && sessionActive && int.TryParse(e.Key, out var num) && num >= 1 && num <= 7)
+        {
+            Answer((Weekday)(num - 1));
+        }
+    }
+
+    private void ResetToSettings()
+    {
+        sessionFinished = false;
+        sessionActive = false;
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}

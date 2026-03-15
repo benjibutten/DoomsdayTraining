@@ -2,76 +2,74 @@
 
 <PageTitle>Årets Doomsday – Doomsday-Algoritmen</PageTitle>
 
-<div class="page-header">
-    <h1>📅 Steg 2: Beräkna årets Doomsday</h1>
-    <p>Justera sekelankaret för att hitta veckodagen som alla Doomsday-datum faller på i ett specifikt år.</p>
-</div>
+<MudText Typo="Typo.h4" GutterBottom="true">📅 Steg 2: Beräkna årets Doomsday</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">Justera sekelankaret för att hitta veckodagen som alla Doomsday-datum faller på i ett specifikt år.</MudText>
 
-<div class="info-box">
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
     <strong>Målet med detta steg:</strong><br />
     Vi vet nu sekelankaret (t.ex. Tisdag för 2000-talet). Men varje år inom seklet har sin
-    <em>egen</em> Doomsday. Vi behöver anpassa sekelankaret med hjälp av de sista två siffrorna
-    i årtalet.
-</div>
+    <em>egen</em> Doomsday. Vi behöver anpassa sekelankaret med hjälp av de sista två siffrorna i årtalet.
+</MudAlert>
 
-<h2>"12-metoden" (Conway's metod)</h2>
-<p>Den populäraste metoden för att snabbt räkna i huvudet. Fyra steg:</p>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">"12-metoden" (Conway's metod)</MudText>
+<MudText Typo="Typo.body1" Class="mb-3">Den populäraste metoden för att snabbt räkna i huvudet. Fyra steg:</MudText>
 
-<div class="step-container">
-    <div class="step-number">a</div>
-    <div class="step-content">
-        <div class="step-title">Ta de sista två siffrorna</div>
-        <div class="step-explanation">Kalla dem <strong>y</strong>. Till exempel: 2024 → y = 24, 1987 → y = 87.</div>
-    </div>
-</div>
+<MudTimeline TimelinePosition="TimelinePosition.Start" Class="mb-4">
+    <MudTimelineItem Color="Color.Primary" Size="Size.Small">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">a</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-3 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Ta de sista två siffrorna</strong></MudText>
+                <MudText Typo="Typo.body2">Kalla dem <strong>y</strong>. Till exempel: 2024 → y = 24, 1987 → y = 87.</MudText>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+    <MudTimelineItem Color="Color.Primary" Size="Size.Small">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">b</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-3 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Dela y med 12</strong></MudText>
+                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Beräkna kvoten och resten:
+• y ÷ 12 = kvot (heltalsdivision)
+• y mod 12 = rest (det som blir över)
 
-<div class="step-container">
-    <div class="step-number">b</div>
-    <div class="step-content">
-        <div class="step-title">Dela y med 12</div>
-        <div class="step-explanation">
-            Beräkna kvoten och resten:
-            • y ÷ 12 = kvot (heltalsdivision)
-            • y mod 12 = rest (det som blir över)
-            
-            Exempel: 87 ÷ 12 = 7 rest 3
-        </div>
-    </div>
-</div>
+Exempel: 87 ÷ 12 = 7 rest 3</MudText>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+    <MudTimelineItem Color="Color.Primary" Size="Size.Small">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">c</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-3 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Dela resten med 4</strong></MudText>
+                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Ta resten från föregående steg och dela med 4 (heltalsdivision):
+• rest ÷ 4 = skottårsjustering
 
-<div class="step-container">
-    <div class="step-number">c</div>
-    <div class="step-content">
-        <div class="step-title">Dela resten med 4</div>
-        <div class="step-explanation">
-            Ta resten från föregående steg och dela med 4 (heltalsdivision):
-            • rest ÷ 4 = skottårsjustering
-            
-            Exempel: 3 ÷ 4 = 0 (tre innehåller inga hela 4:or)
-        </div>
-    </div>
-</div>
+Exempel: 3 ÷ 4 = 0 (tre innehåller inga hela 4:or)</MudText>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+    <MudTimelineItem Color="Color.Primary" Size="Size.Small">
+        <ItemDot><MudAvatar Color="Color.Primary" Size="Size.Small">d</MudAvatar></ItemDot>
+        <ItemContent>
+            <MudPaper Elevation="1" Class="pa-3 mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Summera och ta mod 7</strong></MudText>
+                <MudText Typo="Typo.body2">Lägg ihop sekelankaret + kvot + rest + skottårsjustering.
+Ta sedan mod 7 (resten vid division med 7) för att få veckodagen.</MudText>
+            </MudPaper>
+        </ItemContent>
+    </MudTimelineItem>
+</MudTimeline>
 
-<div class="step-container">
-    <div class="step-number">d</div>
-    <div class="step-content">
-        <div class="step-title">Summera och ta mod 7</div>
-        <div class="step-explanation">
-            Lägg ihop sekelankaret + kvot + rest + skottårsjustering.
-            Ta sedan mod 7 (resten vid division med 7) för att få veckodagen.
-        </div>
-    </div>
-</div>
-
-<div class="formula">
+<MudPaper Elevation="0" Class="pa-3 mb-4" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; text-align:center;">
     Doomsday = (sekelankare + kvot + rest + skottårsjustering) mod 7
-</div>
+</MudPaper>
 
-<h2>Genomgångsexempel</h2>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Genomgångsexempel</MudText>
 
-<div class="card">
-    <div class="card-header-custom">📝 Exempel: År 1987</div>
-    <table class="doomsday-table">
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-3">📝 Exempel: År 1987</MudText>
+    <MudSimpleTable Dense="true" Hover="true" Elevation="0">
         <thead>
             <tr><th>Delsteg</th><th>Beräkning</th><th>Resultat</th></tr>
         </thead>
@@ -83,30 +81,24 @@
             <tr><td>Summa</td><td>3 + 7 + 3 + 0 = 13</td><td><strong>13</strong></td></tr>
             <tr><td>Mod 7</td><td>13 mod 7 = 6</td><td><strong>Lördag (6)</strong></td></tr>
         </tbody>
-    </table>
-    <div class="success-box">
+    </MudSimpleTable>
+    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-3">
         Alla Doomsday-datum 1987 (4/4, 6/6, 8/8 osv.) infaller på en <strong>Lördag</strong>.
-    </div>
-</div>
+    </MudAlert>
+</MudPaper>
 
-<div class="tip-box">
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4">
     <strong>💡 Varför funkar 12-metoden?</strong><br />
     Ett vanligt år har <strong>365 dagar</strong>, vilket är 52 veckor + 1 dag.
     Alltså skiftar veckodagen 1 dag per år. Men vart 4:e år är det skottår (en extra dag).
     12 år = 12 + 3 skottår = 15 extra dagar = 2 veckor + 1 dag = exakt 1 veckodagsshift.
     Därför delar vi med 12!
-</div>
+</MudAlert>
 
-<h2>Testa själv</h2>
-<div class="card">
-    <div class="card-header-custom">🧪 Beräkna årets Doomsday</div>
-    <div class="d-flex gap-2 align-items-end mb-3">
-        <div>
-            <label class="form-label fw-semibold">Årtal</label>
-            <input type="number" class="form-control" @bind="testYear" @bind:event="oninput"
-                   min="1" max="9999" style="max-width: 150px;" />
-        </div>
-    </div>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Testa själv</MudText>
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-2">🧪 Beräkna årets Doomsday</MudText>
+    <MudNumericField @bind-Value="testYear" Label="Årtal" Min="1" Max="9999" Variant="Variant.Outlined" Style="max-width:200px;" Immediate="true" />
 
     @if (testYear > 0)
     {
@@ -115,7 +107,7 @@
             YearDoomsdayCalculator.GetComponents(testYear, centuryAnchor);
         var y = testYear % 100;
 
-        <table class="doomsday-table fade-in">
+        <MudSimpleTable Dense="true" Hover="true" Elevation="0" Class="mt-3">
             <thead>
                 <tr><th>Delsteg</th><th>Beräkning</th><th>Resultat</th></tr>
             </thead>
@@ -127,16 +119,16 @@
                 <tr><td>Summa</td><td>@((int)centuryAnchor) + @quotient + @remainder + @leapAdj = @((int)centuryAnchor + quotient + remainder + leapAdj)</td><td><strong>@((int)centuryAnchor + quotient + remainder + leapAdj)</strong></td></tr>
                 <tr><td>Mod 7</td><td>@((int)centuryAnchor + quotient + remainder + leapAdj) mod 7 = @((int)doomsday)</td><td><strong>@doomsday (@((int)doomsday))</strong></td></tr>
             </tbody>
-        </table>
-        <div class="success-box">
-            Årets Doomsday för @testYear är <span class="badge-weekday">@doomsday</span>
-        </div>
+        </MudSimpleTable>
+        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-3">
+            Årets Doomsday för @testYear är <MudChip T="string" Color="Color.Primary" Size="Size.Small">@doomsday</MudChip>
+        </MudAlert>
     }
-</div>
+</MudPaper>
 
 <div class="d-flex gap-2 mt-4">
-    <a href="learn/century-anchor" class="btn btn-outline-primary">← Steg 1: Sekelankaret</a>
-    <a href="learn/month-doomsdays" class="btn btn-primary">Steg 3: Månadsdatum →</a>
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="learn/century-anchor" StartIcon="@Icons.Material.Filled.ArrowBack">Steg 1: Sekelankaret</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="learn/month-doomsdays" EndIcon="@Icons.Material.Filled.ArrowForward">Steg 3: Månadsdatum</MudButton>
 </div>
 
 @code {

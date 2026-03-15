@@ -2,63 +2,103 @@
 
 <PageTitle>Doomsday-Algoritmen – Lär dig räkna ut veckodagar i huvudet</PageTitle>
 
-<div class="page-header">
-    <h1>🗓️ Doomsday-Algoritmen</h1>
-    <p>Lär dig räkna ut vilken veckodag <strong>vilket datum som helst</strong> infaller på – helt i huvudet!</p>
-</div>
+<MudText Typo="Typo.h4" GutterBottom="true">🗓️ Doomsday-Algoritmen</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">Lär dig räkna ut vilken veckodag <strong>vilket datum som helst</strong> infaller på – helt i huvudet!</MudText>
 
-<div class="info-box">
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
     <strong>Vad är Doomsday-algoritmen?</strong><br />
     En genial metod uppfunnen av matematikern <strong>John Horton Conway</strong> som gör det möjligt att
     bestämma veckodagen för valfritt datum genom enkel huvudräkning. Med övning kan du svara på under 10 sekunder!
-</div>
+</MudAlert>
 
-<h2>Algoritmens fyra steg</h2>
-<p>Hela algoritmen bygger på fyra logiska steg som du lär dig ett i taget:</p>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Algoritmens fyra steg</MudText>
+<MudText Typo="Typo.body1" Class="mb-4">Hela algoritmen bygger på fyra logiska steg som du lär dig ett i taget:</MudText>
 
-<div class="nav-cards-grid">
-    <a href="learn/century-anchor" class="nav-card">
-        <div class="nav-card-icon">🏛️</div>
-        <div class="nav-card-title">1. Sekelankaret</div>
-        <div class="nav-card-desc">Varje sekel (1800-, 1900-, 2000-talet) har en fast ankardag. Lär dig de fyra veckodagarna.</div>
-    </a>
-    <a href="learn/year-doomsday" class="nav-card">
-        <div class="nav-card-icon">📅</div>
-        <div class="nav-card-title">2. Årets Doomsday</div>
-        <div class="nav-card-desc">Justera sekelankaret med "12-metoden" för att hitta årets specifika Doomsday-dag.</div>
-    </a>
-    <a href="learn/month-doomsdays" class="nav-card">
-        <div class="nav-card-icon">📋</div>
-        <div class="nav-card-title">3. Månadsdatum</div>
-        <div class="nav-card-desc">Memorera datumen som alltid faller på Doomsday: 4/4, 6/6, 8/8 och "9 till 5 på 7-Eleven".</div>
-    </a>
-    <a href="learn/final-step" class="nav-card">
-        <div class="nav-card-icon">🎯</div>
-        <div class="nav-card-title">4. Räkna fram</div>
-        <div class="nav-card-desc">Räkna avståndet från närmaste Doomsday-datum till ditt måldatum. Klart!</div>
-    </a>
-</div>
+<MudGrid Spacing="3">
+    <MudItem xs="12" sm="6">
+        <MudCard Elevation="2" Class="cursor-pointer" @onclick='() => NavigateTo("learn/century-anchor")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🏛️</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">1. Sekelankaret</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Varje sekel (1800- till 2100-talet) har en fast ankardag. Lär dig de fyra veckodagarna.</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudCard Elevation="2" Class="cursor-pointer" @onclick='() => NavigateTo("learn/year-doomsday")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">📅</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">2. Årets Doomsday</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Justera sekelankaret med "12-metoden" för att hitta årets specifika Doomsday-dag.</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudCard Elevation="2" Class="cursor-pointer" @onclick='() => NavigateTo("learn/month-doomsdays")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">📋</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">3. Månadsdatum</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Memorera datumen som alltid faller på Doomsday: 4/4, 6/6, 8/8 och "9 till 5 på 7-Eleven".</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudCard Elevation="2" Class="cursor-pointer" @onclick='() => NavigateTo("learn/final-step")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🎯</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">4. Räkna fram</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Räkna avståndet från närmaste Doomsday-datum till ditt måldatum. Klart!</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
 
-<h2>Börja öva direkt</h2>
-<div class="nav-cards-grid">
-    <a href="practice/flashcards" class="nav-card">
-        <div class="nav-card-icon">🃏</div>
-        <div class="nav-card-title">Flashcards</div>
-        <div class="nav-card-desc">Slumpmässiga datum dyker upp – gissa veckodagen så snabbt du kan!</div>
-    </a>
-    <a href="practice/step-trainer" class="nav-card">
-        <div class="nav-card-icon">🧩</div>
-        <div class="nav-card-title">Steg-för-steg-träning</div>
-        <div class="nav-card-desc">Öva på varje delsteg separat: sekelankare, årsberäkning, eller månadsdatum.</div>
-    </a>
-    <a href="calculator" class="nav-card">
-        <div class="nav-card-icon">🔢</div>
-        <div class="nav-card-title">Kalkylator</div>
-        <div class="nav-card-desc">Ange valfritt datum och se hela beräkningen steg för steg, med förklaringar.</div>
-    </a>
-</div>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Börja öva direkt</MudText>
+<MudGrid Spacing="3">
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("practice/flashcards")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🃏</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Flashcards</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Slumpmässiga datum – gissa veckodagen så snabbt du kan!</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("practice/step-trainer")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🧩</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Steg-för-steg</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Öva delmoment separat, eller kör hela algoritmen steg för steg.</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%; border: 2px solid var(--mud-palette-secondary);" @onclick='() => NavigateTo("practice/speed-drill")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">⏱️</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Snabbövning</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Tävla mot klockan – hur många klarar du på en minut?</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("calculator")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🔢</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Kalkylator</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Ange valfritt datum och se hela beräkningen steg för steg.</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
 
-<div class="tip-box" style="margin-top: 2rem;">
-    <strong>💡 Tips för nybörjare:</strong> Börja med att läsa <a href="learn/overview">Översikten</a> för att förstå
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mt-6">
+    <strong>💡 Tips för nybörjare:</strong> Börja med att läsa <MudLink Href="learn/overview">Översikten</MudLink> för att förstå
     helheten, och jobba dig sedan igenom stegen ett i taget. Använd flashcards dagligen för att bli snabbare!
-</div>
+</MudAlert>
+
+@code {
+    [Inject] private NavigationManager Nav { get; set; } = default!;
+    private void NavigateTo(string url) => Nav.NavigateTo(url);
+}

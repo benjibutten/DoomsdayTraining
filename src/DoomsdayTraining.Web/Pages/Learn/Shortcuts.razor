@@ -2,68 +2,66 @@
 
 <PageTitle>Genvägar & Tips – Doomsday-Algoritmen</PageTitle>
 
-<div class="page-header">
-    <h1>⚡ Genvägar & Tips</h1>
-    <p>När du lärt dig grunderna finns det smarta genvägar som gör dig ännu snabbare!</p>
-</div>
+<MudText Typo="Typo.h4" GutterBottom="true">⚡ Genvägar & Tips</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">När du lärt dig grunderna finns det smarta genvägar som gör dig ännu snabbare!</MudText>
 
-<div class="info-box">
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
     <strong>Viktigt:</strong> Lär dig grundalgoritmen först innan du fokuserar på genvägar.
     Genvägar sparar tid men är meningslösa om du inte förstår varje steg ordentligt.
-</div>
+</MudAlert>
 
-<h2>🧠 Minnesknep</h2>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">🧠 Minnesknep</MudText>
 
-<div class="card">
-    <div class="card-header-custom">1. Sekelankare: "FrOTS"</div>
-    <p>
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">1. Sekelankare: "FrOTS"</MudText>
+    <MudText Typo="Typo.body1">
         <strong>Fr</strong>edag (1800) → <strong>O</strong>nsdag (1900) → <strong>T</strong>isdag (2000)
         → <strong>S</strong>öndag (2100)
-    </p>
-    <p class="muted">
+    </MudText>
+    <MudText Typo="Typo.body2" Color="Color.Tertiary">
         Notera att det går "nedåt" (Fr=5, O=3, T=2, S=0) – nästan som en nedräkning!
-    </p>
-</div>
+    </MudText>
+</MudPaper>
 
-<div class="card">
-    <div class="card-header-custom">2. Jämna månader: Datum = Månad</div>
-    <p>
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">2. Jämna månader: Datum = Månad</MudText>
+    <MudText Typo="Typo.body1">
         4/4, 6/6, 8/8, 10/10, 12/12 – inga siffror att memorera, bara regeln
         "jämn månad = repetera siffran"!
-    </p>
-</div>
+    </MudText>
+</MudPaper>
 
-<div class="card">
-    <div class="card-header-custom">3. "9-to-5 at 7-Eleven"</div>
-    <p>
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">3. "9-to-5 at 7-Eleven"</MudText>
+    <MudText Typo="Typo.body1">
         Maj(5)/9, Sep(9)/5, Jul(7)/11, Nov(11)/7 – månad och dag byter plats.
         Frasen "I work <strong>9-to-5</strong> at <strong>7-Eleven</strong>" ger dig alla fyra.
-    </p>
-</div>
+    </MudText>
+</MudPaper>
 
-<div class="card">
-    <div class="card-header-custom">4. Mars – "Nolldagen"</div>
-    <p>
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">4. Mars – "Nolldagen"</MudText>
+    <MudText Typo="Typo.body1">
         Tänk på <strong>"0 mars" = sista februari</strong> = alltid Doomsday.
         Alla multiplar av 7 i mars (7:e, 14:e, 21:a, 28:e) är också Doomsdays.
         Pi-dagen (3/14) är Doomsday – kul bonusfakta!
-    </p>
-</div>
+    </MudText>
+</MudPaper>
 
-<h2>⚡ Snabbknep för årsberäkningen</h2>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">⚡ Snabbknep för årsberäkningen</MudText>
 
-<div class="card">
-    <div class="card-header-custom">Udda+11-metoden (alternativ till 12-metoden)</div>
-    <p>Vissa tycker denna metod är snabbare i huvudet:</p>
-    <ol>
-        <li>Ta <strong>y</strong> = sista två siffror i årtalet</li>
-        <li>Om y är <strong>udda</strong>: lägg till 11 → y</li>
-        <li><strong>Halvera</strong> y</li>
-        <li>Om y nu är <strong>udda</strong>: lägg till 11 → y</li>
-        <li>Ta <strong>y mod 7</strong></li>
-        <li>Doomsday = <strong>sekelankare + (7 − y)</strong> mod 7</li>
-    </ol>
-    <div class="tip-box">
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">Udda+11-metoden (alternativ till 12-metoden)</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">Vissa tycker denna metod är snabbare i huvudet:</MudText>
+    <MudList T="string" Dense="true">
+        <MudListItem T="string">1. Ta <strong>y</strong> = sista två siffror i årtalet</MudListItem>
+        <MudListItem T="string">2. Om y är <strong>udda</strong>: lägg till 11 → y</MudListItem>
+        <MudListItem T="string">3. <strong>Halvera</strong> y</MudListItem>
+        <MudListItem T="string">4. Om y nu är <strong>udda</strong>: lägg till 11 → y</MudListItem>
+        <MudListItem T="string">5. Ta <strong>y mod 7</strong></MudListItem>
+        <MudListItem T="string">6. Doomsday = <strong>sekelankare + (7 − y)</strong> mod 7</MudListItem>
+    </MudList>
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-2">
         <strong>Exempel: 1987 (y = 87)</strong><br />
         87 är udda → 87 + 11 = 98<br />
         98 ÷ 2 = 49<br />
@@ -71,61 +69,46 @@
         60 mod 7 = 4<br />
         7 − 4 = 3<br />
         Onsdag(3) + 3 = 6 = Lördag ✓
-    </div>
-</div>
+    </MudAlert>
+</MudPaper>
 
-<div class="card">
-    <div class="card-header-custom">Årtal nära sekelskiftet</div>
-    <p>
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">Årtal nära sekelskiftet</MudText>
+    <MudText Typo="Typo.body1">
         För år som slutar på <strong>00</strong> (som 1900, 2000) är årets Doomsday
         <strong>samma som sekelankaret</strong> – ingen beräkning behövs!
-    </p>
-    <p>
+    </MudText>
+    <MudText Typo="Typo.body1">
         År som slutar på <strong>01</strong> är bara sekelankaret + 1.
         År <strong>02</strong> = +2. Och så vidare upp till <strong>06</strong>.
         Inga divisioner behövs för dessa!
-    </p>
-</div>
+    </MudText>
+</MudPaper>
 
-<h2>🏃 Tips för att bli snabbare</h2>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">🏃 Tips för att bli snabbare</MudText>
 
-<div class="card">
-    <div class="card-header-custom">Daglig övning</div>
-    <ul>
-        <li>
-            <strong>Flash card-övning:</strong> Gör 10–20 slumpmässiga datum per dag.
-            Fokusera först på korrekthet, sedan på hastighet.
-        </li>
-        <li>
-            <strong>Dagens datum:</strong> Räkna ut veckodagen för varje datum du stöter på under dagen
-            (födelsedagar, nyheter, kvitton osv.).
-        </li>
-        <li>
-            <strong>Tävla mot klockan:</strong> Sikta först på under 30 sekunder,
-            sedan 15, sedan 10, sedan 5!
-        </li>
-    </ul>
-</div>
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">Daglig övning</MudText>
+    <MudList T="string" Dense="true">
+        <MudListItem T="string" Icon="@Icons.Material.Filled.FitnessCenter"><strong>Flash card-övning:</strong> Gör 10–20 slumpmässiga datum per dag. Fokusera först på korrekthet, sedan på hastighet.</MudListItem>
+        <MudListItem T="string" Icon="@Icons.Material.Filled.Today"><strong>Dagens datum:</strong> Räkna ut veckodagen för varje datum du stöter på under dagen (födelsedagar, nyheter, kvitton osv.).</MudListItem>
+        <MudListItem T="string" Icon="@Icons.Material.Filled.Timer"><strong>Tävla mot klockan:</strong> Sikta först på under 30 sekunder, sedan 15, sedan 10, sedan 5!</MudListItem>
+    </MudList>
+</MudPaper>
 
-<div class="card">
-    <div class="card-header-custom">Öva delmomenten separat</div>
-    <ul>
-        <li>
-            <strong>Vecka 1:</strong> Memorera alla månadsdatum tills de sitter reflexmässigt.
-        </li>
-        <li>
-            <strong>Vecka 2:</strong> Öva sekelankare + årsberäkning (ignorera dag/månad).
-        </li>
-        <li>
-            <strong>Vecka 3:</strong> Kombinera allt och kör flashcards dagligen.
-        </li>
-    </ul>
-</div>
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">Öva delmomenten separat</MudText>
+    <MudList T="string" Dense="true">
+        <MudListItem T="string" Icon="@Icons.Material.Filled.LooksOne"><strong>Vecka 1:</strong> Memorera alla månadsdatum tills de sitter reflexmässigt.</MudListItem>
+        <MudListItem T="string" Icon="@Icons.Material.Filled.LooksTwo"><strong>Vecka 2:</strong> Öva sekelankare + årsberäkning (ignorera dag/månad).</MudListItem>
+        <MudListItem T="string" Icon="@Icons.Material.Filled.Looks3"><strong>Vecka 3:</strong> Kombinera allt och kör flashcards dagligen.</MudListItem>
+    </MudList>
+</MudPaper>
 
-<div class="card">
-    <div class="card-header-custom">Vanliga kända datum att verifiera med</div>
-    <p>Använd dessa som "sanity checks" medan du lär dig:</p>
-    <table class="doomsday-table">
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">Vanliga kända datum att verifiera med</MudText>
+    <MudText Typo="Typo.body2" Class="mb-2">Använd dessa som "sanity checks" medan du lär dig:</MudText>
+    <MudSimpleTable Dense="true" Hover="true" Elevation="0">
         <thead>
             <tr><th>Datum</th><th>Händelse</th><th>Veckodag</th></tr>
         </thead>
@@ -136,16 +119,16 @@
             <tr><td>9 nov 1989</td><td>Berlinmurens fall</td><td>Torsdag</td></tr>
             <tr><td>25 dec 2024</td><td>Juldagen 2024</td><td>Onsdag</td></tr>
         </tbody>
-    </table>
-</div>
+    </MudSimpleTable>
+</MudPaper>
 
-<div class="success-box" style="margin-top: 2rem;">
+<MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-4 mb-4">
     <strong>🎉 Du har nu alla verktyg!</strong><br />
-    Gå till <a href="practice/flashcards">Flashcards</a> och börja öva, eller använd
-    <a href="practice/step-trainer">Steg-för-steg-träning</a> för att fokusera på dina svaga punkter.
-</div>
+    Gå till <MudLink Href="practice/flashcards">Flashcards</MudLink> och börja öva, eller använd
+    <MudLink Href="practice/step-trainer">Steg-för-steg-träning</MudLink> för att fokusera på dina svaga punkter.
+</MudAlert>
 
 <div class="d-flex gap-2 mt-4">
-    <a href="learn/final-step" class="btn btn-outline-primary">← Steg 4: Sista steget</a>
-    <a href="practice/flashcards" class="btn btn-accent">Börja öva! →</a>
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="learn/final-step" StartIcon="@Icons.Material.Filled.ArrowBack">Steg 4: Sista steget</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Href="practice/flashcards" EndIcon="@Icons.Material.Filled.ArrowForward">Börja öva!</MudButton>
 </div>
