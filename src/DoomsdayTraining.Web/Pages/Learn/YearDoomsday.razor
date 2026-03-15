@@ -1,0 +1,144 @@
+@page "/learn/year-doomsday"
+
+<PageTitle>Årets Doomsday – Doomsday-Algoritmen</PageTitle>
+
+<div class="page-header">
+    <h1>📅 Steg 2: Beräkna årets Doomsday</h1>
+    <p>Justera sekelankaret för att hitta veckodagen som alla Doomsday-datum faller på i ett specifikt år.</p>
+</div>
+
+<div class="info-box">
+    <strong>Målet med detta steg:</strong><br />
+    Vi vet nu sekelankaret (t.ex. Tisdag för 2000-talet). Men varje år inom seklet har sin
+    <em>egen</em> Doomsday. Vi behöver anpassa sekelankaret med hjälp av de sista två siffrorna
+    i årtalet.
+</div>
+
+<h2>"12-metoden" (Conway's metod)</h2>
+<p>Den populäraste metoden för att snabbt räkna i huvudet. Fyra steg:</p>
+
+<div class="step-container">
+    <div class="step-number">a</div>
+    <div class="step-content">
+        <div class="step-title">Ta de sista två siffrorna</div>
+        <div class="step-explanation">Kalla dem <strong>y</strong>. Till exempel: 2024 → y = 24, 1987 → y = 87.</div>
+    </div>
+</div>
+
+<div class="step-container">
+    <div class="step-number">b</div>
+    <div class="step-content">
+        <div class="step-title">Dela y med 12</div>
+        <div class="step-explanation">
+            Beräkna kvoten och resten:
+            • y ÷ 12 = kvot (heltalsdivision)
+            • y mod 12 = rest (det som blir över)
+            
+            Exempel: 87 ÷ 12 = 7 rest 3
+        </div>
+    </div>
+</div>
+
+<div class="step-container">
+    <div class="step-number">c</div>
+    <div class="step-content">
+        <div class="step-title">Dela resten med 4</div>
+        <div class="step-explanation">
+            Ta resten från föregående steg och dela med 4 (heltalsdivision):
+            • rest ÷ 4 = skottårsjustering
+            
+            Exempel: 3 ÷ 4 = 0 (tre innehåller inga hela 4:or)
+        </div>
+    </div>
+</div>
+
+<div class="step-container">
+    <div class="step-number">d</div>
+    <div class="step-content">
+        <div class="step-title">Summera och ta mod 7</div>
+        <div class="step-explanation">
+            Lägg ihop sekelankaret + kvot + rest + skottårsjustering.
+            Ta sedan mod 7 (resten vid division med 7) för att få veckodagen.
+        </div>
+    </div>
+</div>
+
+<div class="formula">
+    Doomsday = (sekelankare + kvot + rest + skottårsjustering) mod 7
+</div>
+
+<h2>Genomgångsexempel</h2>
+
+<div class="card">
+    <div class="card-header-custom">📝 Exempel: År 1987</div>
+    <table class="doomsday-table">
+        <thead>
+            <tr><th>Delsteg</th><th>Beräkning</th><th>Resultat</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Sekelankare (1900-talet)</td><td>Memorerat</td><td><strong>Onsdag (3)</strong></td></tr>
+            <tr><td>y = sista två siffrorna</td><td>1987 → 87</td><td><strong>87</strong></td></tr>
+            <tr><td>87 ÷ 12</td><td>87 = 7 × 12 + 3</td><td>Kvot: <strong>7</strong>, Rest: <strong>3</strong></td></tr>
+            <tr><td>Rest ÷ 4</td><td>3 ÷ 4 = 0</td><td>Justering: <strong>0</strong></td></tr>
+            <tr><td>Summa</td><td>3 + 7 + 3 + 0 = 13</td><td><strong>13</strong></td></tr>
+            <tr><td>Mod 7</td><td>13 mod 7 = 6</td><td><strong>Lördag (6)</strong></td></tr>
+        </tbody>
+    </table>
+    <div class="success-box">
+        Alla Doomsday-datum 1987 (4/4, 6/6, 8/8 osv.) infaller på en <strong>Lördag</strong>.
+    </div>
+</div>
+
+<div class="tip-box">
+    <strong>💡 Varför funkar 12-metoden?</strong><br />
+    Ett vanligt år har <strong>365 dagar</strong>, vilket är 52 veckor + 1 dag.
+    Alltså skiftar veckodagen 1 dag per år. Men vart 4:e år är det skottår (en extra dag).
+    12 år = 12 + 3 skottår = 15 extra dagar = 2 veckor + 1 dag = exakt 1 veckodagsshift.
+    Därför delar vi med 12!
+</div>
+
+<h2>Testa själv</h2>
+<div class="card">
+    <div class="card-header-custom">🧪 Beräkna årets Doomsday</div>
+    <div class="d-flex gap-2 align-items-end mb-3">
+        <div>
+            <label class="form-label fw-semibold">Årtal</label>
+            <input type="number" class="form-control" @bind="testYear" @bind:event="oninput"
+                   min="1" max="9999" style="max-width: 150px;" />
+        </div>
+    </div>
+
+    @if (testYear > 0)
+    {
+        var centuryAnchor = CenturyAnchorCalculator.Calculate(testYear);
+        var (quotient, remainder, leapAdj, doomsday) =
+            YearDoomsdayCalculator.GetComponents(testYear, centuryAnchor);
+        var y = testYear % 100;
+
+        <table class="doomsday-table fade-in">
+            <thead>
+                <tr><th>Delsteg</th><th>Beräkning</th><th>Resultat</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Sekelankare</td><td>@(testYear / 100 * 100)-talet</td><td><strong>@centuryAnchor (@((int)centuryAnchor))</strong></td></tr>
+                <tr><td>y</td><td>@testYear → @y</td><td><strong>@y</strong></td></tr>
+                <tr><td>y ÷ 12</td><td>@y ÷ 12 = @quotient rest @remainder</td><td>Kvot: <strong>@quotient</strong>, Rest: <strong>@remainder</strong></td></tr>
+                <tr><td>Rest ÷ 4</td><td>@remainder ÷ 4 = @leapAdj</td><td>Justering: <strong>@leapAdj</strong></td></tr>
+                <tr><td>Summa</td><td>@((int)centuryAnchor) + @quotient + @remainder + @leapAdj = @((int)centuryAnchor + quotient + remainder + leapAdj)</td><td><strong>@((int)centuryAnchor + quotient + remainder + leapAdj)</strong></td></tr>
+                <tr><td>Mod 7</td><td>@((int)centuryAnchor + quotient + remainder + leapAdj) mod 7 = @((int)doomsday)</td><td><strong>@doomsday (@((int)doomsday))</strong></td></tr>
+            </tbody>
+        </table>
+        <div class="success-box">
+            Årets Doomsday för @testYear är <span class="badge-weekday">@doomsday</span>
+        </div>
+    }
+</div>
+
+<div class="d-flex gap-2 mt-4">
+    <a href="learn/century-anchor" class="btn btn-outline-primary">← Steg 1: Sekelankaret</a>
+    <a href="learn/month-doomsdays" class="btn btn-primary">Steg 3: Månadsdatum →</a>
+</div>
+
+@code {
+    private int testYear = 2024;
+}

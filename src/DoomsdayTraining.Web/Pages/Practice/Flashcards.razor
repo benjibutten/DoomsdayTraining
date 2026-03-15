@@ -1,0 +1,229 @@
+@page "/practice/flashcards"
+
+<PageTitle>Flashcards – Doomsday-Algoritmen</PageTitle>
+
+<div class="page-header">
+    <h1>🃏 Flashcards – Övningsläge</h1>
+    <p>Ett slumpmässigt datum visas. Räkna ut veckodagen och klicka på ditt svar!</p>
+</div>
+
+@if (!sessionStarted)
+{
+    <div class="card">
+        <div class="card-header-custom">⚙️ Inställningar</div>
+        <div class="row g-3 mb-3">
+            <div class="col-auto">
+                <label class="form-label fw-semibold">Tidsperiod</label>
+                <select class="form-select" @bind="selectedPeriod">
+                    <option value="2000">2000-talet (enklast)</option>
+                    <option value="1900">1900-talet</option>
+                    <option value="all">Alla sekel (1800–2099)</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-accent btn-lg" @onclick="StartSession">
+            🚀 Starta övning
+        </button>
+    </div>
+}
+else
+{
+    <!-- Statistik -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-value">@totalAnswered</div>
+            <div class="stat-label">Svar</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value text-success-custom">@correctCount</div>
+            <div class="stat-label">Rätt</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" style="color: var(--danger);">@wrongCount</div>
+            <div class="stat-label">Fel</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">@(totalAnswered > 0 ? $"{(int)(correctCount * 100.0 / totalAnswered)}%" : "–")</div>
+            <div class="stat-label">Träffsäkerhet</div>
+        </div>
+        @if (averageTime > 0)
+        {
+            <div class="stat-item">
+                <div class="stat-value">@averageTime.ToString("F1")s</div>
+                <div class="stat-label">Snitttid</div>
+            </div>
+        }
+    </div>
+
+    <!-- Streak -->
+    @if (recentResults.Count > 0)
+    {
+        <div class="streak">
+            @foreach (var r in recentResults.TakeLast(20))
+            {
+                <div class="streak-dot @(r ? "correct" : "incorrect")"></div>
+            }
+        </div>
+    }
+
+    <!-- Flashcard -->
+    <div class="flashcard fade-in" @key="currentDate">
+        <div class="flashcard-date">
+            @currentDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))
+        </div>
+        <div class="flashcard-hint">Vilken veckodag är detta?</div>
+
+        @if (hasAnswered)
+        {
+            <div class="weekday-grid" style="margin-top: 1.5rem;">
+                @foreach (Weekday day in Enum.GetValues<Weekday>())
+                {
+                    var cssClass = "weekday-btn";
+                    if (day == correctAnswer)
+                        cssClass += " correct";
+                    else if (day == userAnswer && !wasCorrect)
+                        cssClass += " incorrect";
+                    <button class="@cssClass" disabled>@day</button>
+                }
+            </div>
+
+            <div style="margin-top: 1rem;">
+                @if (wasCorrect)
+                {
+                    <div class="success-box" style="text-align: left;">
+                        <strong>✅ Rätt!</strong> Det är @correctAnswer.
+                        @if (currentTimeTaken > 0)
+                        {
+                            <span class="muted"> (@currentTimeTaken.ToString("F1") sekunder)</span>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="danger-box" style="text-align: left;">
+                        <strong>❌ Fel.</strong> Du svarade @userAnswer, men rätt svar är
+                        <strong>@correctAnswer</strong>.
+                    </div>
+                }
+                <button class="btn btn-primary mt-2" @onclick="NextCard">
+                    Nästa datum →
+                </button>
+                <button class="btn btn-outline-primary mt-2 ms-2" @onclick="ShowSteps">
+                    Visa lösning
+                </button>
+
+                @if (showSolution && currentResult is not null)
+                {
+                    <div class="mt-3 fade-in" style="text-align: left;">
+                        @foreach (var step in currentResult.Steps)
+                        {
+                            <div class="step-container">
+                                <div class="step-number">@step.StepNumber</div>
+                                <div class="step-content">
+                                    <div class="step-title">@step.Title</div>
+                                    <div class="step-explanation">@step.Explanation</div>
+                                    <div class="step-calculation">@step.Calculation</div>
+                                    <div class="step-result">Resultat: @step.Result</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="weekday-grid" style="margin-top: 1.5rem;">
+                @foreach (Weekday day in Enum.GetValues<Weekday>())
+                {
+                    var d = day;
+                    <button class="weekday-btn" @onclick="() => Answer(d)">@d</button>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="text-center mt-3">
+        <button class="btn btn-outline-primary btn-sm" @onclick="ResetSession">
+            🔄 Starta om
+        </button>
+    </div>
+}
+
+@code {
+    private string selectedPeriod = "2000";
+    private bool sessionStarted;
+    private DateOnly currentDate;
+    private Weekday correctAnswer;
+    private Weekday userAnswer;
+    private bool hasAnswered;
+    private bool wasCorrect;
+    private bool showSolution;
+    private DoomsdayResult? currentResult;
+    private DateTime questionShownAt;
+    private double currentTimeTaken;
+
+    private int totalAnswered;
+    private int correctCount;
+    private int wrongCount;
+    private double totalTime;
+    private double averageTime => totalAnswered > 0 ? totalTime / totalAnswered : 0;
+    private List<bool> recentResults = [];
+
+    private void StartSession()
+    {
+        sessionStarted = true;
+        totalAnswered = 0;
+        correctCount = 0;
+        wrongCount = 0;
+        totalTime = 0;
+        recentResults.Clear();
+        GenerateNewDate();
+    }
+
+    private void GenerateNewDate()
+    {
+        currentDate = selectedPeriod switch
+        {
+            "2000" => RandomDateGenerator.GenerateForCentury(2000),
+            "1900" => RandomDateGenerator.GenerateForCentury(1900),
+            _ => RandomDateGenerator.Generate()
+        };
+        correctAnswer = DoomsdayAlgorithm.GetWeekday(currentDate);
+        hasAnswered = false;
+        wasCorrect = false;
+        showSolution = false;
+        currentResult = null;
+        questionShownAt = DateTime.Now;
+    }
+
+    private void Answer(Weekday answer)
+    {
+        userAnswer = answer;
+        hasAnswered = true;
+        wasCorrect = answer == correctAnswer;
+        currentTimeTaken = (DateTime.Now - questionShownAt).TotalSeconds;
+        totalAnswered++;
+        totalTime += currentTimeTaken;
+
+        if (wasCorrect)
+            correctCount++;
+        else
+            wrongCount++;
+
+        recentResults.Add(wasCorrect);
+    }
+
+    private void NextCard() => GenerateNewDate();
+
+    private void ShowSteps()
+    {
+        showSolution = true;
+        currentResult = DoomsdayAlgorithm.Calculate(currentDate);
+    }
+
+    private void ResetSession()
+    {
+        sessionStarted = false;
+    }
+}

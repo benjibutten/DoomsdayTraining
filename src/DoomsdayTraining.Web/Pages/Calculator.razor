@@ -1,0 +1,127 @@
+@page "/calculator"
+
+<PageTitle>Kalkylator – Doomsday-Algoritmen</PageTitle>
+
+<div class="page-header">
+    <h1>🔢 Doomsday-Kalkylator</h1>
+    <p>Ange valfritt datum och se hela beräkningen steg för steg med förklaringar.</p>
+</div>
+
+<div class="card">
+    <div class="card-header-custom">📅 Välj datum</div>
+    <div class="d-flex gap-3 align-items-end flex-wrap">
+        <div>
+            <label class="form-label fw-semibold">År</label>
+            <input type="number" class="form-control" @bind="year" min="1" max="9999" style="width: 120px;" />
+        </div>
+        <div>
+            <label class="form-label fw-semibold">Månad</label>
+            <select class="form-select" @bind="month" style="width: 160px;">
+                @for (int m = 1; m <= 12; m++)
+                {
+                    var info = MonthDoomsdayProvider.GetInfoForMonth(m);
+                    <option value="@m">@m – @info.MonthName</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label class="form-label fw-semibold">Dag</label>
+            <input type="number" class="form-control" @bind="day" min="1" max="31" style="width: 80px;" />
+        </div>
+        <button class="btn btn-accent" @onclick="Calculate">Beräkna</button>
+        <button class="btn btn-outline-primary" @onclick="SetToday">Idag</button>
+        <button class="btn btn-outline-primary" @onclick="SetRandomDate">Slumpmässigt</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="danger-box mt-3">@errorMessage</div>
+    }
+</div>
+
+@if (result is not null)
+{
+    <div class="fade-in">
+        <div class="success-box" style="font-size: 1.2rem; text-align: center; margin: 1.5rem 0;">
+            <strong>@result.Date.ToString("d MMMM yyyy", culture)</strong>
+            är en <span class="badge-weekday" style="font-size: 1.1rem;">@result.Weekday</span>
+        </div>
+
+        <h2>Beräkningssteg</h2>
+        @foreach (var step in result.Steps)
+        {
+            <div class="step-container">
+                <div class="step-number">@step.StepNumber</div>
+                <div class="step-content">
+                    <div class="step-title">@step.Title</div>
+                    <div class="step-explanation">@step.Explanation</div>
+                    <div class="step-calculation">@step.Calculation</div>
+                    <div class="step-result">Resultat: @step.Result</div>
+                </div>
+            </div>
+        }
+
+        <h2>Sammanfattning</h2>
+        <div class="card">
+            <table class="doomsday-table">
+                <tbody>
+                    <tr><td>Datum</td><td><strong>@result.Date.ToString("yyyy-MM-dd")</strong></td></tr>
+                    <tr><td>Skottår</td><td>@(result.IsLeapYear ? "Ja ✓" : "Nej")</td></tr>
+                    <tr><td>Sekelankare</td><td><strong>@result.CenturyAnchor</strong></td></tr>
+                    <tr><td>Årets Doomsday</td><td><strong>@result.YearDoomsday</strong></td></tr>
+                    <tr><td>Doomsday-referens i månaden</td><td><strong>@result.MonthDoomsdayDate.ToString("d MMMM", culture)</strong></td></tr>
+                    <tr><td>Slutgiltig veckodag</td><td><span class="badge-weekday">@result.Weekday</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    private int year = 2024;
+    private int month = 4;
+    private int day = 10;
+    private string? errorMessage;
+    private DoomsdayResult? result;
+    private readonly System.Globalization.CultureInfo culture = new("sv-SE");
+
+    private void Calculate()
+    {
+        errorMessage = null;
+        result = null;
+
+        try
+        {
+            var daysInMonth = DateTime.DaysInMonth(year, month);
+            if (day < 1 || day > daysInMonth)
+            {
+                errorMessage = $"Ogiltig dag: {month}/{day}. Månaden har {daysInMonth} dagar.";
+                return;
+            }
+            var date = new DateOnly(year, month, day);
+            result = DoomsdayAlgorithm.Calculate(date);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Ogiltigt datum: {ex.Message}";
+        }
+    }
+
+    private void SetToday()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        year = today.Year;
+        month = today.Month;
+        day = today.Day;
+        Calculate();
+    }
+
+    private void SetRandomDate()
+    {
+        var date = RandomDateGenerator.Generate();
+        year = date.Year;
+        month = date.Month;
+        day = date.Day;
+        Calculate();
+    }
+}

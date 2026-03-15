@@ -1,0 +1,134 @@
+@page "/learn/final-step"
+
+<PageTitle>Sista steget – Doomsday-Algoritmen</PageTitle>
+
+<div class="page-header">
+    <h1>🎯 Steg 4: Räkna fram till måldatumet</h1>
+    <p>Det sista och enklaste steget – räkna dagar från Doomsday-referensen till ditt datum.</p>
+</div>
+
+<div class="info-box">
+    <strong>Nu har du alla pusselbitar!</strong><br />
+    Du vet årets Doomsday-veckodag (från steg 1+2) och du vet Doomsday-referensdatumet
+    i den aktuella månaden (från steg 3). Nu räknar du bara avståndet i dagar.
+</div>
+
+<h2>Så här gör du</h2>
+
+<div class="step-container">
+    <div class="step-number">1</div>
+    <div class="step-content">
+        <div class="step-title">Hitta skillnaden i dagar</div>
+        <div class="step-explanation">
+            Räkna hur många dagar det är mellan Doomsday-referensdatumet och ditt måldatum.
+
+            Exempel: Doomsday i april = den 4:e. Ditt datum = 19 april.
+            Skillnad: 19 − 4 = 15 dagar framåt.
+        </div>
+    </div>
+</div>
+
+<div class="step-container">
+    <div class="step-number">2</div>
+    <div class="step-content">
+        <div class="step-title">Förenkla med mod 7</div>
+        <div class="step-explanation">
+            Eftersom en vecka har 7 dagar bryr vi oss bara om resten vid division med 7.
+
+            Exempel: 15 mod 7 = 1 dag framåt.
+            (15 dagar = 2 hela veckor + 1 dag)
+        </div>
+    </div>
+</div>
+
+<div class="step-container">
+    <div class="step-number">3</div>
+    <div class="step-content">
+        <div class="step-title">Räkna fram (eller bak) från Doomsday</div>
+        <div class="step-explanation">
+            Lägg till (eller dra ifrån) dagarna till årets Doomsday-veckodag.
+
+            Exempel: Om Doomsday = Torsdag och vi ska framåt 1 dag:
+            Torsdag + 1 = Fredag ✓
+        </div>
+    </div>
+</div>
+
+<div class="formula">
+    Veckodag = (Doomsday-veckodag + skillnad) mod 7
+</div>
+
+<h2>Genomgångsexempel</h2>
+
+<div class="card">
+    <div class="card-header-custom">📝 Exempel: 19 april 2024</div>
+    <table class="doomsday-table">
+        <thead>
+            <tr><th>Steg</th><th>Info</th><th>Resultat</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Årets Doomsday (2024)</td><td>Från steg 1+2</td><td><strong>Torsdag</strong></td></tr>
+            <tr><td>Doomsday-datum i april</td><td>4/4 (jämn månad)</td><td><strong>4 april = Torsdag</strong></td></tr>
+            <tr><td>Skillnad till 19:e</td><td>19 − 4 = 15 dagar</td><td><strong>15 dagar</strong></td></tr>
+            <tr><td>Mod 7</td><td>15 mod 7 = 1</td><td><strong>1 dag framåt</strong></td></tr>
+            <tr><td>Slutresultat</td><td>Torsdag + 1 dag</td><td><strong>Fredag ✓</strong></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="tip-box">
+    <strong>💡 Tips: Räkna åt båda hållen!</strong><br />
+    Om ditt datum ligger nära slutet av månaden, kan det vara lättare att räkna <em>bakåt</em>
+    från nästa månads Doomsday (eller framåt till nästa 7-dagarsperiod). Till exempel:
+    för 2 april kan du räkna 4 − 2 = 2 dagar bakåt från Doomsday istället för att
+    räkna långt framåt.
+</div>
+
+<h2>Testa hela algoritmen</h2>
+<div class="card">
+    <div class="card-header-custom">🧪 Prova med ett datum</div>
+    <div class="d-flex gap-2 align-items-end mb-3">
+        <div>
+            <label class="form-label fw-semibold">Datum</label>
+            <input type="date" class="form-control" @bind="testDate" style="max-width: 200px;" />
+        </div>
+        <button class="btn btn-primary" @onclick="ShowResult">Beräkna</button>
+    </div>
+
+    @if (result is not null)
+    {
+        <div class="fade-in">
+            @foreach (var step in result.Steps)
+            {
+                <div class="step-container">
+                    <div class="step-number">@step.StepNumber</div>
+                    <div class="step-content">
+                        <div class="step-title">@step.Title</div>
+                        <div class="step-explanation">@step.Explanation</div>
+                        <div class="step-calculation">@step.Calculation</div>
+                        <div class="step-result">Resultat: @step.Result</div>
+                    </div>
+                </div>
+            }
+            <div class="success-box" style="font-size: 1.2rem;">
+                <strong>@result.Date.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))</strong>
+                är en <span class="badge-weekday" style="font-size: 1.1rem;">@result.Weekday</span>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="d-flex gap-2 mt-4">
+    <a href="learn/month-doomsdays" class="btn btn-outline-primary">← Steg 3: Månadsdatum</a>
+    <a href="learn/shortcuts" class="btn btn-primary">Genvägar & tips →</a>
+</div>
+
+@code {
+    private DateOnly testDate = new(2024, 4, 19);
+    private DoomsdayResult? result;
+
+    private void ShowResult()
+    {
+        result = DoomsdayAlgorithm.Calculate(testDate);
+    }
+}

@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DoomsdayTraining.Domain/DoomsdayTraining.Domain.csproj" />
+    <Project Path="src/DoomsdayTraining.Web/DoomsdayTraining.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DoomsdayTraining.Domain.Tests/DoomsdayTraining.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
