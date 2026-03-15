@@ -95,7 +95,8 @@
 
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">Snabbtest: Kan du dem?</MudText>
 <MudPaper Elevation="2" Class="pa-4 mb-4">
-    <MudText Typo="Typo.h6" Class="mb-3">🧪 Vilken dag är Doomsday i...?</MudText>
+    <MudText Typo="Typo.h6" Class="mb-3">🧪 Vilket datum är Doomsday i...?</MudText>
+    <MudText Typo="Typo.body2" Class="mb-3">Testa utan att titta på tabellen — byt månad och svara!</MudText>
     <MudGrid Spacing="2">
         <MudItem xs="12" sm="4">
             <MudSelect @bind-Value="selectedMonth" Label="Välj månad" Variant="Variant.Outlined">
@@ -108,8 +109,8 @@
         </MudItem>
         <MudItem xs="12" sm="3">
             <MudSelect @bind-Value="isLeapYear" Label="Skottår?" Variant="Variant.Outlined">
-                <MudSelectItem Value="false">Nej</MudSelectItem>
-                <MudSelectItem Value="true">Ja</MudSelectItem>
+                <MudSelectItem Value="false">Nej (vanligt år)</MudSelectItem>
+                <MudSelectItem Value="true">Ja (skottår)</MudSelectItem>
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="3" Class="d-flex align-end">
@@ -126,6 +127,38 @@
             <MudText Typo="Typo.caption">@info.Mnemonic</MudText>
         </MudAlert>
     }
+</MudPaper>
+
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Från referensdatum till måldatum</MudText>
+<MudText Typo="Typo.body1" Class="mb-3">
+    Att kunna referensdalen räcker inte – du måste också kunna hoppa från den till vilket datum som helst i månaden.
+    Prova tankekedjan nedan. <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary" OnClick="NewDemoDate">Nytt exempel →</MudButton>
+</MudText>
+
+<MudPaper Elevation="2" Class="pa-4 mb-4" @key="demoKey">
+    @{
+        var demoRef = MonthDoomsdayProvider.GetDoomsdayForMonth(demoDate.Month, LeapYearChecker.IsLeapYear(demoDate.Year));
+        var demoDiff = demoDate.Day - demoRef;
+        var demoDiffMod = ((demoDiff % 7) + 7) % 7;
+        var demoMInfo = MonthDoomsdayProvider.GetInfoForMonth(demoDate.Month);
+        var demoWeekday = DoomsdayAlgorithm.GetWeekday(demoDate);
+        var demoYearDoomsday = YearDoomsdayCalculator.Calculate(demoDate.Year);
+        var svCulture = new System.Globalization.CultureInfo("sv-SE");
+    }
+    <MudText Typo="Typo.h6" Class="mb-1">📝 @demoDate.ToString("d MMMM yyyy", svCulture)</MudText>
+    <MudText Typo="Typo.body2" Class="mb-3">Anta att vi redan vet att årets Doomsday är <strong>@demoYearDoomsday</strong>.</MudText>
+    <MudSimpleTable Dense="true" Hover="true" Elevation="0">
+        <thead><tr><th>Tanken</th><th>Beräkning</th><th>Resultat</th></tr></thead>
+        <tbody>
+            <tr><td>Doomsday-referens i månaden</td><td>@demoMInfo.MonthName → @demoMInfo.Mnemonic</td><td><strong>@demoRef/@demoDate.Month = @demoYearDoomsday</strong></td></tr>
+            <tr><td>Avstånd till @demoDate.Day:e</td><td>@demoDate.Day − @demoRef = @demoDiff dagar</td><td><strong>@demoDiff dagar @(demoDiff >= 0 ? "framåt" : "bakåt")</strong></td></tr>
+            <tr><td>Förenkla (mod 7)</td><td>|@demoDiff| mod 7 = @demoDiffMod</td><td><strong>@demoDiffMod dag(ar) @(demoDiff >= 0 ? "framåt" : "bakåt")</strong></td></tr>
+            <tr><td>Räkna från Doomsday</td><td>@demoYearDoomsday + @(demoDiff >= 0 ? "+" : "")@demoDiff (mod 7)</td><td><strong>@demoWeekday</strong></td></tr>
+        </tbody>
+    </MudSimpleTable>
+    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-3">
+        @demoDate.ToString("d MMMM yyyy", svCulture) är en <strong>@demoWeekday</strong>.
+    </MudAlert>
 </MudPaper>
 
 <div class="d-flex gap-2 mt-4">
@@ -151,4 +184,37 @@
     private bool showAnswer;
 
     private void ShowAnswer() => showAnswer = true;
+
+    // Demo: "från referensdatum till måldatum"
+    private static readonly DateOnly[] DemoDates =
+    [
+        new DateOnly(2024, 4, 17),
+        new DateOnly(2024, 6, 23),
+        new DateOnly(2024, 9, 2),
+        new DateOnly(2024, 11, 19),
+        new DateOnly(2024, 7, 30),
+        new DateOnly(2024, 8, 5),
+        new DateOnly(2024, 12, 27),
+        new DateOnly(2024, 5, 13),
+        new DateOnly(2024, 3, 22),
+        new DateOnly(2024, 10, 31),
+    ];
+
+    private DateOnly demoDate;
+    private int demoKey;
+
+    protected override void OnInitialized()
+    {
+        demoDate = DemoDates[Random.Shared.Next(DemoDates.Length)];
+        _selectedMonth = Random.Shared.Next(1, 13);
+    }
+
+    private void NewDemoDate()
+    {
+        DateOnly next;
+        do { next = DemoDates[Random.Shared.Next(DemoDates.Length)]; }
+        while (next == demoDate);
+        demoDate = next;
+        demoKey++;
+    }
 }

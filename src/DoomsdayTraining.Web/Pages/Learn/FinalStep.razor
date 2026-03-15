@@ -57,20 +57,39 @@ Torsdag + 1 = Fredag ✓</MudText>
 </MudPaper>
 
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">Genomgångsexempel</MudText>
-<MudPaper Elevation="2" Class="pa-4 mb-4">
-    <MudText Typo="Typo.h6" Class="mb-3">📝 Exempel: 19 april 2024</MudText>
-    <MudSimpleTable Dense="true" Hover="true" Elevation="0">
+<MudText Typo="Typo.body2" Class="mb-2">Exemplet nedan slumpas bland kända historiska datum.
+<MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary" OnClick="NewExample">Nytt exempel →</MudButton></MudText>
+
+<MudPaper Elevation="2" Class="pa-4 mb-4" @key="exampleKey">
+    @{
+        var exRes = DoomsdayAlgorithm.Calculate(exampleDate);
+        var svCulture = new System.Globalization.CultureInfo("sv-SE");
+        var exDoomsdayRef = exRes.MonthDoomsdayDate.Day;
+        var exDiff = exampleDate.Day - exDoomsdayRef;
+        var exDiffMod = ((exDiff % 7) + 7) % 7;
+        var exMInfo = MonthDoomsdayProvider.GetInfoForMonth(exampleDate.Month);
+    }
+    <MudText Typo="Typo.h6" Class="mb-1">📝 @exampleDate.ToString("d MMMM yyyy", svCulture)</MudText>
+    @if (!string.IsNullOrEmpty(exampleLabel))
+    {
+        <MudText Typo="Typo.caption" Color="Color.Tertiary" Class="mb-3">@exampleLabel</MudText>
+    }
+    <MudSimpleTable Dense="true" Hover="true" Elevation="0" Class="mt-2">
         <thead>
             <tr><th>Steg</th><th>Info</th><th>Resultat</th></tr>
         </thead>
         <tbody>
-            <tr><td>Årets Doomsday (2024)</td><td>Från steg 1+2</td><td><strong>Torsdag</strong></td></tr>
-            <tr><td>Doomsday-datum i april</td><td>4/4 (jämn månad)</td><td><strong>4 april = Torsdag</strong></td></tr>
-            <tr><td>Skillnad till 19:e</td><td>19 − 4 = 15 dagar</td><td><strong>15 dagar</strong></td></tr>
-            <tr><td>Mod 7</td><td>15 mod 7 = 1</td><td><strong>1 dag framåt</strong></td></tr>
-            <tr><td>Slutresultat</td><td>Torsdag + 1 dag</td><td><strong>Fredag ✓</strong></td></tr>
+            <tr><td>Sekelankare</td><td>@(exampleDate.Year / 100 * 100)-talet (minnesregel: FrOTS)</td><td><strong>@exRes.CenturyAnchor</strong></td></tr>
+            <tr><td>Årets Doomsday</td><td>y = @(exampleDate.Year % 100), 12-metoden</td><td><strong>@exRes.YearDoomsday</strong></td></tr>
+            <tr><td>Doomsday-referens i @exMInfo.MonthName</td><td>@exMInfo.Mnemonic</td><td><strong>@exDoomsdayRef/@exampleDate.Month = @exRes.YearDoomsday</strong></td></tr>
+            <tr><td>Avstånd</td><td>@exampleDate.Day − @exDoomsdayRef = @exDiff dag(ar)</td><td><strong>@exDiff dagar @(exDiff >= 0 ? "framåt" : "bakåt")</strong></td></tr>
+            <tr><td>Mod 7</td><td>@(Math.Abs(exDiff)) mod 7 = @exDiffMod</td><td><strong>@exDiffMod dag(ar)</strong></td></tr>
+            <tr><td>Slutresultat</td><td>@exRes.YearDoomsday + @(exDiff >= 0 ? "+" : "")@exDiff (mod 7)</td><td><strong>@exRes.Weekday ✓</strong></td></tr>
         </tbody>
     </MudSimpleTable>
+    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-3">
+        @exampleDate.ToString("d MMMM yyyy", svCulture) är en <strong>@exRes.Weekday</strong>. Verifiera gärna med kalkylatorn!
+    </MudAlert>
 </MudPaper>
 
 <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4">
@@ -127,6 +146,39 @@ Torsdag + 1 = Fredag ✓</MudText>
 @code {
     private DateTime? testDateTime = new DateTime(2024, 4, 19);
     private DoomsdayResult? result;
+
+    private static readonly (DateOnly Date, string Label)[] ExampleDates =
+    [
+        (new DateOnly(2024, 4, 19), ""),
+        (new DateOnly(2001, 9, 11), "9/11"),
+        (new DateOnly(1969, 7, 20), "Månlandningen"),
+        (new DateOnly(1989, 11, 9), "Berlinmurens fall"),
+        (new DateOnly(2000,  1,  1), "Millennieskiftet"),
+        (new DateOnly(1944,  6,  6), "D-dagen"),
+        (new DateOnly(1912,  4, 15), "Titanic sjunker"),
+        (new DateOnly(2026,  3, 15), "Idag"),
+    ];
+
+    private DateOnly exampleDate;
+    private string exampleLabel = "";
+    private int exampleKey;
+
+    protected override void OnInitialized() => PickExample(-1);
+
+    private void NewExample()
+    {
+        var currentIdx = Array.FindIndex(ExampleDates, e => e.Date == exampleDate);
+        PickExample(currentIdx);
+    }
+
+    private void PickExample(int exclude)
+    {
+        int idx;
+        do { idx = Random.Shared.Next(ExampleDates.Length); } while (idx == exclude);
+        exampleDate = ExampleDates[idx].Date;
+        exampleLabel = ExampleDates[idx].Label;
+        exampleKey++;
+    }
 
     private void ShowResult()
     {

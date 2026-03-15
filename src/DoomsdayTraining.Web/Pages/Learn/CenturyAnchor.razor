@@ -29,25 +29,82 @@
 
 <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4">
     <strong>🧠 Minnesregel: "FrOTS"</strong><br />
-    <strong>Fr</strong>edag → <strong>O</strong>nsdag → <strong>T</strong>isdag → <strong>S</strong>öndag<br />
-    1800 → 1900 → 2000 → 2100<br />
-    Säg det högt några gånger: "Frots, Frots, Frots" – och du har dem!
+    <strong>Fr</strong>edag (1800) → <strong>O</strong>nsdag (1900) → <strong>T</strong>isdag (2000) → <strong>S</strong>öndag (2100)<br />
+    Säg det högt några gånger: "Frots, Frots, Frots" – och du har alla fyra!
 </MudAlert>
+
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Varför just dessa dagar?</MudText>
+<MudPaper Elevation="1" Class="pa-4 mb-4">
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Varje sekel om 100 år innehåller 36 524 dagar (vanliga år) eller 36 525 (om seklet råkar ha ett extra skottår).
+        Enligt den gregorianska kalenderregeln är sekelår <em>inte</em> skottår såvida de inte är delbara med 400.
+        Det gör att 100 år = 52 veckor × 7 dagar × 100 + lite extra = ett antal hela veckor plus en rest.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        Den resten är precis <strong>5 dagar bakåt</strong> (eller 2 framåt, det är samma sak mod 7) för varje sekel.
+        Så om 1900-talet börjar på Onsdag (3) börjar 2000-talet på Tisdag (2 = 3 − 1 mod 7).
+        Det är just det mönstret som FrOTS sammanfattar.
+    </MudText>
+</MudPaper>
+
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Testa dig – välj rätt ankardag</MudText>
+<MudPaper Elevation="2" Class="pa-4 mb-4" @key="quizKey">
+    <MudText Typo="Typo.body2" Class="mb-1">Vilket sekelankare har...</MudText>
+    <MudText Typo="Typo.h3" Color="Color.Primary" Align="Align.Center" Class="mb-4">@quizCentury-talet</MudText>
+
+    @if (!quizAnswered)
+    {
+        <MudGrid Spacing="2" Justify="Justify.Center">
+            @foreach (Weekday day in Enum.GetValues<Weekday>())
+            {
+                var d = day;
+                <MudItem xs="4" sm="3">
+                    <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => AnswerQuiz(d)" Size="Size.Small">@d</MudButton>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+    else
+    {
+        <MudGrid Spacing="2" Justify="Justify.Center" Class="mb-3">
+            @foreach (Weekday day in Enum.GetValues<Weekday>())
+            {
+                var color = day == quizCorrectAnswer ? Color.Success
+                          : (day == quizUserAnswer && !quizWasCorrect) ? Color.Error
+                          : Color.Default;
+                var variant = (day == quizCorrectAnswer || (day == quizUserAnswer && !quizWasCorrect)) ? Variant.Filled : Variant.Outlined;
+                <MudItem xs="4" sm="3">
+                    <MudButton FullWidth="true" Variant="@variant" Color="@color" Disabled="true" Size="Size.Small">@day</MudButton>
+                </MudItem>
+            }
+        </MudGrid>
+        @if (quizWasCorrect)
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">✅ Rätt! @quizCentury-talet = <strong>@quizCorrectAnswer</strong>.</MudAlert>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-3">❌ Fel. Du svarade @quizUserAnswer. Rätt: <strong>@quizCorrectAnswer</strong>.</MudAlert>
+        }
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mb-3">
+            Kom ihåg: <strong>FrOTS</strong> – Fredag (1800) → Onsdag (1900) → Tisdag (2000) → Söndag (2100)
+        </MudAlert>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextQuiz" EndIcon="@Icons.Material.Filled.ArrowForward">Nästa fråga</MudButton>
+    }
+</MudPaper>
 
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">Formeln bakom (för den nyfikne)</MudText>
 <MudText Typo="Typo.body1" Class="mb-2">
-    Du behöver inte formeln för att använda algoritmen – det räcker att memorera de fyra dagarna.
-    Men om du vill förstå matematiken:
+    Minnesregeln räcker för att använda algoritmen. Men om du vill förstå matematiken:
 </MudText>
 <MudPaper Elevation="0" Class="pa-3 mb-2" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; text-align:center;">
     ankardag = (5 × (sekeltal mod 4) + 2) mod 7
 </MudPaper>
 <MudText Typo="Typo.body2" Class="mb-4">Där "sekeltal" är de första två siffrorna i årtalet (t.ex. 20 för 2000-talet).</MudText>
 
-<MudText Typo="Typo.h5" Class="mt-6 mb-3">Testa själv</MudText>
+<MudText Typo="Typo.h5" Class="mt-4 mb-3">Slå upp vilket år som helst</MudText>
 <MudPaper Elevation="2" Class="pa-4 mb-4">
-    <MudText Typo="Typo.h6" Class="mb-2">🧪 Prova med ett år</MudText>
-    <MudText Typo="Typo.body2" Class="mb-3">Skriv in ett årtal så visar vi vilket sekelankare det tillhör och hur beräkningen ser ut:</MudText>
+    <MudText Typo="Typo.body2" Class="mb-3">Skriv in ett godtyckligt år och se vilket sekelankare det tillhör:</MudText>
     <MudNumericField @bind-Value="testYear" Label="Årtal" Min="1" Max="9999" Variant="Variant.Outlined" Style="max-width:200px;" Immediate="true" />
 
     @if (testYear > 0)
@@ -68,4 +125,32 @@
 
 @code {
     private int testYear = 2024;
+
+    // Quiz
+    private static readonly int[] QuizCenturies = [1800, 1900, 2000, 2100];
+    private int quizKey;
+    private int quizCentury;
+    private Weekday quizCorrectAnswer;
+    private Weekday quizUserAnswer;
+    private bool quizAnswered;
+    private bool quizWasCorrect;
+
+    protected override void OnInitialized() => NewQuizCentury();
+
+    private void NewQuizCentury()
+    {
+        quizCentury = QuizCenturies[Random.Shared.Next(QuizCenturies.Length)];
+        quizCorrectAnswer = CenturyAnchorCalculator.Calculate(quizCentury);
+        quizAnswered = false;
+        quizKey++;
+    }
+
+    private void AnswerQuiz(Weekday answer)
+    {
+        quizUserAnswer = answer;
+        quizWasCorrect = answer == quizCorrectAnswer;
+        quizAnswered = true;
+    }
+
+    private void NextQuiz() => NewQuizCentury();
 }

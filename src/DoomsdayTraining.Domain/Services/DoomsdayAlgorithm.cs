@@ -63,7 +63,8 @@ public static class DoomsdayAlgorithm
         {
             StepNumber = stepNumber++,
             Title = "Bestäm sekelankaret",
-            Explanation = centuryInfo.Explanation,
+            Explanation = centuryInfo.Explanation +
+                          " Minnesregel: FrOTS = Fredag (1800) → Onsdag (1900) → Tisdag (2000) → Söndag (2100).",
             Calculation = $"(5 × ({date.Year / 100} mod 4) + 2) mod 7 = {(int)centuryAnchor}",
             Result = $"{centuryAnchor}"
         });
@@ -72,18 +73,17 @@ public static class DoomsdayAlgorithm
         var (quotient, remainder, leapAdj, yearDoomsday) =
             YearDoomsdayCalculator.GetComponents(date.Year, centuryAnchor);
         var lastTwo = date.Year % 100;
+        var yearTotal = (int)centuryAnchor + quotient + remainder + leapAdj;
         steps.Add(new DoomsdayCalculationStep
         {
             StepNumber = stepNumber++,
-            Title = "Beräkna årets Doomsday",
-            Explanation = $"Vi tar de sista två siffrorna i årtalet ({lastTwo}) och använder 12-metoden:\n" +
-                          $"• {lastTwo} ÷ 12 = {quotient} (kvot) med rest {remainder}\n" +
-                          $"• {remainder} ÷ 4 = {leapAdj} (skottårsjustering)\n" +
-                          $"• Summera: {centuryAnchor}({(int)centuryAnchor}) + {quotient} + {remainder} + {leapAdj} = " +
-                          $"{(int)centuryAnchor + quotient + remainder + leapAdj}\n" +
-                          $"• Mod 7 = {(int)yearDoomsday}",
-            Calculation = $"{(int)centuryAnchor} + {quotient} + {remainder} + {leapAdj} = " +
-                          $"{(int)centuryAnchor + quotient + remainder + leapAdj} → mod 7 = {(int)yearDoomsday}",
+            Title = "Beräkna årets Doomsday (12-metoden)",
+            Explanation = $"De sista två siffrorna: y = {lastTwo}.\n" +
+                          $"  a) 12-årsblock: {lastTwo} ÷ 12 = {quotient} hela block → {quotient} hopp\n" +
+                          $"  b) Överblivna år: {lastTwo} − {quotient * 12} = {remainder} år kvar\n" +
+                          $"  c) Skottårshopp i resten: {remainder} ÷ 4 = {leapAdj} hela 4-årsgrupp(er) → {leapAdj} extra hopp\n" +
+                          $"  d) Summera allt: sekelankare({(int)centuryAnchor}) + {quotient} + {remainder} + {leapAdj} = {yearTotal} → mod 7 = {(int)yearDoomsday}",
+            Calculation = $"{(int)centuryAnchor} + {quotient} + {remainder} + {leapAdj} = {yearTotal} → mod 7 = {(int)yearDoomsday}",
             Result = $"{yearDoomsday}"
         });
 

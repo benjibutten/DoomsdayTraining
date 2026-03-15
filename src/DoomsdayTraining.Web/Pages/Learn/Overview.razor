@@ -25,7 +25,7 @@
         <MudText Typo="Typo.caption">→ Det här memorerar du.</MudText>
     </MudListItem>
     <MudListItem T="string" Icon="@Icons.Material.Filled.LooksTwo">
-        <strong>Året 1987 justerar ankaret:</strong> Genom enkel division hittar vi att Doomsday-veckodagen 1987 är <strong>Lördag</strong>.
+        <strong>Året 1987 justerar ankaret:</strong> Vi delar upp 87 i 12-årsblock, överblivna år och skottårshopp. Då ser vi att Doomsday-veckodagen 1987 är <strong>Lördag</strong>.
     </MudListItem>
     <MudListItem T="string" Icon="@Icons.Material.Filled.Looks3">
         <strong>Mars har ett känt Doomsday-datum:</strong> 7 mars = Lördag (i 1987).
@@ -67,9 +67,9 @@ Minnesregel: <strong>FrOTS</strong> (Fredag, Onsdag, Tisdag, Söndag)</MudText>
         <ItemContent>
             <MudPaper Elevation="1" Class="pa-4 mb-2">
                 <MudText Typo="Typo.subtitle1"><strong>Beräkna årets Doomsday</strong></MudText>
-                <MudText Typo="Typo.body2" Class="mt-1">Med "12-metoden" justerar du sekelankaret baserat på de sista två siffrorna i årtalet. Tre enkla divisioner och en addition.</MudText>
+                <MudText Typo="Typo.body2" Class="mt-1">Med 12-metoden delar du upp de sista två siffrorna i 12-årsblock, år som blir över och hela 4-årsgrupper. Då blir årsjusteringen tydlig i stället för magisk.</MudText>
                 <MudPaper Elevation="0" Class="pa-2 mt-2" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; text-align:center;">
-                    Sekelankare + (y ÷ 12) + (y mod 12) + (y mod 12 ÷ 4)  (mod 7)
+                    Sekelankare + (y ÷ 12) + (y mod 12) + ((y mod 12) ÷ 4)  (mod 7)
                 </MudPaper>
                 <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="mt-2" Href="learn/year-doomsday">Lär dig mer →</MudButton>
             </MudPaper>

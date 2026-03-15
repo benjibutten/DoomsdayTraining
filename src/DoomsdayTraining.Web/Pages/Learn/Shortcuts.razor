@@ -3,12 +3,83 @@
 <PageTitle>Genvägar & Tips – Doomsday-Algoritmen</PageTitle>
 
 <MudText Typo="Typo.h4" GutterBottom="true">⚡ Genvägar & Tips</MudText>
-<MudText Typo="Typo.subtitle1" Class="mb-4">När du lärt dig grunderna finns det smarta genvägar som gör dig ännu snabbare!</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">När du lärt dig grunderna finns det smarta genvägar, minnesknep och huvudräkningsvanor som gör dig ännu snabbare.</MudText>
 
 <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
     <strong>Viktigt:</strong> Lär dig grundalgoritmen först innan du fokuserar på genvägar.
     Genvägar sparar tid men är meningslösa om du inte förstår varje steg ordentligt.
 </MudAlert>
+
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">🧮 Det hjälper att ha koll på</MudText>
+
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">1. 12-tabellen du faktiskt behöver – slå upp under övning</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Du behöver inte kunna hela multiplikationstabellen. Det räcker att känna igen var varje 12-årsblock slutar –
+        tio värden att ha i bakhuvudet.
+    </MudText>
+    <MudSimpleTable Dense="true" Hover="true" Elevation="0" Class="mb-2">
+        <thead><tr><th>Multipel av 12</th><th>Kvot (block)</th><th>y-intervall</th></tr></thead>
+        <tbody>
+            <tr><td>0</td><td>0</td><td>y = 0–11</td></tr>
+            <tr><td>12</td><td>1</td><td>y = 12–23</td></tr>
+            <tr><td>24</td><td>2</td><td>y = 24–35</td></tr>
+            <tr><td>36</td><td>3</td><td>y = 36–47</td></tr>
+            <tr><td>48</td><td>4</td><td>y = 48–59</td></tr>
+            <tr><td>60</td><td>5</td><td>y = 60–71</td></tr>
+            <tr><td>72</td><td>6</td><td>y = 72–83</td></tr>
+            <tr><td>84</td><td>7</td><td>y = 84–95</td></tr>
+            <tr><td>96</td><td>8</td><td>y = 96–99</td></tr>
+        </tbody>
+    </MudSimpleTable>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+        <strong>Exempel y = 87:</strong> 87 ligger i raden 84–95 → kvot = 7, rest = 87 − 84 = 3.
+    </MudAlert>
+</MudPaper>
+
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">2. Rest ÷ 4 – slå upp direkt</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Resten från steg b är alltid 0–11. Slå upp skottårsjusteringen här:
+    </MudText>
+    <MudSimpleTable Dense="true" Hover="true" Elevation="0">
+        <thead><tr><th>Rest (steg b)</th><th>Steg c – justering</th></tr></thead>
+        <tbody>
+            <tr><td>0, 1, 2, 3</td><td>0</td></tr>
+            <tr><td>4, 5, 6, 7</td><td>1</td></tr>
+            <tr><td>8, 9, 10, 11</td><td>2</td></tr>
+        </tbody>
+    </MudSimpleTable>
+</MudPaper>
+
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">3. Mod 7 snabbt i huvudet</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Plocka bort hela veckor. Summor 0–6 är klara direkt. Annars:
+    </MudText>
+    <MudSimpleTable Dense="true" Hover="true" Elevation="0">
+        <thead><tr><th>Summa</th><th>mod 7</th><th>Summa</th><th>mod 7</th></tr></thead>
+        <tbody>
+            <tr><td>7</td><td>0</td><td>15</td><td>1</td></tr>
+            <tr><td>8</td><td>1</td><td>16</td><td>2</td></tr>
+            <tr><td>9</td><td>2</td><td>17</td><td>3</td></tr>
+            <tr><td>10</td><td>3</td><td>18</td><td>4</td></tr>
+            <tr><td>11</td><td>4</td><td>19</td><td>5</td></tr>
+            <tr><td>12</td><td>5</td><td>20</td><td>6</td></tr>
+            <tr><td>13</td><td>6</td><td>21</td><td>0</td></tr>
+            <tr><td>14</td><td>0</td><td>22–28 …</td><td>mod 7 på nytt</td></tr>
+        </tbody>
+    </MudSimpleTable>
+</MudPaper>
+
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">4. Mental checklista – hela algoritmen i fyra rader</MudText>
+    <MudText Typo="Typo.body2" Class="mb-2">Ha detta som en intern monolog när du räknar:</MudText>
+    <MudPaper Elevation="0" Class="pa-3" Style="font-family:monospace; background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; font-size:0.9rem; white-space:pre-line;">1. Sekel? → FrOTS  (Fredag=5 / Onsdag=3 / Tisdag=2 / Söndag=0)
+2. y ÷ 12 = kvot, rest. rest ÷ 4 = justering. Summera + mod 7.
+3. Doomsday-ref i månaden? (4/4 · 6/6 · 8/8 · 10/10 · 12/12 · 9-to-5@7-Eleven)
+4. Avstånd = datum − ref. Mod 7. Hoppa från årets Doomsday.</MudPaper>
+</MudPaper>
 
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">🧠 Minnesknep</MudText>
 
@@ -18,8 +89,9 @@
         <strong>Fr</strong>edag (1800) → <strong>O</strong>nsdag (1900) → <strong>T</strong>isdag (2000)
         → <strong>S</strong>öndag (2100)
     </MudText>
-    <MudText Typo="Typo.body2" Color="Color.Tertiary">
-        Notera att det går "nedåt" (Fr=5, O=3, T=2, S=0) – nästan som en nedräkning!
+    <MudText Typo="Typo.body2" Color="Color.Tertiary" Class="mt-1">
+        Som tal: 5 → 3 → 2 → 0. Hoppar −2, −1, −2. Avvikelsen till −1 beror på att 2000 är ett skottsekel (delbart med 400).
+        Tipset: börja alltid från Tisdag(2) för 2000-talet och räkna dig bakåt/framåt om du nickar iväg.
     </MudText>
 </MudPaper>
 
@@ -45,6 +117,33 @@
         Tänk på <strong>"0 mars" = sista februari</strong> = alltid Doomsday.
         Alla multiplar av 7 i mars (7:e, 14:e, 21:a, 28:e) är också Doomsdays.
         Pi-dagen (3/14) är Doomsday – kul bonusfakta!
+    </MudText>
+</MudPaper>
+
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">🧷 Minnestekniker som brukar fungera</MudText>
+
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">Bygg små paket i stället för en lång lista</MudText>
+    <MudText Typo="Typo.body1">
+        Lär dig inte allt som en enda lång rad fakta. Dela upp det i små grupper:
+        sekelankare som ett paket, jämna månader som ett paket och "9-till-5 på 7-Eleven" som ett paket.
+        Då blir återkallningen mycket snabbare.
+    </MudText>
+</MudPaper>
+
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">Försök minnas innan du tittar</MudText>
+    <MudText Typo="Typo.body1">
+        Minnet blir starkare när du först försöker återkalla regeln själv och sedan kontrollerar facit.
+        Titta alltså på ett datum, säg till exempel "FrOTS" eller "9-till-5 på 7-Eleven" högt, och kolla sedan.
+    </MudText>
+</MudPaper>
+
+<MudPaper Elevation="2" Class="pa-4 mb-3">
+    <MudText Typo="Typo.h6" Class="mb-2">Ha minst två exempel per regel</MudText>
+    <MudText Typo="Typo.body1">
+        Om en regel inte sitter på första exemplet, byt direkt. Träna till exempel steg c både med rest 3 och rest 7,
+        så att du ser skillnaden mellan skottårsjustering 0 och 1 i praktiken.
     </MudText>
 </MudPaper>
 
@@ -117,7 +216,10 @@
             <tr><td>11 sep 2001</td><td>9/11</td><td>Tisdag</td></tr>
             <tr><td>20 jul 1969</td><td>Månlandningen</td><td>Söndag</td></tr>
             <tr><td>9 nov 1989</td><td>Berlinmurens fall</td><td>Torsdag</td></tr>
+            <tr><td>6 jun 1944</td><td>D-dagen (Normandie)</td><td>Tisdag</td></tr>
+            <tr><td>15 apr 1912</td><td>Titanic sjunker</td><td>Måndag</td></tr>
             <tr><td>25 dec 2024</td><td>Juldagen 2024</td><td>Onsdag</td></tr>
+            <tr><td>15 mar 2026</td><td>Idag (nu du läser detta)</td><td>Söndag</td></tr>
         </tbody>
     </MudSimpleTable>
 </MudPaper>

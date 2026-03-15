@@ -12,7 +12,17 @@
 </MudAlert>
 
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">"12-metoden" (Conway's metod)</MudText>
-<MudText Typo="Typo.body1" Class="mb-3">Den populäraste metoden för att snabbt räkna i huvudet. Fyra steg:</MudText>
+<MudText Typo="Typo.body1" Class="mb-3">Den populäraste metoden för att snabbt räkna i huvudet. Fyra steg, där varje steg svarar på en egen fråga om årtalet:</MudText>
+
+<MudPaper Elevation="1" Class="pa-4 mb-4">
+    <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>Så ska du tänka på steg 2</strong></MudText>
+    <MudText Typo="Typo.body2" Style="white-space:pre-line;">12-metoden bryter ned de sista två siffrorna i årtalet i tre delar:
+• Hur många hela 12-årsblock har passerat?
+• Hur många år blir över efter dessa block?
+• Hur många hela 4-årsgrupper finns i de överblivna åren?
+
+När du tänker så blir formeln mindre magisk och mer logisk.</MudText>
+</MudPaper>
 
 <MudTimeline TimelinePosition="TimelinePosition.Start" Class="mb-4">
     <MudTimelineItem Color="Color.Primary" Size="Size.Small">
@@ -20,7 +30,12 @@
         <ItemContent>
             <MudPaper Elevation="1" Class="pa-3 mb-2">
                 <MudText Typo="Typo.subtitle1"><strong>Ta de sista två siffrorna</strong></MudText>
-                <MudText Typo="Typo.body2">Kalla dem <strong>y</strong>. Till exempel: 2024 → y = 24, 1987 → y = 87.</MudText>
+                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Kalla dem <strong>y</strong>. De visar hur långt in i seklet du har kommit.
+Vi tittar bara på de sista två siffrorna eftersom sekelankaret redan tog hand om själva seklet.
+
+Exempel:
+• 2024 → y = 24
+• 1987 → y = 87</MudText>
             </MudPaper>
         </ItemContent>
     </MudTimelineItem>
@@ -29,11 +44,14 @@
         <ItemContent>
             <MudPaper Elevation="1" Class="pa-3 mb-2">
                 <MudText Typo="Typo.subtitle1"><strong>Dela y med 12</strong></MudText>
-                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Beräkna kvoten och resten:
-• y ÷ 12 = kvot (heltalsdivision)
-• y mod 12 = rest (det som blir över)
+                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Nu delar du upp y i hela 12-årsblock och år som blir över:
+• y ÷ 12 = kvot = antalet hela 12-årsblock
+• y mod 12 = rest = åren som blev över
 
-Exempel: 87 ÷ 12 = 7 rest 3</MudText>
+Varför 12? Varje hel 12-årsperiod flyttar Doomsday exakt en veckodag framåt.
+
+Exempel: 87 ÷ 12 = 7 rest 3
+Det betyder 7 hela 12-årsblock och 3 extra år.</MudText>
             </MudPaper>
         </ItemContent>
     </MudTimelineItem>
@@ -42,10 +60,16 @@ Exempel: 87 ÷ 12 = 7 rest 3</MudText>
         <ItemContent>
             <MudPaper Elevation="1" Class="pa-3 mb-2">
                 <MudText Typo="Typo.subtitle1"><strong>Dela resten med 4</strong></MudText>
-                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Ta resten från föregående steg och dela med 4 (heltalsdivision):
-• rest ÷ 4 = skottårsjustering
+                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Nu tittar du bara på resten från steg b, alltså de år som blev över.
+• Varje hel grupp om 4 år innehåller ett skottår
+• Ett skottår ger en extra dagsförskjutning
+• Därför berättar rest ÷ 4 hur många extra skottårshopp som finns kvar
 
-Exempel: 3 ÷ 4 = 0 (tre innehåller inga hela 4:or)</MudText>
+Det här steget frågar alltså inte bara om slutåret är skottår, utan hur många hela 4-årsblock som ryms i resten.
+
+Exempel:
+• 3 ÷ 4 = 0 → inga hela 4-årsblock, alltså ingen extra justering
+• 7 ÷ 4 = 1 → en hel 4-årsgrupp, alltså en extra justering</MudText>
             </MudPaper>
         </ItemContent>
     </MudTimelineItem>
@@ -54,8 +78,13 @@ Exempel: 3 ÷ 4 = 0 (tre innehåller inga hela 4:or)</MudText>
         <ItemContent>
             <MudPaper Elevation="1" Class="pa-3 mb-2">
                 <MudText Typo="Typo.subtitle1"><strong>Summera och ta mod 7</strong></MudText>
-                <MudText Typo="Typo.body2">Lägg ihop sekelankaret + kvot + rest + skottårsjustering.
-Ta sedan mod 7 (resten vid division med 7) för att få veckodagen.</MudText>
+                <MudText Typo="Typo.body2" Style="white-space:pre-line;">Lägg ihop sekelankaret + kvot + rest + skottårsjustering.
+Varje del motsvarar ett antal veckodagshopp framåt.
+
+Ta sedan mod 7, eftersom veckodagarna går i en cykel på 7.
+
+Exempel: 3 + 7 + 3 + 0 = 13
+13 mod 7 = 6 → Lördag</MudText>
             </MudPaper>
         </ItemContent>
     </MudTimelineItem>
@@ -66,38 +95,66 @@ Ta sedan mod 7 (resten vid division med 7) för att få veckodagen.</MudText>
 </MudPaper>
 
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">Genomgångsexempel</MudText>
+<MudText Typo="Typo.body2" Class="mb-2">Byt mellan tre exempel från 1900-talet så att sekelankaret är samma och du kan fokusera på hur årsdelen förändras.</MudText>
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <MudButton Variant="@(selectedExampleYear == 1987 ? Variant.Filled : Variant.Outlined)" Color="Color.Primary" OnClick="@(() => selectedExampleYear = 1987)">1987: justering 0</MudButton>
+    <MudButton Variant="@(selectedExampleYear == 1979 ? Variant.Filled : Variant.Outlined)" Color="Color.Primary" OnClick="@(() => selectedExampleYear = 1979)">1979: justering 1</MudButton>
+    <MudButton Variant="@(selectedExampleYear == 1994 ? Variant.Filled : Variant.Outlined)" Color="Color.Primary" OnClick="@(() => selectedExampleYear = 1994)">1994: justering 2</MudButton>
+</div>
+
+@{
+    var exampleCenturyAnchor = CenturyAnchorCalculator.Calculate(selectedExampleYear);
+    var (exampleQuotient, exampleRemainder, exampleLeapAdjustment, exampleDoomsday) =
+        YearDoomsdayCalculator.GetComponents(selectedExampleYear, exampleCenturyAnchor);
+    var exampleTotal = (int)exampleCenturyAnchor + exampleQuotient + exampleRemainder + exampleLeapAdjustment;
+}
 
 <MudPaper Elevation="2" Class="pa-4 mb-4">
-    <MudText Typo="Typo.h6" Class="mb-3">📝 Exempel: År 1987</MudText>
+    <MudText Typo="Typo.h6" Class="mb-3">📝 Exempel: År @selectedExampleYear</MudText>
     <MudSimpleTable Dense="true" Hover="true" Elevation="0">
         <thead>
             <tr><th>Delsteg</th><th>Beräkning</th><th>Resultat</th></tr>
         </thead>
         <tbody>
-            <tr><td>Sekelankare (1900-talet)</td><td>Memorerat</td><td><strong>Onsdag (3)</strong></td></tr>
-            <tr><td>y = sista två siffrorna</td><td>1987 → 87</td><td><strong>87</strong></td></tr>
-            <tr><td>87 ÷ 12</td><td>87 = 7 × 12 + 3</td><td>Kvot: <strong>7</strong>, Rest: <strong>3</strong></td></tr>
-            <tr><td>Rest ÷ 4</td><td>3 ÷ 4 = 0</td><td>Justering: <strong>0</strong></td></tr>
-            <tr><td>Summa</td><td>3 + 7 + 3 + 0 = 13</td><td><strong>13</strong></td></tr>
-            <tr><td>Mod 7</td><td>13 mod 7 = 6</td><td><strong>Lördag (6)</strong></td></tr>
+            <tr><td>Sekelankare (1900-talet)</td><td>Memorerat</td><td><strong>@exampleCenturyAnchor (@((int)exampleCenturyAnchor))</strong></td></tr>
+            <tr><td>y = sista två siffrorna</td><td>@selectedExampleYear → @(selectedExampleYear % 100)</td><td><strong>@(selectedExampleYear % 100)</strong></td></tr>
+            <tr><td>y ÷ 12</td><td>@(selectedExampleYear % 100) = @exampleQuotient × 12 + @exampleRemainder</td><td>Kvot: <strong>@exampleQuotient</strong>, Rest: <strong>@exampleRemainder</strong></td></tr>
+            <tr><td>Rest ÷ 4</td><td>@exampleRemainder ÷ 4 = @exampleLeapAdjustment</td><td>Skottårsjustering: <strong>@exampleLeapAdjustment</strong></td></tr>
+            <tr><td>Summa</td><td>@((int)exampleCenturyAnchor) + @exampleQuotient + @exampleRemainder + @exampleLeapAdjustment = @exampleTotal</td><td><strong>@exampleTotal</strong></td></tr>
+            <tr><td>Mod 7</td><td>@exampleTotal mod 7 = @((int)exampleDoomsday)</td><td><strong>@exampleDoomsday (@((int)exampleDoomsday))</strong></td></tr>
         </tbody>
     </MudSimpleTable>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
+        <strong>Så läser du steg c här:</strong><br />
+        @GetLeapAdjustmentExplanation(exampleRemainder, exampleLeapAdjustment)
+    </MudAlert>
+
     <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-3">
-        Alla Doomsday-datum 1987 (4/4, 6/6, 8/8 osv.) infaller på en <strong>Lördag</strong>.
+        Alla Doomsday-datum @selectedExampleYear (4/4, 6/6, 8/8 osv.) infaller på en <strong>@exampleDoomsday</strong>.
     </MudAlert>
 </MudPaper>
 
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+    <strong>Vanligt missförstånd:</strong><br />
+    Steg c är inte en ren kontroll av om just det aktuella året råkar vara skottår.
+    Det räknar hur många hela 4-årsblock som finns bland de år som blev över efter att 12-årsblocken tagits bort.
+</MudAlert>
+
 <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4">
     <strong>💡 Varför funkar 12-metoden?</strong><br />
-    Ett vanligt år har <strong>365 dagar</strong>, vilket är 52 veckor + 1 dag.
-    Alltså skiftar veckodagen 1 dag per år. Men vart 4:e år är det skottår (en extra dag).
-    12 år = 12 + 3 skottår = 15 extra dagar = 2 veckor + 1 dag = exakt 1 veckodagsshift.
-    Därför delar vi med 12!
+    Under 12 år flyttar veckodagen först 12 steg framåt bara av vanliga år.
+    Bland dessa år finns normalt 3 skottår, och de ger 3 extra steg.
+    Totalt blir det alltså 15 steg, och 15 mod 7 = 1.
+    Därför motsvarar varje hel 12-årsgrupp exakt ett extra veckodagshopp i huvudräkningen.
+    Resten tas sedan hand om av "rest" och "rest ÷ 4".
 </MudAlert>
 
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">Testa själv</MudText>
 <MudPaper Elevation="2" Class="pa-4 mb-4">
     <MudText Typo="Typo.h6" Class="mb-2">🧪 Beräkna årets Doomsday</MudText>
+    <MudText Typo="Typo.body2" Class="mb-3">Tabellen följer samma tanke som ovan: först 12-årsblock, sedan överblivna år, sedan hur många hela 4-årsgrupper som finns i resten.</MudText>
     <MudNumericField @bind-Value="testYear" Label="Årtal" Min="1" Max="9999" Variant="Variant.Outlined" Style="max-width:200px;" Immediate="true" />
 
     @if (testYear > 0)
@@ -114,8 +171,8 @@ Ta sedan mod 7 (resten vid division med 7) för att få veckodagen.</MudText>
             <tbody>
                 <tr><td>Sekelankare</td><td>@(testYear / 100 * 100)-talet</td><td><strong>@centuryAnchor (@((int)centuryAnchor))</strong></td></tr>
                 <tr><td>y</td><td>@testYear → @y</td><td><strong>@y</strong></td></tr>
-                <tr><td>y ÷ 12</td><td>@y ÷ 12 = @quotient rest @remainder</td><td>Kvot: <strong>@quotient</strong>, Rest: <strong>@remainder</strong></td></tr>
-                <tr><td>Rest ÷ 4</td><td>@remainder ÷ 4 = @leapAdj</td><td>Justering: <strong>@leapAdj</strong></td></tr>
+                <tr><td>y ÷ 12</td><td>@y ÷ 12 = @quotient rest @remainder</td><td>12-årsblock: <strong>@quotient</strong>, Överblivna år: <strong>@remainder</strong></td></tr>
+                <tr><td>Rest ÷ 4</td><td>@remainder ÷ 4 = @leapAdj</td><td>Skottårsjustering: <strong>@leapAdj</strong></td></tr>
                 <tr><td>Summa</td><td>@((int)centuryAnchor) + @quotient + @remainder + @leapAdj = @((int)centuryAnchor + quotient + remainder + leapAdj)</td><td><strong>@((int)centuryAnchor + quotient + remainder + leapAdj)</strong></td></tr>
                 <tr><td>Mod 7</td><td>@((int)centuryAnchor + quotient + remainder + leapAdj) mod 7 = @((int)doomsday)</td><td><strong>@doomsday (@((int)doomsday))</strong></td></tr>
             </tbody>
@@ -133,4 +190,16 @@ Ta sedan mod 7 (resten vid division med 7) för att få veckodagen.</MudText>
 
 @code {
     private int testYear = 2024;
+    private int selectedExampleYear = 1987;
+
+    private static string GetLeapAdjustmentExplanation(int remainder, int leapAdjustment)
+    {
+        if (leapAdjustment == 0)
+        {
+            return $"Resten är {remainder}, så där ryms inga hela 4-årsblock. Därför blir skottårsjusteringen 0.";
+        }
+
+        var groupText = leapAdjustment == 1 ? "en hel 4-årsgrupp" : $"{leapAdjustment} hela 4-årsgrupper";
+        return $"Resten är {remainder}, så där ryms {groupText}. Varje sådan grupp bidrar med ett extra veckodagshopp, därför blir skottårsjusteringen {leapAdjustment}.";
+    }
 }

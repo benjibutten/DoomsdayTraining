@@ -70,15 +70,18 @@
             @if (wasCorrect)
             {
                 <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">
-                    ✅ Rätt! @centuryYear-talet har ankardagen <strong>@centuryCorrectAnswer</strong>.
+                    ✅ Rätt! @centuryYear-talet = <strong>@centuryCorrectAnswer</strong>.
                 </MudAlert>
             }
             else
             {
                 <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-3">
-                    ❌ Fel. Du svarade @centuryUserAnswer. Rätt svar: <strong>@centuryCorrectAnswer</strong>.
+                    ❌ Fel. Du svarade @centuryUserAnswer. Rätt: <strong>@centuryCorrectAnswer</strong>.
                 </MudAlert>
             }
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mb-3">
+                <strong>FrOTS:</strong> <strong>Fr</strong>edag (1800) → <strong>O</strong>nsdag (1900) → <strong>T</strong>isdag (2000) → <strong>S</strong>öndag (2100)
+            </MudAlert>
             <MudGrid Spacing="2" Justify="Justify.Center" Class="mb-3">
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
@@ -118,6 +121,12 @@
 
         @if (hasAnswered)
         {
+            var yy = yearToGuess % 100;
+            var yQuot = yy / 12;
+            var yRem = yy % 12;
+            var yLeap = yRem / 4;
+            var ySum = (int)yearCenturyAnchor + yQuot + yRem + yLeap;
+
             @if (wasCorrect)
             {
                 <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">
@@ -144,13 +153,13 @@
                 }
             </MudGrid>
 
-            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-3 text-left">
-                <strong>Beräkning:</strong> y = @(yearToGuess % 100) →
-                @(yearToGuess % 100) ÷ 12 = @(yearToGuess % 100 / 12) rest @(yearToGuess % 100 % 12) →
-                @(yearToGuess % 100 % 12) ÷ 4 = @(yearToGuess % 100 % 12 / 4) →
-                @((int)yearCenturyAnchor) + @(yearToGuess % 100 / 12) + @(yearToGuess % 100 % 12) + @(yearToGuess % 100 % 12 / 4) = @((int)yearCenturyAnchor + yearToGuess % 100 / 12 + yearToGuess % 100 % 12 + yearToGuess % 100 % 12 / 4)
-                → mod 7 = @((int)yearCorrectAnswer) = @yearCorrectAnswer
-            </MudAlert>
+            <MudPaper Elevation="0" Class="pa-3 mb-3 text-left" Style="background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px; font-size:0.9rem;">
+                <MudText Typo="Typo.caption" Class="mb-1"><strong>Steg-för-steg (y = @yy):</strong></MudText>
+                <div>a) 12-årsblock: @yy ÷ 12 = <strong>@yQuot</strong></div>
+                <div>b) Överblivna år: @yy mod 12 = <strong>@yRem</strong></div>
+                <div>c) Skottårshopp: @yRem ÷ 4 = <strong>@yLeap</strong></div>
+                <div>d) Summa: @((int)yearCenturyAnchor) + @yQuot + @yRem + @yLeap = @ySum → mod 7 = <strong>@yearCorrectAnswer</strong></div>
+            </MudPaper>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextQuestion" EndIcon="@Icons.Material.Filled.ArrowForward">Nästa</MudButton>
         }
         else
