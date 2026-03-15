@@ -56,6 +56,15 @@
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">Börja öva direkt</MudText>
 <MudGrid Spacing="3">
     <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%; border: 2px solid var(--mud-palette-primary);" @onclick='() => NavigateTo("practice/guided-simulator")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🎓</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Guidad simulator</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Få hjälp genom varje steg med förklaringar, liknelser och tips – som en privatlektionscoach!</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
         <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("practice/flashcards")'>
             <MudCardContent>
                 <MudText Typo="Typo.h3" Align="Align.Center">🃏</MudText>

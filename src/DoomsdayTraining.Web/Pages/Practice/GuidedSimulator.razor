@@ -1,0 +1,707 @@
+@page "/practice/guided-simulator"
+
+<PageTitle>Guidad Simulator – Doomsday-Algoritmen</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">🎓 Guidad Simulator</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">Jag guidar dig genom varje steg i Doomsday-algoritmen – med förklaringar, liknelser och tips anpassade efter just ditt datum.</MudText>
+
+@if (!started)
+{
+    <MudPaper Elevation="2" Class="pa-4 mb-4">
+        <MudText Typo="Typo.h6" Class="mb-3">📅 Välj ett datum att lösa</MudText>
+        <MudGrid Spacing="2">
+            <MudItem xs="12" sm="3">
+                <MudNumericField @bind-Value="inputYear" Label="År" Min="1" Max="9999" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudSelect @bind-Value="inputMonth" Label="Månad" Variant="Variant.Outlined">
+                    @for (int m = 1; m <= 12; m++)
+                    {
+                        var info = MonthDoomsdayProvider.GetInfoForMonth(m);
+                        <MudSelectItem Value="@m">@m – @info.MonthName</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="2">
+                <MudNumericField @bind-Value="inputDay" Label="Dag" Min="1" Max="31" Variant="Variant.Outlined" />
+            </MudItem>
+        </MudGrid>
+        <div class="d-flex gap-2 mt-4 flex-wrap">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large" OnClick="StartWithInput"
+                       StartIcon="@Icons.Material.Filled.PlayArrow">Starta med detta datum</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large" OnClick="StartWithRandom"
+                       StartIcon="@Icons.Material.Filled.Casino">Slumpa ett datum</MudButton>
+        </div>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-3">@errorMessage</MudAlert>
+        }
+    </MudPaper>
+
+    <MudPaper Elevation="1" Class="pa-4 mb-4" Style="border-left: 4px solid var(--mud-palette-info); background: var(--mud-palette-background-gray, #f5f5f5);">
+        <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>🧭 Hur fungerar simulatorn?</strong></MudText>
+        <MudText Typo="Typo.body1">
+            Simulatorn guidar dig genom alla steg i Doomsday-algoritmen för det datum du valt.
+            Vid varje steg får du en förklaring med liknelse, sen försöker du själv räkna ut svaret.
+            Klicka "Visa svaret" när du vill se facit och förklaringen av just de siffror som gäller.
+            Det är som att ha en privatlärare bredvid dig som väntar tålmodigt medan du tänker!
+        </MudText>
+    </MudPaper>
+}
+else
+{
+    @* ── Datumbanderoll ── *@
+    <MudPaper Elevation="3" Class="pa-4 mb-4 text-center" Style="border-radius:16px;">
+        <MudText Typo="Typo.h4" Color="Color.Primary" Style="font-variant-numeric: tabular-nums;">
+            @date.ToString("d MMMM yyyy", svCulture)
+        </MudText>
+        <MudText Typo="Typo.body2">Vilken veckodag är detta? Följ stegen nedan för att räkna ut det!</MudText>
+    </MudPaper>
+
+    @* ── Stegindikator ── *@
+    <div class="d-flex gap-2 mb-4 justify-center flex-wrap">
+        @for (var s = 0; s < 5; s++)
+        {
+            var stepNum = s;
+            var isActive = currentStep == stepNum;
+            var isDone = currentStep > stepNum;
+            var label = StepLabels[stepNum];
+            <MudChip T="string" Size="Size.Small"
+                     Color="@(isDone ? Color.Success : isActive ? Color.Primary : Color.Default)"
+                     Variant="@(isActive || isDone ? Variant.Filled : Variant.Outlined)">
+                @(stepNum + 1). @label
+            </MudChip>
+        }
+    </div>
+
+    @* ═══════ STEG 1: SKOTTÅRSKONTROLL ═══════ *@
+    @if (currentStep >= 0)
+    {
+        <MudPaper Elevation="2" Class="pa-4 mb-4" Style="border-radius:12px;" id="step-0">
+            <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-2">
+                <MudIcon Icon="@Icons.Material.Filled.Looks3" Size="Size.Small" Class="mr-1" />
+                Steg 1: Är @date.Year ett skottår?
+            </MudText>
+
+            <MudPaper Elevation="0" Class="pa-3 mb-3" Style="border-left: 4px solid var(--mud-palette-info); background: var(--mud-palette-background-gray, #f5f5f5);">
+                <MudText Typo="Typo.body2">
+                    <strong>🔑 Liknelse:</strong> Tänk på skottårsreglerna som ett system av portar.
+                    Först frågar du: "Är året delbart med 4?" Om ja → du passerar port 1.
+                    Sen: "Delbart med 100?" Om ja → port 2 stängs (inte skottår).
+                    Men: "Delbart med 400?" Om ja → det finns en hemlig bakdörr som öppnar igen!
+                </MudText>
+            </MudPaper>
+
+            <MudText Typo="Typo.body1" Class="mb-3">
+                Tänk efter: Är <strong>@date.Year</strong> delbart med 4? Med 100? Med 400?
+                Det här påverkar januari och februari.
+            </MudText>
+
+            @if (!step1Revealed)
+            {
+                <div class="d-flex gap-2 flex-wrap">
+                    <MudButton Variant="Variant.Outlined" Color="@(step1UserAnswer == true ? Color.Primary : Color.Default)"
+                               OnClick="@(() => step1UserAnswer = true)">Ja, skottår</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="@(step1UserAnswer == false ? Color.Primary : Color.Default)"
+                               OnClick="@(() => step1UserAnswer = false)">Nej, inte skottår</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RevealStep1"
+                               StartIcon="@Icons.Material.Filled.Visibility">Visa svaret</MudButton>
+                </div>
+            }
+            else
+            {
+                @if (step1UserAnswer.HasValue)
+                {
+                    var isCorrect = step1UserAnswer.Value == isLeapYear;
+                    <MudAlert Severity="@(isCorrect ? Severity.Success : Severity.Error)" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                        @(isCorrect ? "✅ Rätt!" : $"❌ Inte riktigt. ")
+                        @date.Year är @(isLeapYear ? "ett skottår ✓" : "inte ett skottår").
+                    </MudAlert>
+                }
+
+                <MudPaper Elevation="0" Class="pa-3 mb-2" Style="background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px;">
+                    <MudText Typo="Typo.body2" Style="white-space:pre-line;">@GetLeapYearExplanation()</MudText>
+                </MudPaper>
+
+                @if (currentStep == 0)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextStep" Class="mt-2"
+                               EndIcon="@Icons.Material.Filled.ArrowForward">Gå vidare till steg 2</MudButton>
+                }
+            }
+        </MudPaper>
+    }
+
+    @* ═══════ STEG 2: SEKELANKARET ═══════ *@
+    @if (currentStep >= 1)
+    {
+        <MudPaper Elevation="2" Class="pa-4 mb-4" Style="border-radius:12px;" id="step-1">
+            <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-2">
+                <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Size="Size.Small" Class="mr-1" />
+                Steg 2: Sekelankaret för @(date.Year / 100 * 100)-talet
+            </MudText>
+
+            <MudPaper Elevation="0" Class="pa-3 mb-3" Style="border-left: 4px solid var(--mud-palette-info); background: var(--mud-palette-background-gray, #f5f5f5);">
+                <MudText Typo="Typo.body2">
+                    <strong>⏰ Liknelse:</strong> Varje sekel har sin egen "tidszon" – en fast veckodag som är startpunkten.
+                    Precis som du direkt vet att Stockholm = +1 timme, ska du direkt veta vilken dag det är
+                    för @(date.Year / 100 * 100)-talet. Minnesregel: <strong>FrOTS</strong> =
+                    Fredag (1800) → Onsdag (1900) → Tisdag (2000) → Söndag (2100).
+                </MudText>
+            </MudPaper>
+
+            <MudText Typo="Typo.body1" Class="mb-3">
+                Vilken veckodag är ankaret för <strong>@(date.Year / 100 * 100)-talet</strong>?
+            </MudText>
+
+            @if (!step2Revealed)
+            {
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                    @foreach (Weekday day in Enum.GetValues<Weekday>())
+                    {
+                        var d = day;
+                        <MudButton Variant="@(step2UserAnswer == d ? Variant.Filled : Variant.Outlined)"
+                                   Color="@(step2UserAnswer == d ? Color.Primary : Color.Default)"
+                                   OnClick="@(() => step2UserAnswer = d)" Size="Size.Small">@d</MudButton>
+                    }
+                </div>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RevealStep2"
+                           StartIcon="@Icons.Material.Filled.Visibility">Visa svaret</MudButton>
+            }
+            else
+            {
+                @if (step2UserAnswer.HasValue)
+                {
+                    var isCorrect = step2UserAnswer.Value == centuryAnchor;
+                    <MudAlert Severity="@(isCorrect ? Severity.Success : Severity.Error)" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                        @(isCorrect ? "✅ Rätt!" : $"❌ Du svarade {step2UserAnswer.Value}.")
+                        @(date.Year / 100 * 100)-talet = <strong>@centuryAnchor</strong>.
+                    </MudAlert>
+                }
+
+                <MudPaper Elevation="0" Class="pa-3 mb-2" Style="background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px;">
+                    <MudText Typo="Typo.body2">@centuryInfo.Explanation</MudText>
+                    <MudText Typo="Typo.body2" Class="mt-1">
+                        📝 FrOTS: <strong>Fr</strong>edag (1800) → <strong>O</strong>nsdag (1900) → <strong>T</strong>isdag (2000) → <strong>S</strong>öndag (2100)
+                    </MudText>
+                </MudPaper>
+
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                    Sekelankaret = <MudChip T="string" Color="Color.Primary" Size="Size.Small">@centuryAnchor (@((int)centuryAnchor))</MudChip>
+                </MudAlert>
+
+                @if (currentStep == 1)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextStep" Class="mt-2"
+                               EndIcon="@Icons.Material.Filled.ArrowForward">Gå vidare till steg 3</MudButton>
+                }
+            }
+        </MudPaper>
+    }
+
+    @* ═══════ STEG 3: ÅRETS DOOMSDAY ═══════ *@
+    @if (currentStep >= 2)
+    {
+        var y = date.Year % 100;
+
+        <MudPaper Elevation="2" Class="pa-4 mb-4" Style="border-radius:12px;" id="step-2">
+            <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-2">
+                <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Size="Size.Small" Class="mr-1" />
+                Steg 3: Årets Doomsday (@date.Year)
+            </MudText>
+
+            <MudPaper Elevation="0" Class="pa-3 mb-3" Style="border-left: 4px solid var(--mud-palette-info); background: var(--mud-palette-background-gray, #f5f5f5);">
+                <MudText Typo="Typo.body2">
+                    <strong>💰 Liknelse:</strong> Du har <strong>@y kronor</strong> i småmynt och ska växla.
+                    Först tar du ut 12-kronorssedlar → <strong>@y ÷ 12 = @quotient st</strong> (= @(quotient * 12) kr).
+                    Kvar blir <strong>@remainder kr</strong>.
+                    Sen kollar du 4-kronorsgrupper i resten → <strong>@remainder ÷ 4 = @leapAdj st</strong>.
+                    Varje "sedel" och "grupp" = ett veckodagshopp framåt!
+                </MudText>
+            </MudPaper>
+
+            <MudText Typo="Typo.body1" Class="mb-2">
+                De sista två siffrorna: <strong>y = @y</strong>.
+                Sekelankaret: <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">@centuryAnchor (@((int)centuryAnchor))</MudChip>
+            </MudText>
+
+            @if (!step3Revealed)
+            {
+                <MudText Typo="Typo.body2" Class="mb-2">
+                    Använd 12-metoden: y÷12 = kvot, rest = y mod 12, rest÷4 = skottårsjustering.
+                    Summera allt med sekelankaret, ta mod 7. Vilken veckodag blir det?
+                </MudText>
+
+                @* Sub-steg synliga för att hjälpa *@
+                <MudExpansionPanels MultiExpansion="true" Class="mb-3" Elevation="0">
+                    <MudExpansionPanel Text="💡 Hjälp: Visa delstegen" Dense="true" Expanded="false">
+                        <MudSimpleTable Dense="true" Hover="true" Elevation="0">
+                            <tbody>
+                                <tr><td>a) 12-årsblock</td><td>@y ÷ 12 = ?</td></tr>
+                                <tr><td>b) Överblivna år</td><td>@y mod 12 = ?</td></tr>
+                                <tr><td>c) Skottårshopp</td><td>rest ÷ 4 = ?</td></tr>
+                                <tr><td>d) Summa</td><td>@((int)centuryAnchor) + ? + ? + ? = ? → mod 7 = ?</td></tr>
+                            </tbody>
+                        </MudSimpleTable>
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
+
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                    @foreach (Weekday day in Enum.GetValues<Weekday>())
+                    {
+                        var d = day;
+                        <MudButton Variant="@(step3UserAnswer == d ? Variant.Filled : Variant.Outlined)"
+                                   Color="@(step3UserAnswer == d ? Color.Primary : Color.Default)"
+                                   OnClick="@(() => step3UserAnswer = d)" Size="Size.Small">@d</MudButton>
+                    }
+                </div>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RevealStep3"
+                           StartIcon="@Icons.Material.Filled.Visibility">Visa svaret</MudButton>
+            }
+            else
+            {
+                @if (step3UserAnswer.HasValue)
+                {
+                    var isCorrect = step3UserAnswer.Value == yearDoomsday;
+                    <MudAlert Severity="@(isCorrect ? Severity.Success : Severity.Error)" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                        @(isCorrect ? "✅ Helt rätt!" : $"❌ Du svarade {step3UserAnswer.Value}.")
+                        Årets Doomsday = <strong>@yearDoomsday</strong>.
+                    </MudAlert>
+                }
+
+                <MudSimpleTable Dense="true" Hover="true" Elevation="0" Class="mb-3">
+                    <thead><tr><th>Delsteg</th><th>Beräkning</th><th>Resultat</th></tr></thead>
+                    <tbody>
+                        <tr><td>Sekelankare</td><td>@(date.Year / 100 * 100)-talet (FrOTS)</td><td><strong>@centuryAnchor (@((int)centuryAnchor))</strong></td></tr>
+                        <tr><td>y = sista två siffrorna</td><td>@date.Year → @y</td><td><strong>@y</strong></td></tr>
+                        <tr><td>a) y ÷ 12</td><td>@y ÷ 12 = @quotient rest @remainder</td><td>Block: <strong>@quotient</strong>, Rest: <strong>@remainder</strong></td></tr>
+                        <tr><td>b) Rest ÷ 4</td><td>@remainder ÷ 4 = @leapAdj</td><td>Skottårsjustering: <strong>@leapAdj</strong></td></tr>
+                        <tr><td>c) Summa</td><td>@((int)centuryAnchor) + @quotient + @remainder + @leapAdj = @yearTotal</td><td><strong>@yearTotal</strong></td></tr>
+                        <tr><td>d) Mod 7</td><td>@yearTotal mod 7 = @((int)yearDoomsday)</td><td><strong>@yearDoomsday</strong></td></tr>
+                    </tbody>
+                </MudSimpleTable>
+
+                <MudPaper Elevation="0" Class="pa-3 mb-2" Style="background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px;">
+                    <MudText Typo="Typo.body2">
+                        <strong>🚌 Bussliknelsen:</strong> Du startade vid hållplats @centuryAnchor (@((int)centuryAnchor)).
+                        Du åkte @quotient runda(or) med 12-årsbussen (+@quotient hållplatser),
+                        sedan @remainder extra stopp för överblivna år,
+                        och @leapAdj bonusstopp för skottårshopp.
+                        Totalt: @yearTotal hållplatser. Runt slingan med 7 hållplatser:
+                        @yearTotal mod 7 = @((int)yearDoomsday) → <strong>@yearDoomsday</strong>!
+                    </MudText>
+                </MudPaper>
+
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                    Alla Doomsday-datum @date.Year infaller på en <MudChip T="string" Color="Color.Primary" Size="Size.Small">@yearDoomsday</MudChip>
+                </MudAlert>
+
+                @if (currentStep == 2)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextStep" Class="mt-2"
+                               EndIcon="@Icons.Material.Filled.ArrowForward">Gå vidare till steg 4</MudButton>
+                }
+            }
+        </MudPaper>
+    }
+
+    @* ═══════ STEG 4: MÅNADENS DOOMSDAY-DATUM ═══════ *@
+    @if (currentStep >= 3)
+    {
+        <MudPaper Elevation="2" Class="pa-4 mb-4" Style="border-radius:12px;" id="step-3">
+            <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-2">
+                <MudIcon Icon="@Icons.Material.Filled.ViewList" Size="Size.Small" Class="mr-1" />
+                Steg 4: Doomsday-referens i @monthInfo.MonthName
+            </MudText>
+
+            <MudPaper Elevation="0" Class="pa-3 mb-3" Style="border-left: 4px solid var(--mud-palette-info); background: var(--mud-palette-background-gray, #f5f5f5);">
+                <MudText Typo="Typo.body2">
+                    <strong>🚩 Liknelse:</strong> Varje månad har ett "landmärke" – ett datum du känner igen
+                    som alltid faller på Doomsday. Tänk: i @monthInfo.MonthName,
+                    var ligger mitt landmärke?
+                    @GetMonthHint()
+                </MudText>
+            </MudPaper>
+
+            <MudText Typo="Typo.body1" Class="mb-3">
+                Vilket datum i <strong>@monthInfo.MonthName</strong> är Doomsday?
+                @if ((date.Month == 1 || date.Month == 2) && isLeapYear)
+                {
+                    <span>(Obs: det är ett <strong>skottår</strong>!)</span>
+                }
+                else if (date.Month == 1 || date.Month == 2)
+                {
+                    <span>(Obs: det är <strong>inte</strong> skottår.)</span>
+                }
+            </MudText>
+
+            @if (!step4Revealed)
+            {
+                <div class="d-flex gap-2 align-center mb-2">
+                    <MudNumericField @bind-Value="step4UserDay" Label="Dag" Variant="Variant.Outlined"
+                                     Min="1" Max="31" Style="max-width:120px;" Immediate="true"
+                                     OnKeyDown="HandleStep4KeyDown" />
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RevealStep4"
+                               StartIcon="@Icons.Material.Filled.Visibility">Visa svaret</MudButton>
+                </div>
+            }
+            else
+            {
+                @if (step4UserDay > 0)
+                {
+                    var isCorrect = step4UserDay == doomsdayInMonth;
+                    <MudAlert Severity="@(isCorrect ? Severity.Success : Severity.Error)" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                        @(isCorrect ? "✅ Rätt!" : $"❌ Du svarade {step4UserDay}.")
+                        Doomsday i @monthInfo.MonthName = den <strong>@(doomsdayInMonth):e</strong>.
+                    </MudAlert>
+                }
+
+                <MudPaper Elevation="0" Class="pa-3 mb-2" Style="background:var(--mud-palette-background-gray,#f5f5f5); border-radius:6px;">
+                    <MudText Typo="Typo.body2">
+                        <strong>📝 Minnesregel:</strong> @monthInfo.Mnemonic
+                    </MudText>
+                </MudPaper>
+
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                    @doomsdayInMonth/@date.Month = <MudChip T="string" Color="Color.Primary" Size="Size.Small">@yearDoomsday</MudChip>
+                </MudAlert>
+
+                @if (currentStep == 3)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextStep" Class="mt-2"
+                               EndIcon="@Icons.Material.Filled.ArrowForward">Gå vidare till sista steget</MudButton>
+                }
+            }
+        </MudPaper>
+    }
+
+    @* ═══════ STEG 5: RÄKNA TILL MÅLDATUMET ═══════ *@
+    @if (currentStep >= 4)
+    {
+        var diff = date.Day - doomsdayInMonth;
+        var diffMod = ((diff % 7) + 7) % 7;
+
+        <MudPaper Elevation="2" Class="pa-4 mb-4" Style="border-radius:12px;" id="step-4">
+            <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-2">
+                <MudIcon Icon="@Icons.Material.Filled.GpsFixed" Size="Size.Small" Class="mr-1" />
+                Steg 5: Räkna till @date.Day @monthInfo.MonthName
+            </MudText>
+
+            <MudPaper Elevation="0" Class="pa-3 mb-3" Style="border-left: 4px solid var(--mud-palette-info); background: var(--mud-palette-background-gray, #f5f5f5);">
+                <MudText Typo="Typo.body2">
+                    <strong>🎬 Liknelse:</strong> Du sitter på plats @doomsdayInMonth (= @yearDoomsday) i bioraden.
+                    Du ska hitta plats @(date.Day).
+                    @if (diff == 0)
+                    {
+                        <span>Du sitter redan på rätt plats!</span>
+                    }
+                    else if (diff > 0)
+                    {
+                        <span>Det är @diff platser framåt. Men bioraden har bara 7 "platstyper" – så @diff mod 7 = @diffMod steg.</span>
+                    }
+                    else
+                    {
+                        <span>Det är @(-diff) platser bakåt. Räkna: @(-diff) mod 7 = @((((-diff) % 7) + 7) % 7) steg bakåt.</span>
+                    }
+                </MudText>
+            </MudPaper>
+
+            <MudText Typo="Typo.body1" Class="mb-2">
+                Doomsday = @yearDoomsday, referensdatum = den @(doomsdayInMonth):e.
+                Ditt datum = den @(date.Day):e.
+            </MudText>
+            <MudText Typo="Typo.body1" Class="mb-3">
+                <strong>Vilken veckodag är @date.ToString("d MMMM yyyy", svCulture)?</strong>
+            </MudText>
+
+            @if (!step5Revealed)
+            {
+                <MudExpansionPanels MultiExpansion="true" Class="mb-3" Elevation="0">
+                    <MudExpansionPanel Text="💡 Hjälp: Visa beräkningshjälp" Dense="true" Expanded="false">
+                        <MudText Typo="Typo.body2">
+                            Avstånd: @date.Day − @doomsdayInMonth = @diff dagar.
+                            @if (diff != 0)
+                            {
+                                <br />
+                                <span>@(Math.Abs(diff)) mod 7 = @diffMod → räkna @diffMod @(diff >= 0 ? "framåt" : "bakåt") från @yearDoomsday.</span>
+                            }
+                        </MudText>
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
+
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                    @foreach (Weekday day in Enum.GetValues<Weekday>())
+                    {
+                        var d = day;
+                        <MudButton Variant="@(step5UserAnswer == d ? Variant.Filled : Variant.Outlined)"
+                                   Color="@(step5UserAnswer == d ? Color.Primary : Color.Default)"
+                                   OnClick="@(() => step5UserAnswer = d)" Size="Size.Small">@d</MudButton>
+                    }
+                </div>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RevealStep5"
+                           StartIcon="@Icons.Material.Filled.Visibility">Visa svaret</MudButton>
+            }
+            else
+            {
+                @if (step5UserAnswer.HasValue)
+                {
+                    var isCorrect = step5UserAnswer.Value == finalWeekday;
+                    <MudAlert Severity="@(isCorrect ? Severity.Success : Severity.Error)" Variant="Variant.Outlined" Dense="true" Class="mb-2">
+                        @(isCorrect ? "🎉 Helt rätt!" : $"❌ Du svarade {step5UserAnswer.Value}.")
+                        @date.ToString("d MMMM yyyy", svCulture) är en <strong>@finalWeekday</strong>!
+                    </MudAlert>
+                }
+
+                <MudSimpleTable Dense="true" Hover="true" Elevation="0" Class="mb-3">
+                    <thead><tr><th>Steg</th><th>Beräkning</th><th>Resultat</th></tr></thead>
+                    <tbody>
+                        <tr><td>Referensdatum</td><td>@doomsdayInMonth/@date.Month = @yearDoomsday</td><td><strong>@yearDoomsday</strong></td></tr>
+                        <tr><td>Avstånd</td><td>@date.Day − @doomsdayInMonth = @diff dagar</td><td><strong>@diff @(diff >= 0 ? "framåt" : "bakåt")</strong></td></tr>
+                        @if (diff != 0)
+                        {
+                            <tr><td>Mod 7</td><td>@(Math.Abs(diff)) mod 7 = @diffMod</td><td><strong>@diffMod dag(ar)</strong></td></tr>
+                        }
+                        <tr><td>Resultat</td><td>@yearDoomsday + (@diff) mod 7</td><td><strong>@finalWeekday</strong></td></tr>
+                    </tbody>
+                </MudSimpleTable>
+
+                @* ═══════ SLUTRESULTAT ═══════ *@
+                <MudAlert Severity="Severity.Success" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center" Class="mt-3">
+                    <MudText Typo="Typo.h6">
+                        @date.ToString("d MMMM yyyy", svCulture) är en
+                        <MudChip T="string" Color="Color.Surface" Size="Size.Small">@finalWeekday</MudChip>
+                    </MudText>
+                </MudAlert>
+            }
+        </MudPaper>
+    }
+
+    @* ═══════ SAMMANFATTNING ═══════ *@
+    @if (step5Revealed)
+    {
+        <MudPaper Elevation="3" Class="pa-4 mb-4 text-center" Style="border-radius:16px; border: 2px solid var(--mud-palette-success);">
+            <MudText Typo="Typo.h5" Class="mb-3">📊 Din sammanfattning</MudText>
+            <MudSimpleTable Dense="true" Hover="true" Elevation="0">
+                <tbody>
+                    <tr><td>Skottår?</td><td><strong>@(isLeapYear ? "Ja ✓" : "Nej")</strong></td><td>@(step1UserAnswer.HasValue ? (step1UserAnswer == isLeapYear ? "✅" : "❌") : "–")</td></tr>
+                    <tr><td>Sekelankare</td><td><strong>@centuryAnchor</strong></td><td>@(step2UserAnswer.HasValue ? (step2UserAnswer == centuryAnchor ? "✅" : "❌") : "–")</td></tr>
+                    <tr><td>Årets Doomsday</td><td><strong>@yearDoomsday</strong></td><td>@(step3UserAnswer.HasValue ? (step3UserAnswer == yearDoomsday ? "✅" : "❌") : "–")</td></tr>
+                    <tr><td>Referensdatum</td><td><strong>@doomsdayInMonth:e @monthInfo.MonthName</strong></td><td>@(step4UserDay > 0 ? (step4UserDay == doomsdayInMonth ? "✅" : "❌") : "–")</td></tr>
+                    <tr><td>Slutgiltig veckodag</td><td><strong>@finalWeekday</strong></td><td>@(step5UserAnswer.HasValue ? (step5UserAnswer == finalWeekday ? "✅" : "❌") : "–")</td></tr>
+                </tbody>
+            </MudSimpleTable>
+
+            @{
+                var totalAnswered = (step1UserAnswer.HasValue ? 1 : 0) + (step2UserAnswer.HasValue ? 1 : 0) +
+                    (step3UserAnswer.HasValue ? 1 : 0) + (step4UserDay > 0 ? 1 : 0) + (step5UserAnswer.HasValue ? 1 : 0);
+                var totalCorrect = (step1UserAnswer.HasValue && step1UserAnswer == isLeapYear ? 1 : 0) +
+                    (step2UserAnswer.HasValue && step2UserAnswer == centuryAnchor ? 1 : 0) +
+                    (step3UserAnswer.HasValue && step3UserAnswer == yearDoomsday ? 1 : 0) +
+                    (step4UserDay == doomsdayInMonth ? 1 : 0) +
+                    (step5UserAnswer.HasValue && step5UserAnswer == finalWeekday ? 1 : 0);
+            }
+
+            @if (totalAnswered > 0)
+            {
+                <MudText Typo="Typo.body1" Class="mt-3">
+                    Du svarade rätt på <strong>@totalCorrect av @totalAnswered</strong> steg.
+                    @if (totalCorrect == totalAnswered && totalAnswered == 5)
+                    {
+                        <span>🌟 Perfekt genomgång!</span>
+                    }
+                    else if (totalCorrect == totalAnswered)
+                    {
+                        <span>Bra jobbat!</span>
+                    }
+                    else
+                    {
+                        <span>Fortsätt öva – det blir bättre för varje gång!</span>
+                    }
+                </MudText>
+            }
+
+            <div class="d-flex gap-2 mt-4 justify-center flex-wrap">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="StartWithRandom"
+                           StartIcon="@Icons.Material.Filled.Casino">Nytt slumpmässigt datum</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="Reset"
+                           StartIcon="@Icons.Material.Filled.Replay">Välj eget datum</MudButton>
+            </div>
+        </MudPaper>
+    }
+}
+
+@code {
+    private static readonly System.Globalization.CultureInfo svCulture = new("sv-SE");
+    private static readonly string[] StepLabels = ["Skottår", "Sekelankare", "Årets Doomsday", "Månadsdatum", "Slutresultat"];
+
+    // Input
+    private int inputYear = 2024;
+    private int inputMonth = 7;
+    private int inputDay = 20;
+    private string? errorMessage;
+
+    // State
+    private bool started;
+    private DateOnly date;
+    private int currentStep;
+
+    // Calculated values
+    private bool isLeapYear;
+    private Weekday centuryAnchor;
+    private CenturyAnchorInfo centuryInfo = null!;
+    private int quotient, remainder, leapAdj, yearTotal;
+    private Weekday yearDoomsday;
+    private MonthDoomsdayInfo monthInfo = null!;
+    private int doomsdayInMonth;
+    private Weekday finalWeekday;
+
+    // User answers
+    private bool? step1UserAnswer;
+    private Weekday? step2UserAnswer;
+    private Weekday? step3UserAnswer;
+    private int step4UserDay;
+    private Weekday? step5UserAnswer;
+
+    // Revealed state
+    private bool step1Revealed;
+    private bool step2Revealed;
+    private bool step3Revealed;
+    private bool step4Revealed;
+    private bool step5Revealed;
+
+    private void StartWithInput()
+    {
+        errorMessage = null;
+        try
+        {
+            var daysInMonth = DateTime.DaysInMonth(inputYear, inputMonth);
+            if (inputDay < 1 || inputDay > daysInMonth)
+            {
+                errorMessage = $"Ogiltig dag: {inputMonth}/{inputDay}. Månaden har {daysInMonth} dagar.";
+                return;
+            }
+            date = new DateOnly(inputYear, inputMonth, inputDay);
+            InitializeCalculation();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Ogiltigt datum: {ex.Message}";
+        }
+    }
+
+    private void StartWithRandom()
+    {
+        date = RandomDateGenerator.Generate();
+        inputYear = date.Year;
+        inputMonth = date.Month;
+        inputDay = date.Day;
+        InitializeCalculation();
+    }
+
+    private void InitializeCalculation()
+    {
+        started = true;
+        currentStep = 0;
+
+        isLeapYear = LeapYearChecker.IsLeapYear(date.Year);
+        centuryAnchor = CenturyAnchorCalculator.Calculate(date.Year);
+        centuryInfo = CenturyAnchorCalculator.GetInfo(date.Year);
+
+        var components = YearDoomsdayCalculator.GetComponents(date.Year, centuryAnchor);
+        quotient = components.Quotient;
+        remainder = components.Remainder;
+        leapAdj = components.LeapAdjustment;
+        yearDoomsday = components.Doomsday;
+        yearTotal = (int)centuryAnchor + quotient + remainder + leapAdj;
+
+        monthInfo = MonthDoomsdayProvider.GetInfoForMonth(date.Month);
+        doomsdayInMonth = MonthDoomsdayProvider.GetDoomsdayForMonth(date.Month, isLeapYear);
+        finalWeekday = WeekdayCalculator.Calculate(date.Day, doomsdayInMonth, yearDoomsday);
+
+        // Reset user inputs
+        step1UserAnswer = null;
+        step2UserAnswer = null;
+        step3UserAnswer = null;
+        step4UserDay = 0;
+        step5UserAnswer = null;
+        step1Revealed = false;
+        step2Revealed = false;
+        step3Revealed = false;
+        step4Revealed = false;
+        step5Revealed = false;
+    }
+
+    private void Reset()
+    {
+        started = false;
+        errorMessage = null;
+    }
+
+    private void NextStep() => currentStep++;
+
+    private void RevealStep1() => step1Revealed = true;
+    private void RevealStep2() => step2Revealed = true;
+    private void RevealStep3() => step3Revealed = true;
+    private void RevealStep4() => step4Revealed = true;
+    private void RevealStep5() => step5Revealed = true;
+
+    private void HandleStep4KeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") RevealStep4();
+    }
+
+    private string GetLeapYearExplanation()
+    {
+        var y = date.Year;
+        var lines = new System.Text.StringBuilder();
+        lines.AppendLine($"🔍 Kontroll av {y}:");
+
+        if (y % 4 != 0)
+        {
+            lines.AppendLine($"  {y} ÷ 4 = {y / 4} rest {y % 4} → Inte delbart med 4.");
+            lines.AppendLine($"  → Inte skottår.");
+        }
+        else if (y % 100 != 0)
+        {
+            lines.AppendLine($"  {y} ÷ 4 = {y / 4} → Delbart med 4 ✓");
+            lines.AppendLine($"  {y} ÷ 100 = {y / 100} rest {y % 100} → Inte delbart med 100.");
+            lines.AppendLine($"  → Skottår! (Port 1 passerad, port 2 behöver inte kontrolleras)");
+        }
+        else if (y % 400 != 0)
+        {
+            lines.AppendLine($"  {y} ÷ 4 = {y / 4} → Delbart med 4 ✓");
+            lines.AppendLine($"  {y} ÷ 100 = {y / 100} → Delbart med 100 ✓ (port 2 stängs!)");
+            lines.AppendLine($"  {y} ÷ 400 = {y / 400} rest {y % 400} → Inte delbart med 400.");
+            lines.AppendLine($"  → Inte skottår. (Ingen bakdörr)");
+        }
+        else
+        {
+            lines.AppendLine($"  {y} ÷ 4 = {y / 4} → Delbart med 4 ✓");
+            lines.AppendLine($"  {y} ÷ 100 = {y / 100} → Delbart med 100 ✓ (port 2 stängs!)");
+            lines.AppendLine($"  {y} ÷ 400 = {y / 400} → Delbart med 400 ✓ (bakdörren öppnar!)");
+            lines.AppendLine($"  → Skottår! (Bakdörren räddade dagen)");
+        }
+
+        return lines.ToString().TrimEnd();
+    }
+
+    private string GetMonthHint()
+    {
+        return date.Month switch
+        {
+            1 => "Januari: Normalt den 3:e, vid skottår den 4:e. Tänk: \"3 jan, +1 vid skottår\".",
+            2 => "Februari: Alltid sista dagen! 28:e eller 29:e vid skottår.",
+            3 => "Mars: Multiplar av 7 (7:e, 14:e, 21:a, 28:e). Pi-dagen (14/3) är Doomsday!",
+            4 => "April: Jämn månad = datum lika med månaden! 4/4.",
+            5 => "Maj: \"9-to-5\" – Maj den 9:e.",
+            6 => "Juni: Jämn månad = 6/6.",
+            7 => "Juli: \"7-Eleven\" – Juli den 11:e.",
+            8 => "Augusti: Jämn månad = 8/8.",
+            9 => "September: \"9-to-5\" baklänges – September den 5:e.",
+            10 => "Oktober: Jämn månad = 10/10.",
+            11 => "November: \"7-Eleven\" baklänges – November den 7:e.",
+            12 => "December: Jämn månad = 12/12.",
+            _ => ""
+        };
+    }
+}

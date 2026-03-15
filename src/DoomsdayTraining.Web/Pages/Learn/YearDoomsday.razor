@@ -11,15 +11,27 @@
     <em>egen</em> Doomsday. Vi behöver anpassa sekelankaret med hjälp av de sista två siffrorna i årtalet.
 </MudAlert>
 
+<MudPaper Elevation="1" Class="pa-4 mb-4" Style="border-left: 4px solid var(--mud-palette-info); background: var(--mud-palette-background-gray, #f5f5f5);">
+    <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>💰 Tänk på det som att växla pengar</strong></MudText>
+    <MudText Typo="Typo.body1">
+        Föreställ dig att du har 87 kronor i småmynt och vill växla in dem.
+        Först tar du ut så många <strong>12-kronorssedlar</strong> det går (7 st = 84 kr).
+        Sen kollar du vad som blir över (<strong>3 kr</strong>).
+        Sist räknar du hur många <strong>4-kronorsgrupper</strong> som ryms i resten (3 ÷ 4 = 0 st).
+        Varje "sedel" och "grupp" representerar ett hopp i veckodagar.
+        På just detta sätt bryter 12-metoden ner årtalet i hanterbara bitar.
+    </MudText>
+</MudPaper>
+
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">"12-metoden" (Conway's metod)</MudText>
 <MudText Typo="Typo.body1" Class="mb-3">Den populäraste metoden för att snabbt räkna i huvudet. Fyra steg, där varje steg svarar på en egen fråga om årtalet:</MudText>
 
 <MudPaper Elevation="1" Class="pa-4 mb-4">
     <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>Så ska du tänka på steg 2</strong></MudText>
     <MudText Typo="Typo.body2" Style="white-space:pre-line;">12-metoden bryter ned de sista två siffrorna i årtalet i tre delar:
-• Hur många hela 12-årsblock har passerat?
-• Hur många år blir över efter dessa block?
-• Hur många hela 4-årsgrupper finns i de överblivna åren?
+• Hur många hela 12-årsblock har passerat? (som att räkna hela dussin)
+• Hur många år blir över efter dessa block? (myntet som blir kvar)
+• Hur många hela 4-årsgrupper finns i de överblivna åren? (extra bonus från skottår)
 
 När du tänker så blir formeln mindre magisk och mer logisk.</MudText>
 </MudPaper>
@@ -150,6 +162,18 @@ Exempel: 3 + 7 + 3 + 0 = 13
     Därför motsvarar varje hel 12-årsgrupp exakt ett extra veckodagshopp i huvudräkningen.
     Resten tas sedan hand om av "rest" och "rest ÷ 4".
 </MudAlert>
+
+<MudPaper Elevation="1" Class="pa-4 mb-4" Style="border-left: 4px solid var(--mud-palette-success); background: var(--mud-palette-background-gray, #f5f5f5);">
+    <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>🚌 Liknelse: Bussresan</strong></MudText>
+    <MudText Typo="Typo.body1">
+        Tänk dig att du åker buss och vill veta vilken hållplats du hamnar på.
+        Bussen går i en slinga med <strong>7 hållplatser</strong> (veckodagarna) och kör runt, runt.
+        Varje <strong>12-årsblock</strong> är som en hel runda plus en extra hållplats.
+        De <strong>överblivna åren</strong> är extra hållplatser du åker förbi.
+        Och <strong>skottårsjusteringen</strong> är bonushållplatser för att bussen ibland gör extra stopp.
+        Till slut kollar du bara vilken hållplats du stannar på – det är din veckodag!
+    </MudText>
+</MudPaper>
 
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">Testa själv</MudText>
 <MudPaper Elevation="2" Class="pa-4 mb-4">
