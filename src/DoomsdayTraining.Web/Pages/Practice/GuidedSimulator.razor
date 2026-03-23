@@ -56,6 +56,12 @@ else
             @date.ToString("d MMMM yyyy", svCulture)
         </MudText>
         <MudText Typo="Typo.body2">Vilken veckodag är detta? Följ stegen nedan för att räkna ut det!</MudText>
+        <div class="d-flex gap-2 justify-center mt-2">
+            <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Default" OnClick="StartWithRandom"
+                       StartIcon="@Icons.Material.Filled.Casino">Nytt datum</MudButton>
+            <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Default" OnClick="Reset"
+                       StartIcon="@Icons.Material.Filled.Replay">Välj annat</MudButton>
+        </div>
     </MudPaper>
 
     @* ── Stegindikator ── *@
@@ -101,11 +107,9 @@ else
             {
                 <div class="d-flex gap-2 flex-wrap">
                     <MudButton Variant="Variant.Outlined" Color="@(step1UserAnswer == true ? Color.Primary : Color.Default)"
-                               OnClick="@(() => step1UserAnswer = true)">Ja, skottår</MudButton>
+                               OnClick="@(() => SelectStep1Answer(true))">Ja, skottår</MudButton>
                     <MudButton Variant="Variant.Outlined" Color="@(step1UserAnswer == false ? Color.Primary : Color.Default)"
-                               OnClick="@(() => step1UserAnswer = false)">Nej, inte skottår</MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RevealStep1"
-                               StartIcon="@Icons.Material.Filled.Visibility">Visa svaret</MudButton>
+                               OnClick="@(() => SelectStep1Answer(false))">Nej, inte skottår</MudButton>
                 </div>
             }
             else
@@ -162,11 +166,9 @@ else
                         var d = day;
                         <MudButton Variant="@(step2UserAnswer == d ? Variant.Filled : Variant.Outlined)"
                                    Color="@(step2UserAnswer == d ? Color.Primary : Color.Default)"
-                                   OnClick="@(() => step2UserAnswer = d)" Size="Size.Small">@d</MudButton>
+                                   OnClick="@(() => SelectStep2Answer(d))" Size="Size.Small">@d</MudButton>
                     }
                 </div>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RevealStep2"
-                           StartIcon="@Icons.Material.Filled.Visibility">Visa svaret</MudButton>
             }
             else
             {
@@ -232,7 +234,33 @@ else
                     Summera allt med sekelankaret, ta mod 7. Vilken veckodag blir det?
                 </MudText>
 
-                @* Sub-steg synliga för att hjälpa *@
+                @* Kladdyta – anteckna dina uträkningar *@
+                <MudPaper Elevation="0" Class="pa-3 mb-3" Style="background:var(--mud-palette-background-gray,#f5f5f5); border-radius:8px;">
+                    <MudText Typo="Typo.caption" Class="mb-2"><strong>📝 Kladdyta</strong> – fyll i dina beräkningar:</MudText>
+                    <MudGrid Spacing="2">
+                        <MudItem xs="4">
+                            <MudNumericField T="int?" @bind-Value="scratchQuotient" Label="@($"{y} ÷ 12")" Variant="Variant.Outlined"
+                                             Margin="Margin.Dense" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudNumericField T="int?" @bind-Value="scratchRemainder" Label="@($"{y} mod 12")" Variant="Variant.Outlined"
+                                             Margin="Margin.Dense" Immediate="true" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudNumericField T="int?" @bind-Value="scratchLeapAdj" Label="rest ÷ 4" Variant="Variant.Outlined"
+                                             Margin="Margin.Dense" Immediate="true" />
+                        </MudItem>
+                    </MudGrid>
+                    @if (scratchQuotient.HasValue || scratchRemainder.HasValue || scratchLeapAdj.HasValue)
+                    {
+                        var scratchSum = (int)centuryAnchor + (scratchQuotient ?? 0) + (scratchRemainder ?? 0) + (scratchLeapAdj ?? 0);
+                        <MudText Typo="Typo.body2" Class="mt-2" Style="font-family:monospace;">
+                            @((int)centuryAnchor) + @(scratchQuotient ?? 0) + @(scratchRemainder ?? 0) + @(scratchLeapAdj ?? 0) = @scratchSum → mod 7 = @(/*((scratchSum % 7) + 7) % 7*/"?") → @(/*(Weekday)(((scratchSum % 7) + 7) % 7)*/"Vilken dag?")
+                        </MudText>
+                    }
+                </MudPaper>
+
+                @* Hjälp och genvägar *@
                 <MudExpansionPanels MultiExpansion="true" Class="mb-3" Elevation="0">
                     <MudExpansionPanel Text="💡 Hjälp: Visa delstegen" Dense="true" Expanded="false">
                         <MudSimpleTable Dense="true" Hover="true" Elevation="0">
@@ -244,6 +272,25 @@ else
                             </tbody>
                         </MudSimpleTable>
                     </MudExpansionPanel>
+                    <MudExpansionPanel Text="⚡ Genväg: Bli snabbare i huvudet" Dense="true" Expanded="false">
+                        <MudText Typo="Typo.body2" Class="mb-2">
+                            <strong>Tänk inte "dela med 12"</strong> – hitta <strong>närmsta tolva under</strong> talet.
+                            Lär dig 12-tabellen: 12, 24, 36, 48, 60, 72, 84, 96.
+                        </MudText>
+                        <MudPaper Elevation="0" Class="pa-2 mb-2" Style="font-family:monospace; font-size:0.85rem; background:var(--mud-palette-surface); border-radius:4px; white-space:pre-line; line-height:1.6;">00–11 → 0 tolvor    48–59 → 4 tolvor
+12–23 → 1 tolva     60–71 → 5 tolvor
+24–35 → 2 tolvor    72–83 → 6 tolvor
+36–47 → 3 tolvor    84–95 → 7 tolvor</MudPaper>
+                        <MudText Typo="Typo.body2" Class="mb-1">
+                            <strong>Rest ÷ 4 – tänk block, inte division:</strong>
+                        </MudText>
+                        <MudText Typo="Typo.body2" Style="font-family:monospace;" Class="mb-2">
+                            0–3 → 0 · 4–7 → 1 · 8–11 → 2
+                        </MudText>
+                        <MudText Typo="Typo.body2">
+                            Målet: se hela trippen (kvot, rest, rest÷4) på 1–2 sekunder!
+                        </MudText>
+                    </MudExpansionPanel>
                 </MudExpansionPanels>
 
                 <div class="d-flex gap-2 flex-wrap mb-2">
@@ -252,11 +299,9 @@ else
                         var d = day;
                         <MudButton Variant="@(step3UserAnswer == d ? Variant.Filled : Variant.Outlined)"
                                    Color="@(step3UserAnswer == d ? Color.Primary : Color.Default)"
-                                   OnClick="@(() => step3UserAnswer = d)" Size="Size.Small">@d</MudButton>
+                                   OnClick="@(() => SelectStep3Answer(d))" Size="Size.Small">@d</MudButton>
                     }
                 </div>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RevealStep3"
-                           StartIcon="@Icons.Material.Filled.Visibility">Visa svaret</MudButton>
             }
             else
             {
@@ -337,12 +382,16 @@ else
 
             @if (!step4Revealed)
             {
-                <div class="d-flex gap-2 align-center mb-2">
-                    <MudNumericField @bind-Value="step4UserDay" Label="Dag" Variant="Variant.Outlined"
-                                     Min="1" Max="31" Style="max-width:120px;" Immediate="true"
-                                     OnKeyDown="HandleStep4KeyDown" />
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RevealStep4"
-                               StartIcon="@Icons.Material.Filled.Visibility">Visa svaret</MudButton>
+                <MudText Typo="Typo.body2" Class="mb-2">Välj rätt dag:</MudText>
+                <div class="d-flex gap-2 flex-wrap mb-3">
+                    @foreach (var day in new[] { 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 28, 29 })
+                    {
+                        var d = day;
+                        <MudButton Variant="@(step4UserDay == d ? Variant.Filled : Variant.Outlined)"
+                                   Color="@(step4UserDay == d ? Color.Primary : Color.Default)"
+                                   OnClick="@(() => SelectStep4Answer(d))" Size="Size.Small"
+                                   Style="min-width:48px; min-height:40px;">@d</MudButton>
+                    }
                 </div>
             }
             else
@@ -435,11 +484,9 @@ else
                         var d = day;
                         <MudButton Variant="@(step5UserAnswer == d ? Variant.Filled : Variant.Outlined)"
                                    Color="@(step5UserAnswer == d ? Color.Primary : Color.Default)"
-                                   OnClick="@(() => step5UserAnswer = d)" Size="Size.Small">@d</MudButton>
+                                   OnClick="@(() => SelectStep5Answer(d))" Size="Size.Small">@d</MudButton>
                     }
                 </div>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RevealStep5"
-                           StartIcon="@Icons.Material.Filled.Visibility">Visa svaret</MudButton>
             }
             else
             {
@@ -562,6 +609,11 @@ else
     private int step4UserDay;
     private Weekday? step5UserAnswer;
 
+    // Scratchpad (step 3)
+    private int? scratchQuotient;
+    private int? scratchRemainder;
+    private int? scratchLeapAdj;
+
     // Revealed state
     private bool step1Revealed;
     private bool step2Revealed;
@@ -624,6 +676,9 @@ else
         step3UserAnswer = null;
         step4UserDay = 0;
         step5UserAnswer = null;
+        scratchQuotient = null;
+        scratchRemainder = null;
+        scratchLeapAdj = null;
         step1Revealed = false;
         step2Revealed = false;
         step3Revealed = false;
@@ -638,6 +693,40 @@ else
     }
 
     private void NextStep() => currentStep++;
+
+    private void SelectStep1Answer(bool answer)
+    {
+        step1UserAnswer = answer;
+        step1Revealed = true;
+        if (answer == isLeapYear) NextStep();
+    }
+
+    private void SelectStep2Answer(Weekday day)
+    {
+        step2UserAnswer = day;
+        step2Revealed = true;
+        if (day == centuryAnchor) NextStep();
+    }
+
+    private void SelectStep3Answer(Weekday day)
+    {
+        step3UserAnswer = day;
+        step3Revealed = true;
+        if (day == yearDoomsday) NextStep();
+    }
+
+    private void SelectStep4Answer(int day)
+    {
+        step4UserDay = day;
+        step4Revealed = true;
+        if (day == doomsdayInMonth) NextStep();
+    }
+
+    private void SelectStep5Answer(Weekday day)
+    {
+        step5UserAnswer = day;
+        step5Revealed = true;
+    }
 
     private void RevealStep1() => step1Revealed = true;
     private void RevealStep2() => step2Revealed = true;

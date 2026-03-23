@@ -92,6 +92,15 @@
         </MudCard>
     </MudItem>
     <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%; border: 2px solid var(--mud-palette-error);" @onclick='() => NavigateTo("practice/speed-run")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🔥</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Speed Run</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Varje delberäkning steg för steg. Fel svar = Game Over. Hur långt klarar du dig?</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
         <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("calculator")'>
             <MudCardContent>
                 <MudText Typo="Typo.h3" Align="Align.Center">🔢</MudText>

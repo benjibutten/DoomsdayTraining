@@ -68,3 +68,10 @@
 .loading-progress-text:after {
     content: var(--blazor-load-percentage-text, "Laddar");
 }
+
+/* ─── Mobilvänliga inputs (förhindra iOS auto-zoom) ─── */
+input,
+select,
+textarea {
+    font-size: max(16px, 1rem) !important;
+}
