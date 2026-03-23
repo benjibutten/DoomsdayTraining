@@ -198,32 +198,10 @@ else if (gameActive)
                 </MudPaper>
                 break;
 
-            @* ──── FAS 2: y-VÄRDE (sista 2 siffrorna) ──── *@
+            @* ──── FAS 2: y ÷ 12 = kvot ──── *@
             case 2:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">③ Sista två siffrorna i @currentDate.Year?</MudText>
-                    @if (selectedDifficulty == "easy")
-                    {
-                        <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
-                            y = @currentDate.Year mod 100
-                        </MudText>
-                    }
-                    <div class="d-flex gap-2 flex-wrap justify-center">
-                        @foreach (var opt in GetYOptions())
-                        {
-                            var v = opt;
-                            <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Medium"
-                                       OnClick="@(() => AnswerY(v))" Disabled="answering"
-                                       Style="min-width:72px; min-height:48px; font-size:1.15rem; font-weight:bold;">@v</MudButton>
-                        }
-                    </div>
-                </MudPaper>
-                break;
-
-            @* ──── FAS 3: y ÷ 12 = kvot ──── *@
-            case 3:
-                <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">④ @calcY ÷ 12 = ?</MudText>
+                    <MudText Typo="Typo.h6" Class="mb-2">③ @calcY ÷ 12 = ?</MudText>
                     @if (selectedDifficulty == "easy")
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
@@ -242,10 +220,10 @@ else if (gameActive)
                 </MudPaper>
                 break;
 
-            @* ──── FAS 4: y mod 12 = rest ──── *@
-            case 4:
+            @* ──── FAS 3: y mod 12 = rest ──── *@
+            case 3:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑤ @calcY mod 12 = ?</MudText>
+                    <MudText Typo="Typo.h6" Class="mb-2">④ @calcY mod 12 = ?</MudText>
                     @if (selectedDifficulty == "easy")
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
@@ -270,10 +248,10 @@ else if (gameActive)
                 </MudPaper>
                 break;
 
-            @* ──── FAS 5: rest ÷ 4 = skottårsjustering ──── *@
-            case 5:
+            @* ──── FAS 4: rest ÷ 4 = skottårsjustering ──── *@
+            case 4:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑥ @calcRemainder ÷ 4 = ?</MudText>
+                    <MudText Typo="Typo.h6" Class="mb-2">⑤ @calcRemainder ÷ 4 = ?</MudText>
                     @if (selectedDifficulty == "easy")
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
@@ -292,10 +270,10 @@ else if (gameActive)
                 </MudPaper>
                 break;
 
-            @* ──── FAS 6: SUMMA ──── *@
-            case 6:
+            @* ──── FAS 5: SUMMA ──── *@
+            case 5:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑦ Summa: @((int)calcCenturyAnchor) + @calcQuotient + @calcRemainder + @calcLeapAdj = ?</MudText>
+                    <MudText Typo="Typo.h6" Class="mb-2">⑥ Summa: @((int)calcCenturyAnchor) + @calcQuotient + @calcRemainder + @calcLeapAdj = ?</MudText>
                     @if (selectedDifficulty == "easy")
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
@@ -314,10 +292,10 @@ else if (gameActive)
                 </MudPaper>
                 break;
 
-            @* ──── FAS 7: SUMMA MOD 7 → ÅRETS DOOMSDAY ──── *@
-            case 7:
+            @* ──── FAS 6: SUMMA MOD 7 → ÅRETS DOOMSDAY ──── *@
+            case 6:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑧ @calcYearTotal mod 7 = ? → Årets Doomsday</MudText>
+                    <MudText Typo="Typo.h6" Class="mb-2">⑦ @calcYearTotal mod 7 = ? → Årets Doomsday</MudText>
                     @if (selectedDifficulty == "easy")
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
@@ -336,10 +314,10 @@ else if (gameActive)
                 </MudPaper>
                 break;
 
-            @* ──── FAS 8: MÅNADENS DOOMSDAY-DATUM ──── *@
-            case 8:
+            @* ──── FAS 7: MÅNADENS DOOMSDAY-DATUM ──── *@
+            case 7:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑨ Doomsday-datum i @calcMonthInfo.MonthName?</MudText>
+                    <MudText Typo="Typo.h6" Class="mb-2">⑧ Doomsday-datum i @calcMonthInfo.MonthName?</MudText>
                     @if (selectedDifficulty != "hard")
                     {
                         @if (currentDate.Month <= 2)
@@ -367,12 +345,12 @@ else if (gameActive)
                 </MudPaper>
                 break;
 
-            @* ──── FAS 9: AVSTÅND (diff) ──── *@
-            case 9:
+            @* ──── FAS 8: AVSTÅND (diff) ──── *@
+            case 8:
             {
                 var diff = currentDate.Day - calcDoomsdayInMonth;
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑩ Avstånd: @currentDate.Day − @calcDoomsdayInMonth = ?</MudText>
+                    <MudText Typo="Typo.h6" Class="mb-2">⑨ Avstånd: @currentDate.Day − @calcDoomsdayInMonth = ?</MudText>
                     @if (selectedDifficulty == "easy")
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
@@ -392,12 +370,12 @@ else if (gameActive)
                 break;
             }
 
-            @* ──── FAS 10: SLUTGILTIG VECKODAG ──── *@
-            case 10:
+            @* ──── FAS 9: SLUTGILTIG VECKODAG ──── *@
+            case 9:
             {
                 var finalDiff = currentDate.Day - calcDoomsdayInMonth;
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑪ @currentDate.Day @calcMonthInfo.MonthName @currentDate.Year = ?</MudText>
+                    <MudText Typo="Typo.h6" Class="mb-2">⑩ @currentDate.Day @calcMonthInfo.MonthName @currentDate.Year = ?</MudText>
                     @if (selectedDifficulty != "hard")
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
@@ -449,14 +427,14 @@ else if (gameActive)
                 <span>@currentDate.Year</span>
                 @if (currentPhase > 0) { <span> · Skott=@(calcIsLeapYear ? "Ja" : "Nej")</span> }
                 @if (currentPhase > 1) { <span> · Ankare=@(calcCenturyAnchor)(@((int)calcCenturyAnchor))</span> }
-                @if (currentPhase > 2) { <span> · y=@calcY</span> }
-                @if (currentPhase > 3) { <span> · ÷12=@calcQuotient</span> }
-                @if (currentPhase > 4) { <span> · mod12=@calcRemainder</span> }
-                @if (currentPhase > 5) { <span> · ÷4=@calcLeapAdj</span> }
-                @if (currentPhase > 6) { <span> · Σ=@calcYearTotal</span> }
-                @if (currentPhase > 7) { <span> · Doom=@calcYearDoomsday</span> }
-                @if (currentPhase > 8) { <span> · Ref=@(calcDoomsdayInMonth):e</span> }
-                @if (currentPhase > 9) { <span> · Δ=@calcDiff</span> }
+                @if (currentPhase > 1) { <span> · y=@calcY</span> }
+                @if (currentPhase > 2) { <span> · ÷12=@calcQuotient</span> }
+                @if (currentPhase > 3) { <span> · mod12=@calcRemainder</span> }
+                @if (currentPhase > 4) { <span> · ÷4=@calcLeapAdj</span> }
+                @if (currentPhase > 5) { <span> · Σ=@calcYearTotal</span> }
+                @if (currentPhase > 6) { <span> · Doom=@calcYearDoomsday</span> }
+                @if (currentPhase > 7) { <span> · Ref=@(calcDoomsdayInMonth):e</span> }
+                @if (currentPhase > 8) { <span> · Δ=@calcDiff</span> }
             </MudPaper>
         }
     </div>
@@ -547,9 +525,9 @@ else if (gameOver)
 @code {
     private static readonly System.Globalization.CultureInfo svCulture = new("sv-SE");
 
-    // 11 phases: leap, anchor, y, q, r, leapAdj, sum, mod7, month, diff, finalDay
+    // 10 phases: leap, anchor, q, r, leapAdj, sum, mod7, month, diff, finalDay
     private static readonly string[] PhaseLabels =
-        ["①", "②", "y", "÷12", "%12", "÷4", "Σ", "%7", "Mån", "Δ", "Dag"];
+        ["①", "②", "÷12", "%12", "÷4", "Σ", "%7", "Mån", "Δ", "Dag"];
 
     // ── Timing ──
     private const int StepFeedbackMs    = 800;   // hur länge "✅ Rätt!" syns efter varje delsteg
@@ -559,7 +537,6 @@ else if (gameOver)
     private const int PtsLeapYear       = 10;
     private const int PtsCenturyFrots   = 10;    // känt FrOTS-sekel
     private const int PtsCenturyFormula = 20;    // sekel utanför FrOTS (kräver formel)
-    private const int PtsYValue         = 5;
     private const int PtsQuotient       = 15;
     private const int PtsRemainder      = 15;
     private const int PtsLeapAdj        = 10;
@@ -597,7 +574,7 @@ else if (gameOver)
 
     // ── Current date calculation ──
     private DateOnly currentDate;
-    private int currentPhase; // 0–10
+    private int currentPhase; // 0–9
     private bool calcIsLeapYear;
     private Weekday calcCenturyAnchor;
     private CenturyAnchorInfo calcCenturyInfo = null!;
@@ -680,7 +657,7 @@ else if (gameOver)
         feedbackAnimKey++;  // triggar CSS-animationen
         currentPhase++;
 
-        if (currentPhase > 10)
+        if (currentPhase > 9)
         {
             answering = true;
             streak++;
@@ -745,22 +722,13 @@ else if (gameOver)
             WrongAnswer(1, $"{answer}", $"{calcCenturyAnchor}", calcCenturyInfo.Explanation);
     }
 
-    private async void AnswerY(int answer)
-    {
-        if (answering) return;
-        if (answer == calcY)
-            await CorrectAnswer(PtsYValue);
-        else
-            WrongAnswer(2, $"{answer}", $"{calcY}", $"{currentDate.Year} mod 100 = {calcY}");
-    }
-
     private async void AnswerQuotient(int answer)
     {
         if (answering) return;
         if (answer == calcQuotient)
             await CorrectAnswer(PtsQuotient);
         else
-            WrongAnswer(3, $"{answer}", $"{calcQuotient}",
+            WrongAnswer(2, $"{answer}", $"{calcQuotient}",
                 $"{calcY} ÷ 12 = {calcQuotient} (närmsta 12:a under {calcY} = {calcQuotient * 12})");
     }
 
@@ -770,7 +738,7 @@ else if (gameOver)
         if (answer == calcRemainder)
             await CorrectAnswer(PtsRemainder);
         else
-            WrongAnswer(4, $"{answer}", $"{calcRemainder}",
+            WrongAnswer(3, $"{answer}", $"{calcRemainder}",
                 $"{calcY} − ({calcQuotient} × 12) = {calcY} − {calcQuotient * 12} = {calcRemainder}");
     }
 
@@ -780,7 +748,7 @@ else if (gameOver)
         if (answer == calcLeapAdj)
             await CorrectAnswer(PtsLeapAdj);
         else
-            WrongAnswer(5, $"{answer}", $"{calcLeapAdj}",
+            WrongAnswer(4, $"{answer}", $"{calcLeapAdj}",
                 $"{calcRemainder} ÷ 4 = {calcLeapAdj} (0–3→0, 4–7→1, 8–11→2)");
     }
 
@@ -790,7 +758,7 @@ else if (gameOver)
         if (answer == calcYearTotal)
             await CorrectAnswer(PtsSum);
         else
-            WrongAnswer(6, $"{answer}", $"{calcYearTotal}",
+            WrongAnswer(5, $"{answer}", $"{calcYearTotal}",
                 $"{(int)calcCenturyAnchor} + {calcQuotient} + {calcRemainder} + {calcLeapAdj} = {calcYearTotal}");
     }
 
@@ -800,17 +768,17 @@ else if (gameOver)
         if (answer == calcYearDoomsday)
             await CorrectAnswer(PtsYearDoomsday);
         else
-            WrongAnswer(7, $"{(int)answer} ({answer})", $"{(int)calcYearDoomsday} ({calcYearDoomsday})",
+            WrongAnswer(6, $"{(int)answer} ({answer})", $"{(int)calcYearDoomsday} ({calcYearDoomsday})",
                 $"{calcYearTotal} mod 7 = {(int)calcYearDoomsday} → {calcYearDoomsday}");
     }
 
     private async void AnswerMonthDoomsday(int answer)
     {
         if (answering) return;
-        if (answer == calcDoomsdayInMonth)
+        if (IsValidMonthDoomsdayAnswer(answer))
             await CorrectAnswer(PtsMonthDoomsday);
         else
-            WrongAnswer(8, $"Den {answer}:e", $"Den {calcDoomsdayInMonth}:e",
+            WrongAnswer(7, $"Den {answer}:e", GetValidMonthDoomsdayAnswersText(),
                 $"{calcMonthInfo.MonthName}: {calcMonthInfo.Mnemonic}");
     }
 
@@ -820,7 +788,7 @@ else if (gameOver)
         if (answer == calcDiff)
             await CorrectAnswer(PtsDiff);
         else
-            WrongAnswer(9, $"{answer}", $"{calcDiff}",
+            WrongAnswer(8, $"{answer}", $"{calcDiff}",
                 $"{currentDate.Day} − {calcDoomsdayInMonth} = {calcDiff}");
     }
 
@@ -832,7 +800,7 @@ else if (gameOver)
         else
         {
             var diffMod = ((calcDiff % 7) + 7) % 7;
-            WrongAnswer(10, $"{answer}", $"{calcFinalWeekday}",
+            WrongAnswer(9, $"{answer}", $"{calcFinalWeekday}",
                 $"{calcYearDoomsday}({(int)calcYearDoomsday}) + {calcDiff} dagar.\n" +
                 $"{(int)calcYearDoomsday} + {calcDiff} = {(int)calcYearDoomsday + calcDiff}, mod 7 = {(int)calcFinalWeekday} → {calcFinalWeekday}");
         }
@@ -841,18 +809,6 @@ else if (gameOver)
     // ═══════════════════════════════════════════════
     // OPTION GENERATORS – smarta val för varje fas
     // ═══════════════════════════════════════════════
-
-    private int[] GetYOptions()
-    {
-        var correct = calcY;
-        var options = new HashSet<int> { correct };
-        if (correct > 0) options.Add(correct - 1);
-        options.Add(correct + 1);
-        if (correct >= 10) options.Add(correct - 10);
-        if (correct < 90) options.Add(correct + 10);
-        options.Add(Math.Abs(100 - correct));
-        return options.Where(x => x >= 0 && x <= 99).OrderBy(x => x).ToArray();
-    }
 
     private int[] GetRemainderOptions()
     {
@@ -884,7 +840,7 @@ else if (gameOver)
         {
             1 => [3, 4],
             2 => [28, 29],
-            3 => [7, 14, 21],
+            3 => [7, 14, 21, 28],
             4 => [4, 5, 6],
             5 => [5, 9, 10],
             6 => [6, 7, 8],
@@ -921,19 +877,39 @@ else if (gameOver)
         return c >= FrotsCenturyMin && c <= FrotsCenturyMax;
     }
 
+    private bool IsValidMonthDoomsdayAnswer(int day)
+    {
+        if (day < 1 || day > DateTime.DaysInMonth(currentDate.Year, currentDate.Month))
+            return false;
+
+        var delta = day - calcDoomsdayInMonth;
+        return ((delta % 7) + 7) % 7 == 0;
+    }
+
+    private string GetValidMonthDoomsdayAnswersText()
+    {
+        var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
+        var validDays = Enumerable.Range(1, daysInMonth)
+            .Where(IsValidMonthDoomsdayAnswer)
+            .ToArray();
+
+        return validDays.Length == 1
+            ? $"Den {validDays[0]}:e"
+            : string.Join(", ", validDays.Select(day => $"Den {day}:e"));
+    }
+
     private static string GetPhaseLabel(int phase) => phase switch
     {
         0 => "① Skottår",
         1 => "② Sekelankare",
-        2 => "③ y-värde",
-        3 => "④ y ÷ 12",
-        4 => "⑤ y mod 12",
-        5 => "⑥ rest ÷ 4",
-        6 => "⑦ Summa",
-        7 => "⑧ Årets Doomsday (mod 7)",
-        8 => "⑨ Månadens Doomsday-datum",
-        9 => "⑩ Avstånd",
-        10 => "⑪ Slutgiltig veckodag",
+        2 => "③ y ÷ 12",
+        3 => "④ y mod 12",
+        4 => "⑤ rest ÷ 4",
+        5 => "⑥ Summa",
+        6 => "⑦ Årets Doomsday (mod 7)",
+        7 => "⑧ Månadens Doomsday-datum",
+        8 => "⑨ Avstånd",
+        9 => "⑩ Slutgiltig veckodag",
         _ => ""
     };
 
