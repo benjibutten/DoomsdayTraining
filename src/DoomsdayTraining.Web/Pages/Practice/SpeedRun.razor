@@ -44,7 +44,7 @@
                            Color="Color.Error" OnClick="@(() => selectedDifficulty = "hard")"
                            Style="min-width:130px;">🔴 Svår</MudButton>
                 <MudButton Variant="@(selectedDifficulty == "expert" ? Variant.Filled : Variant.Outlined)"
-                           Color="Color.Dark" OnClick="@(() => selectedDifficulty = "expert")"
+                           Color="@(selectedDifficulty == "expert" ? Color.Dark : Color.Default)" OnClick="@(() => selectedDifficulty = "expert")"
                            Style="min-width:130px;">💀 Expert</MudButton>
             </div>
             <MudText Typo="Typo.body2" Style="opacity:0.7;" Class="mb-2">
@@ -117,6 +117,10 @@ else if (gameActive)
         <div class="d-flex gap-1 mb-2 justify-center align-center" style="flex-wrap:nowrap; overflow-x:auto;">
             @foreach (var (label, idx) in PhaseLabels.Select((l, i) => (l, i)))
             {
+                @* Expert: skip phases 8 (Δ) and 9 (m7) since they're merged into final day *@
+                if (selectedDifficulty == "expert" && (idx == 8 || idx == 9))
+                    continue;
+
                 var done = currentPhase > idx;
                 var active = currentPhase == idx;
                 <MudChip T="string" Size="Size.Small"
@@ -483,16 +487,52 @@ else if (gameActive)
                 break;
             }
 
-            @* ──── FAS 9: SLUTGILTIG VECKODAG ──── *@
+            @* ──── FAS 9: AVSTÅND MOD 7 ──── *@
             case 9:
+                <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == "expert" && !phasePeeked)
+                        { <text>⑩ Mod 7?</text> }
+                        else
+                        { <text>⑩ @Math.Abs(calcDiff) mod 7 = ?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (selectedDifficulty == "easy")
+                    {
+                        <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
+                            @Math.Abs(calcDiff) ÷ 7 = @(Math.Abs(calcDiff) / 7) rest ?
+                        </MudText>
+                    }
+                    <div class="d-flex gap-2 flex-wrap justify-center">
+                        @for (var i = 0; i <= 6; i++)
+                        {
+                            var v = i;
+                            <MudButton Variant="Variant.Filled" Color="Color.Tertiary" Size="Size.Medium"
+                                       OnClick="@(() => AnswerDiffMod7(v))" Disabled="answering"
+                                       Style="min-width:56px; min-height:48px; font-size:1.15rem; font-weight:bold;">@v</MudButton>
+                        }
+                    </div>
+                </MudPaper>
+                break;
+
+            @* ──── FAS 10: SLUTGILTIG VECKODAG ──── *@
+            case 10:
             {
                 var finalDiff = currentDate.Day - calcDoomsdayInMonth;
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
                     <MudText Typo="Typo.h6" Class="mb-2">
                         @if (selectedDifficulty == "expert" && !phasePeeked)
-                        { <text>⑩ Veckodag?</text> }
+                        { <text>⑨ Räkna ut dag?</text> }
+                        else if (selectedDifficulty == "expert")
+                        { <text>⑨ @currentDate.Day @calcMonthInfo.MonthName @currentDate.Year = ?</text> }
                         else
-                        { <text>⑩ @currentDate.Day @calcMonthInfo.MonthName @currentDate.Year = ?</text> }
+                        { <text>⑪ @currentDate.Day @calcMonthInfo.MonthName @currentDate.Year = ?</text> }
                     </MudText>
                     @if (ShowExpertPeekButton)
                     {
@@ -506,6 +546,7 @@ else if (gameActive)
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                             Doomsday = @calcYearDoomsday · ref @(calcDoomsdayInMonth):e @calcMonthInfo.MonthName
                             · dag @currentDate.Day är @Math.Abs(finalDiff) dag(ar) @(finalDiff >= 0 ? "efter" : "före") referensen
+                            · mod 7 = @calcDiffMod7 dag(ar)
                         </MudText>
                     }
                     <div class="d-flex gap-2 flex-wrap justify-center">
@@ -562,6 +603,7 @@ else if (gameActive)
                     @if (currentPhase > 6) { <span> · Doom=@calcYearDoomsday</span> }
                     @if (currentPhase > 7) { <span> · Ref=@(calcDoomsdayInMonth):e</span> }
                     @if (currentPhase > 8) { <span> · Δ=@calcDiff</span> }
+                    @if (currentPhase > 9) { <span> · m7=@calcDiffMod7</span> }
                 </MudPaper>
             }
             else if (!summaryPeeked)
@@ -585,6 +627,7 @@ else if (gameActive)
                     @if (currentPhase > 6) { <span> · Doom=@calcYearDoomsday</span> }
                     @if (currentPhase > 7) { <span> · Ref=@(calcDoomsdayInMonth):e</span> }
                     @if (currentPhase > 8) { <span> · Δ=@calcDiff</span> }
+                    @if (currentPhase > 9) { <span> · m7=@calcDiffMod7</span> }
                 </MudPaper>
             }
         }
@@ -626,6 +669,7 @@ else if (gameOver)
                         <tr><td>Årets Doomsday</td><td>@calcYearTotal mod 7 = @((int)calcYearDoomsday) → @calcYearDoomsday</td></tr>
                         <tr><td>Referensdatum</td><td>@calcDoomsdayInMonth/@currentDate.Month</td></tr>
                         <tr><td>Avstånd</td><td>@currentDate.Day − @calcDoomsdayInMonth = @calcDiff</td></tr>
+                        <tr><td>Mod 7</td><td>|@calcDiff| mod 7 = @calcDiffMod7</td></tr>
                         <tr><td>Slutdag</td><td>@calcFinalWeekday</td></tr>
                     </tbody>
                 </MudSimpleTable>
@@ -678,7 +722,7 @@ else if (gameOver)
 
     // 10 phases: leap, anchor, q, r, leapAdj, sum, mod7, month, diff, finalDay
     private static readonly string[] PhaseLabels =
-        ["①", "②", "÷12", "%12", "÷4", "Σ", "%7", "Mån", "Δ", "Dag"];
+        ["①", "②", "÷12", "%12", "÷4", "Σ", "%7", "Mån", "Δ", "m7", "Dag"];
 
     // ── Timing ──
     private const int StepFeedbackMs    = 800;   // hur länge "✅ Rätt!" syns efter varje delsteg
@@ -695,6 +739,7 @@ else if (gameOver)
     private const int PtsYearDoomsday   = 20;
     private const int PtsMonthDoomsday  = 15;
     private const int PtsDiff           = 10;
+    private const int PtsDiffMod7       = 10;
     private const int PtsFinalDay       = 25;
     private const int StreakBonusPerDate = 15;   // multiplié med streak och multiplier
 
@@ -731,7 +776,7 @@ else if (gameOver)
 
     // ── Current date calculation ──
     private DateOnly currentDate;
-    private int currentPhase; // 0–9
+    private int currentPhase; // 0–10
     private bool calcIsLeapYear;
     private Weekday calcCenturyAnchor;
     private CenturyAnchorInfo calcCenturyInfo = null!;
@@ -740,7 +785,7 @@ else if (gameOver)
     private Weekday calcYearDoomsday;
     private MonthDoomsdayInfo calcMonthInfo = null!;
     private int calcDoomsdayInMonth;
-    private int calcDiff;
+    private int calcDiff, calcDiffMod7;
     private Weekday calcFinalWeekday;
 
     // ── Game over info ──
@@ -805,6 +850,7 @@ else if (gameOver)
         calcMonthInfo = MonthDoomsdayProvider.GetInfoForMonth(currentDate.Month);
         calcDoomsdayInMonth = MonthDoomsdayProvider.GetDoomsdayForMonth(currentDate.Month, calcIsLeapYear);
         calcDiff = currentDate.Day - calcDoomsdayInMonth;
+        calcDiffMod7 = Math.Abs(calcDiff) % 7;
         calcFinalWeekday = WeekdayCalculator.Calculate(currentDate.Day, calcDoomsdayInMonth, calcYearDoomsday);
     }
 
@@ -817,7 +863,11 @@ else if (gameOver)
         currentPhase++;
         phasePeeked = false;
 
-        if (currentPhase > 9)
+        // Expert: skip distance + mod7 phases, go straight to final day
+        if (selectedDifficulty == "expert" && currentPhase == 8)
+            currentPhase = 10;
+
+        if (currentPhase > 10)
         {
             answering = true;
             streak++;
@@ -952,15 +1002,30 @@ else if (gameOver)
                 $"{currentDate.Day} − {calcDoomsdayInMonth} = {calcDiff}");
     }
 
+    private async void AnswerDiffMod7(int answer)
+    {
+        if (answering) return;
+        if (answer == calcDiffMod7)
+            await CorrectAnswer(PtsDiffMod7);
+        else
+            WrongAnswer(9, $"{answer}", $"{calcDiffMod7}",
+                $"|{calcDiff}| mod 7 = {Math.Abs(calcDiff)} mod 7 = {calcDiffMod7}");
+    }
+
     private async void AnswerFinalDay(Weekday answer)
     {
         if (answering) return;
         if (answer == calcFinalWeekday)
-            await CorrectAnswer(PtsFinalDay);
+        {
+            var pts = selectedDifficulty == "expert"
+                ? PtsDiff + PtsDiffMod7 + PtsFinalDay   // combined score for expert
+                : PtsFinalDay;
+            await CorrectAnswer(pts);
+        }
         else
         {
             var diffMod = ((calcDiff % 7) + 7) % 7;
-            WrongAnswer(9, $"{answer}", $"{calcFinalWeekday}",
+            WrongAnswer(10, $"{answer}", $"{calcFinalWeekday}",
                 $"{calcYearDoomsday}({(int)calcYearDoomsday}) + {calcDiff} dagar.\n" +
                 $"{(int)calcYearDoomsday} + {calcDiff} = {(int)calcYearDoomsday + calcDiff}, mod 7 = {(int)calcFinalWeekday} → {calcFinalWeekday}");
         }
@@ -1111,7 +1176,8 @@ else if (gameOver)
         6 => "⑦ Årets Doomsday (mod 7)",
         7 => "⑧ Månadens Doomsday-datum",
         8 => "⑨ Avstånd",
-        9 => "⑩ Slutgiltig veckodag",
+        9 => "⑩ Avstånd mod 7",
+        10 => "⑪ Slutgiltig veckodag",
         _ => ""
     };
 
