@@ -17,6 +17,46 @@
         user-select: none;
         display: inline-block;
     }
+
+    /* ── Minnesträning ── */
+    @@keyframes memorize-glow {
+        0%, 100% { box-shadow: 0 0 8px rgba(33, 150, 243, 0.3); transform: scale(1); }
+        50%      { box-shadow: 0 0 24px rgba(33, 150, 243, 0.7); transform: scale(1.02); }
+    }
+    .memorize-banner {
+        animation: memorize-glow 0.7s ease-in-out 4;
+        border: 2px solid var(--mud-palette-info);
+        border-radius: 12px;
+        text-align: center;
+        position: absolute;
+        left: 0; right: 0;
+        bottom: 100%;
+        z-index: 10;
+    }
+    @@keyframes memorize-fadeout {
+        0%   { opacity: 1; }
+        100% { opacity: 0; }
+    }
+    .memorize-banner-hide {
+        animation: memorize-fadeout 0.4s ease forwards;
+        position: absolute;
+        left: 0; right: 0;
+        bottom: 100%;
+        z-index: 10;
+    }
+    .mem-val-blur {
+        filter: blur(5px);
+        user-select: none;
+        transition: filter 0.2s;
+        cursor: help;
+    }
+    .mem-val-blur:hover {
+        filter: blur(0);
+    }
+    .mem-forgotten {
+        text-decoration: line-through;
+        opacity: 0.5;
+    }
 </style>
 
 <PageTitle>Speed Run – Doomsday-Algoritmen</PageTitle>
@@ -67,6 +107,21 @@
                     })
                 </MudText>
             </MudPaper>
+
+            <MudDivider Class="my-3" />
+            <div class="d-flex align-center gap-2 justify-center">
+                <MudSwitch @bind-Value="memoryTraining" Color="Color.Info" T="bool" Label="🧠 Minnesträning" />
+            </div>
+            <MudText Typo="Typo.caption" Style="opacity:0.6;" Class="text-center">
+                @if (memoryTraining)
+                {
+                    <text>Aktivt! Mellanresultat visas kort – sedan måste du minnas dem.</text>
+                }
+                else
+                {
+                    <text>Öva på att memorera mellanresultat som behövs i kommande steg.</text>
+                }
+            </MudText>
         </MudPaper>
 
         @if (highScorePoints > 0)
@@ -117,8 +172,8 @@ else if (gameActive)
         <div class="d-flex gap-1 mb-2 justify-center align-center" style="flex-wrap:nowrap; overflow-x:auto;">
             @foreach (var (label, idx) in PhaseLabels.Select((l, i) => (l, i)))
             {
-                @* Expert: skip phases 8 (Δ) and 9 (m7) since they're merged into final day *@
-                if (selectedDifficulty == "expert" && (idx == 8 || idx == 9))
+                @* Skip phases 8 (Δ) and 9 (m7) when expert OR when diff is 0 *@
+                if ((selectedDifficulty == "expert" || skipDistancePhases) && (idx == 8 || idx == 9))
                     continue;
 
                 var done = currentPhase > idx;
@@ -144,6 +199,57 @@ else if (gameActive)
             <MudAlert Severity="Severity.Success" Variant="Variant.Filled" Dense="true" Class="mb-2 text-center">
                 🌟 Datum klart! +@lastStepPoints p bonus!
             </MudAlert>
+        }
+
+        @* ═══════ MINNESTRÄNING: MEMORERA-FLASH (overlay) ═══════ *@
+        <div style="position:relative;">
+        @if (memoryTraining && showMemorizeFlash && (memorizeNewItems.Count > 0 || memorizeForgetItems.Count > 0))
+        {
+            <MudPaper @key="memorizeFlashKey" Elevation="3"
+                      Class="@("pa-3 mb-2 " + (memorizeFlashFading ? "memorize-banner-hide" : "memorize-banner"))">
+                @if (memorizeNewItems.Count > 0)
+                {
+                    <MudText Typo="Typo.subtitle2" Color="Color.Info" Class="mb-1">
+                        <strong>🧠 MEMORERA!</strong>
+                    </MudText>
+                    <div class="d-flex gap-2 flex-wrap justify-center">
+                        @foreach (var item in memorizeNewItems)
+                        {
+                            <MudChip T="string" Color="Color.Info" Variant="Variant.Filled" Size="Size.Medium"
+                                     Style="font-size:0.95rem;">
+                                @item.Label: <strong>@item.Value</strong>
+                            </MudChip>
+                        }
+                    </div>
+                }
+                @if (memorizeForgetItems.Count > 0)
+                {
+                    <MudText Typo="Typo.caption" Class="mt-2" Style="opacity:0.6;">
+                        ✓ Kan glömmas:
+                        @foreach (var item in memorizeForgetItems)
+                        {
+                            <span class="mem-forgotten mx-1">@item.Label</span>
+                        }
+                    </MudText>
+                }
+            </MudPaper>
+        }
+        </div>
+
+        @* ═══════ MINNESTRÄNING: MINNESLISTA ═══════ *@
+        @if (memoryTraining && activeMemoryItems.Count > 0 && !showDateComplete)
+        {
+            <div class="d-flex gap-1 mb-2 justify-center align-center flex-wrap">
+                <MudText Typo="Typo.caption" Style="opacity:0.5;">🧠</MudText>
+                @foreach (var item in activeMemoryItems)
+                {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                             Color="@(item.UsedThisStep ? Color.Warning : Color.Default)"
+                             Style="font-size:0.75rem;">
+                        @item.Label: <span class="mem-val-blur">@item.Value</span>
+                    </MudChip>
+                }
+            </div>
         }
 
         @* ═══════════════════════════════════════════════════
@@ -751,6 +857,7 @@ else if (gameOver)
 
     // ── Settings ──
     private string selectedDifficulty = "normal";
+    private bool memoryTraining;
 
     // ── Game state ──
     private bool gameActive;
@@ -787,6 +894,19 @@ else if (gameOver)
     private int calcDoomsdayInMonth;
     private int calcDiff, calcDiffMod7;
     private Weekday calcFinalWeekday;
+    private bool skipDistancePhases;
+
+    // ── Memory training ──
+    private bool showMemorizeFlash;
+    private bool memorizeFlashFading;
+    private int memorizeFlashKey;
+    private const int MemorizeFlashMs = 3000;
+    private const int MemorizeFadeMs = 400;
+    private List<MemoryChipItem> activeMemoryItems = new();
+    private List<MemoryChipItem> memorizeNewItems = new();
+    private List<MemoryChipItem> memorizeForgetItems = new();
+
+    private record MemoryChipItem(string Label, string Value, bool UsedThisStep = false);
 
     // ── Game over info ──
     private int failedPhase;
@@ -826,6 +946,11 @@ else if (gameOver)
         answering = false;
         phasePeeked = false;
         summaryPeeked = false;
+        activeMemoryItems = new();
+        memorizeNewItems = new();
+        memorizeForgetItems = new();
+        showMemorizeFlash = false;
+        memorizeFlashFading = false;
 
         currentDate = selectedDifficulty switch
         {
@@ -852,6 +977,7 @@ else if (gameOver)
         calcDiff = currentDate.Day - calcDoomsdayInMonth;
         calcDiffMod7 = Math.Abs(calcDiff) % 7;
         calcFinalWeekday = WeekdayCalculator.Calculate(currentDate.Day, calcDoomsdayInMonth, calcYearDoomsday);
+        skipDistancePhases = false;
     }
 
     private async Task CorrectAnswer(int basePoints)
@@ -863,9 +989,28 @@ else if (gameOver)
         currentPhase++;
         phasePeeked = false;
 
-        // Expert: skip distance + mod7 phases, go straight to final day
-        if (selectedDifficulty == "expert" && currentPhase == 8)
+        // Skip distance + mod7 phases: expert mode OR when target day IS the doomsday
+        if ((selectedDifficulty == "expert" || skipDistancePhases) && currentPhase == 8)
             currentPhase = 10;
+
+        // Memory training: compute flash items for the new phase
+        if (memoryTraining && currentPhase <= 10)
+        {
+            var newItems = GetMemoryItemsForPhase(currentPhase);
+            var oldLabels = activeMemoryItems.Select(x => x.Label).ToHashSet();
+            var newLabels = newItems.Select(x => x.Label).ToHashSet();
+            memorizeNewItems = newItems.Where(x => !oldLabels.Contains(x.Label)).ToList();
+            memorizeForgetItems = activeMemoryItems.Where(x => !newLabels.Contains(x.Label)).ToList();
+            activeMemoryItems = newItems;
+
+            if (memorizeNewItems.Count > 0 || memorizeForgetItems.Count > 0)
+            {
+                showMemorizeFlash = true;
+                memorizeFlashFading = false;
+                memorizeFlashKey++;
+                _ = HideMemorizeFlashAsync();
+            }
+        }
 
         if (currentPhase > 10)
         {
@@ -986,7 +1131,18 @@ else if (gameOver)
     {
         if (answering) return;
         if (IsValidMonthDoomsdayAnswer(answer))
+        {
+            // Update reference to the date the user actually chose so subsequent
+            // distance/mod-7 steps are consistent with their selection.
+            calcDoomsdayInMonth = answer;
+            calcDiff = currentDate.Day - calcDoomsdayInMonth;
+            calcDiffMod7 = Math.Abs(calcDiff) % 7;
+
+            // If the target day IS the doomsday, skip the redundant distance steps
+            skipDistancePhases = calcDiff == 0;
+
             await CorrectAnswer(PtsMonthDoomsday);
+        }
         else
             WrongAnswer(7, $"Den {answer}:e", GetValidMonthDoomsdayAnswersText(),
                 $"{calcMonthInfo.MonthName}: {calcMonthInfo.Mnemonic}");
@@ -1017,8 +1173,8 @@ else if (gameOver)
         if (answering) return;
         if (answer == calcFinalWeekday)
         {
-            var pts = selectedDifficulty == "expert"
-                ? PtsDiff + PtsDiffMod7 + PtsFinalDay   // combined score for expert
+            var pts = (selectedDifficulty == "expert" || skipDistancePhases)
+                ? PtsDiff + PtsDiffMod7 + PtsFinalDay   // combined score when distance steps skipped
                 : PtsFinalDay;
             await CorrectAnswer(pts);
         }
@@ -1074,45 +1230,58 @@ else if (gameOver)
 
     private int[] GetMonthDoomsdayOptions()
     {
-        int[] baseOptions = currentDate.Month switch
-        {
-            1 => [3, 4],
-            2 => [28, 29],
-            3 => [7, 14, 21, 28],
-            4 => [4, 5, 6],
-            5 => [5, 9, 10],
-            6 => [6, 7, 8],
-            7 => [7, 11, 12],
-            8 => [8, 9, 10],
-            9 => [5, 6, 9],
-            10 => [10, 11, 12],
-            11 => [7, 8, 11],
-            12 => [12, 13, 14],
-            _ => [1]
-        };
+        var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
+        var canonical = calcDoomsdayInMonth;
 
-        if (IsHardOrExpert && currentDate.Month >= 3)
+        // All valid doomsday dates in this month (congruent mod 7)
+        var validSet = new HashSet<int>(
+            Enumerable.Range(1, daysInMonth).Where(d => ((d - canonical) % 7 + 7) % 7 == 0));
+
+        var options = new HashSet<int>(validSet);
+
+        // Always add wrong nearby dates as distractors
+        int[] offsets = IsHardOrExpert ? [-3, -2, -1, 1, 2, 3] : [-2, -1, 1, 2];
+        foreach (var valid in validSet)
         {
-            var options = new HashSet<int>(baseOptions);
-            var correct = calcDoomsdayInMonth;
-            for (var d = -2; d <= 2; d++)
+            foreach (var off in offsets)
             {
-                var v = correct + d;
-                if (v >= 1 && v <= 28) options.Add(v);
+                var v = valid + off;
+                if (v >= 1 && v <= daysInMonth && !validSet.Contains(v))
+                    options.Add(v);
             }
-            if (correct + 7 <= 28) options.Add(correct + 7);
-            if (correct - 7 >= 1) options.Add(correct - 7);
-            return options.OrderBy(x => x).ToArray();
-        }
-        if (IsHardOrExpert && currentDate.Month <= 2)
-        {
-            var options = new HashSet<int>(baseOptions);
-            if (currentDate.Month == 1) { options.Add(2); options.Add(5); }
-            else { options.Add(26); options.Add(27); }
-            return options.OrderBy(x => x).ToArray();
         }
 
-        return baseOptions;
+        // Month-specific extra distractors (common confusions)
+        int[] extras = currentDate.Month switch
+        {
+            1 => [2, 5, 10],           // confuse with Feb or regular dates
+            2 => [26, 27],             // close to 28/29
+            3 => [3, 10, 17, 24],      // off-by-4 from 7,14,21,28
+            5 => [7, 12],              // confuse with 7-Eleven rule
+            7 => [4, 14],              // confuse with even-month rule
+            9 => [9, 12],              // confuse with month number
+            11 => [4, 11, 14],         // confuse with even-month rule
+            _ => []
+        };
+        foreach (var e in extras)
+        {
+            if (e >= 1 && e <= daysInMonth && !validSet.Contains(e))
+                options.Add(e);
+        }
+
+        // Hard/expert: ensure even more spread
+        if (IsHardOrExpert)
+        {
+            foreach (var valid in validSet)
+            {
+                if (valid + 7 <= daysInMonth && !validSet.Contains(valid + 7)) options.Add(valid + 7);
+                if (valid - 7 >= 1 && !validSet.Contains(valid - 7)) options.Add(valid - 7);
+                if (valid + 4 <= daysInMonth) options.Add(valid + 4);
+                if (valid - 4 >= 1) options.Add(valid - 4);
+            }
+        }
+
+        return options.OrderBy(x => x).ToArray();
     }
 
     private int[] GetDiffOptions()
@@ -1216,6 +1385,69 @@ else if (gameOver)
         if (totalStepsCorrect >= 20) return "Du klarade många steg! Fortsätt öva.";
         if (totalStepsCorrect >= 5) return "Bra start! Varje försök bygger minnet.";
         return "Ge inte upp! Det blir lättare ju mer du övar.";
+    }
+
+    // ═══════════════════════════════════════════════
+    // MEMORY TRAINING
+    // ═══════════════════════════════════════════════
+
+    private List<MemoryChipItem> GetMemoryItemsForPhase(int phase)
+    {
+        var items = new List<MemoryChipItem>();
+        bool isExpert = selectedDifficulty == "expert";
+
+        // Leap year: needed at phase 7 for Jan/Feb month doomsday
+        if (currentDate.Month <= 2 && phase >= 1 && phase <= 7)
+            items.Add(new("Skottår", calcIsLeapYear ? "Ja" : "Nej", phase == 7));
+
+        // Century anchor number: needed at phase 5 (sum)
+        if (phase >= 2 && phase <= 5)
+            items.Add(new("Ankare", $"{(int)calcCenturyAnchor}", phase == 5));
+
+        // Quotient: needed at phase 5 (sum)
+        if (phase >= 3 && phase <= 5)
+            items.Add(new("Kvot", $"{calcQuotient}", phase == 5));
+
+        // Remainder: needed at phases 4 (leap adj) and 5 (sum)
+        if (phase >= 4 && phase <= 5)
+            items.Add(new("Rest", $"{calcRemainder}", phase == 5));
+
+        // Leap adjustment: needed at phase 5 (sum) – only visible at phase 5
+        if (phase == 5)
+            items.Add(new("÷4", $"{calcLeapAdj}", true));
+
+        // Sum: needed at phase 6 (mod 7)
+        if (phase == 6)
+            items.Add(new("Summa", $"{calcYearTotal}", true));
+
+        // Year doomsday: needed at phase 10 (final day) – longest carry!
+        if (phase >= 7 && phase <= 10)
+            items.Add(new("Doom", $"{calcYearDoomsday}", phase == 10));
+
+        // Month doomsday ref: needed at phase 8 (distance), or expert phase 10
+        if (phase == 8 || (isExpert && phase == 10))
+            items.Add(new("Ref", $"{calcDoomsdayInMonth}", true));
+
+        // Diff: needed at phase 9 (mod 7)
+        if (phase == 9)
+            items.Add(new("Δ", $"{calcDiff}", true));
+
+        // DiffMod7: needed at phase 10 (final day)
+        if (phase == 10 && !isExpert)
+            items.Add(new("m7", $"{calcDiffMod7}", true));
+
+        return items;
+    }
+
+    private async Task HideMemorizeFlashAsync()
+    {
+        await Task.Delay(MemorizeFlashMs);
+        memorizeFlashFading = true;
+        StateHasChanged();
+        await Task.Delay(MemorizeFadeMs);
+        showMemorizeFlash = false;
+        memorizeFlashFading = false;
+        StateHasChanged();
     }
 
     // ═══════════════════════════════════════════════
