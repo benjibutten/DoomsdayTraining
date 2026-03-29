@@ -1191,6 +1191,18 @@ else if (gameOver)
     // OPTION GENERATORS – smarta val för varje fas
     // ═══════════════════════════════════════════════
 
+    private static readonly Random _rng = new();
+
+    private static T[] Shuffle<T>(T[] arr)
+    {
+        for (var i = arr.Length - 1; i > 0; i--)
+        {
+            var j = _rng.Next(i + 1);
+            (arr[i], arr[j]) = (arr[j], arr[i]);
+        }
+        return arr;
+    }
+
     private int[] GetRemainderOptions()
     {
         var correct = calcRemainder;
@@ -1205,7 +1217,7 @@ else if (gameOver)
             for (var i = 0; i <= 11; i += 2)
                 options.Add(i);
         }
-        return options.OrderBy(x => x).ToArray();
+        return Shuffle(options.OrderBy(x => x).ToArray());
     }
 
     private int[] GetSumOptions()
@@ -1225,7 +1237,7 @@ else if (gameOver)
             if (correct >= 12) options.Add(correct - 12);
             options.Add(correct + 12);
         }
-        return options.Where(x => x >= 0).OrderBy(x => x).ToArray();
+        return Shuffle(options.Where(x => x >= 0).OrderBy(x => x).ToArray());
     }
 
     private int[] GetMonthDoomsdayOptions()
@@ -1281,7 +1293,7 @@ else if (gameOver)
             }
         }
 
-        return options.OrderBy(x => x).ToArray();
+        return Shuffle(options.OrderBy(x => x).ToArray());
     }
 
     private int[] GetDiffOptions()
@@ -1300,7 +1312,7 @@ else if (gameOver)
             options.Add(correct + 7);
             options.Add(correct - 7);
         }
-        return options.OrderBy(x => x).ToArray();
+        return Shuffle(options.OrderBy(x => x).ToArray());
     }
 
     // ═══════════════════════════════════════════════
