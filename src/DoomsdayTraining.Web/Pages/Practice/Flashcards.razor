@@ -91,12 +91,13 @@ else
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
                     i++;
+                    var optionNumber = i;
                     var color = day == correctAnswer ? Color.Success
                               : (day == userAnswer && !wasCorrect) ? Color.Error
                               : Color.Default;
                     var variant = (day == correctAnswer || (day == userAnswer && !wasCorrect)) ? Variant.Filled : Variant.Outlined;
                     <MudItem xs="4" sm="3">
-                        <MudButton FullWidth="true" Variant="@variant" Color="@color" Disabled="true" Size="Size.Small">@i. @day</MudButton>
+                        <MudButton FullWidth="true" Variant="@variant" Color="@color" Disabled="true" Size="Size.Small">@optionNumber. @day</MudButton>
                     </MudItem>
                 }
             </MudGrid>
@@ -145,9 +146,10 @@ else
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
                     j++;
+                    var optionNumber = j;
                     var d = day;
                     <MudItem xs="4" sm="3">
-                        <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => Answer(d)" Size="Size.Small">@j. @d</MudButton>
+                        <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => Answer(d)" Size="Size.Small">@optionNumber. @d</MudButton>
                     </MudItem>
                 }
             </MudGrid>

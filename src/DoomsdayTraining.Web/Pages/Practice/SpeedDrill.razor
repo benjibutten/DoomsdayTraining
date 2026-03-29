@@ -77,10 +77,11 @@ else if (sessionActive)
             @foreach (Weekday day in Enum.GetValues<Weekday>())
             {
                 n++;
+                var optionNumber = n;
                 var d = day;
                 <MudItem xs="4" sm="3">
                     <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary"
-                               OnClick="() => Answer(d)" Size="Size.Small" Disabled="showFeedback">@n. @d</MudButton>
+                               OnClick="() => Answer(d)" Size="Size.Small" Disabled="showFeedback">@optionNumber. @d</MudButton>
                 </MudItem>
             }
         </MudGrid>
