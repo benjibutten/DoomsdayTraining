@@ -197,13 +197,13 @@
             @if (wasCorrect)
             {
                 <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">
-                    ✅ Rätt! Doomsday i @monthInfo!.MonthName = den <strong>@monthCorrectDay:e</strong>.
+                    ✅ Rätt! I @monthInfo!.MonthName fungerar <strong>@GetMonthDoomsdayAnswersText(monthInfo!.Month, monthIsLeapYear)</strong> som Doomsday-datum.
                 </MudAlert>
             }
             else
             {
                 <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-3">
-                    ❌ Fel. Du svarade @monthUserDay. Rätt: den <strong>@monthCorrectDay:e</strong>.
+                    ❌ Fel. Du svarade @monthUserDay:e. Giltiga svar: <strong>@GetMonthDoomsdayAnswersText(monthInfo!.Month, monthIsLeapYear)</strong>.
                 </MudAlert>
             }
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-3 text-left">@monthInfo!.Mnemonic</MudAlert>
@@ -212,10 +212,14 @@
         else
         {
             <div class="d-flex gap-2 align-center justify-center mt-3">
-                <MudNumericField @bind-Value="monthUserDay" Label="Dag i månaden" Variant="Variant.Outlined"
-                                 Min="1" Max="31" Style="max-width:120px;"
-                                 Immediate="true" OnKeyDown="HandleMonthKeyDown" />
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AnswerMonth" Class="align-self-center">Svara</MudButton>
+                <MudSelect @bind-Value="monthUserDay" Label="Dag i månaden" Variant="Variant.Outlined" Style="min-width:160px; max-width:200px;">
+                    <MudSelectItem Value="@NoDaySelected" Disabled="true">@SelectDayPlaceholder</MudSelectItem>
+                    @foreach (var day in GetDayOptions(monthInfo!.Month, monthIsLeapYear))
+                    {
+                        <MudSelectItem Value="@day">@FormatOrdinalDay(day)</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AnswerMonth" Class="align-self-center" Disabled="@(monthUserDay == NoDaySelected)">Svara</MudButton>
             </div>
         }
     </MudPaper>
@@ -227,7 +231,7 @@
     <MudPaper Elevation="4" Class="pa-4 pa-sm-6 mx-auto mb-4" Style="max-width:600px; border-radius:16px;" @key="questionKey">
         <MudText Typo="Typo.body2" Class="text-center mb-1">Beräkna veckodagen för...</MudText>
         <MudText Typo="Typo.h4" Color="Color.Primary" Class="text-center mb-4" Style="font-variant-numeric: tabular-nums;">
-            @fullDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))
+            @fullDate.ToString("d MMMM yyyy", SwedishCulture)
         </MudText>
 
         @* Progressindikator *@
@@ -313,7 +317,7 @@
                 Årets Doomsday: <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">@fullYearCorrect</MudChip>
             </MudText>
             <MudText Typo="Typo.body1" Class="mb-3">
-                Vilket datum i <strong>@(new System.Globalization.CultureInfo("sv-SE").DateTimeFormat.GetMonthName(fullDate.Month))</strong>
+                Vilket datum i <strong>@SwedishCulture.DateTimeFormat.GetMonthName(fullDate.Month)</strong>
                 är Doomsday-referensen?
                 @if (fullDate.Month == 1 || fullDate.Month == 2)
                 {
@@ -321,10 +325,15 @@
                 }
             </MudText>
             <div class="d-flex gap-2 align-center justify-center">
-                <MudNumericField @bind-Value="fullStepMonthDay" Label="Dag" Variant="Variant.Outlined"
-                                 Min="1" Max="31" Style="max-width:120px;" Immediate="true" />
+                <MudSelect @bind-Value="fullStepMonthDay" Label="Dag" Variant="Variant.Outlined" Style="min-width:140px; max-width:180px;">
+                    <MudSelectItem Value="@NoDaySelected" Disabled="true">@SelectDayPlaceholder</MudSelectItem>
+                    @foreach (var day in GetDayOptions(fullDate.Month, LeapYearChecker.IsLeapYear(fullDate.Year)))
+                    {
+                        <MudSelectItem Value="@day">@FormatOrdinalDay(day)</MudSelectItem>
+                    }
+                </MudSelect>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitFullStep"
-                           EndIcon="@Icons.Material.Filled.ArrowForward" Class="align-self-center">Nästa steg</MudButton>
+                           EndIcon="@Icons.Material.Filled.ArrowForward" Class="align-self-center" Disabled="@(fullStepMonthDay == NoDaySelected)">Nästa steg</MudButton>
             </div>
             @if (fullStepErrors.ContainsKey(2))
             {
@@ -339,7 +348,7 @@
                 Doomsday = <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">@fullYearCorrect</MudChip>,
                 Referensdatum = den <strong>@fullMonthDayCorrect:e</strong>
             </MudText>
-            <MudText Typo="Typo.body1" Class="mb-3">Vilken veckodag är <strong>@fullDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))</strong>?</MudText>
+            <MudText Typo="Typo.body1" Class="mb-3">Vilken veckodag är <strong>@fullDate.ToString("d MMMM yyyy", SwedishCulture)</strong>?</MudText>
             <MudGrid Spacing="2" Justify="Justify.Center">
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
@@ -366,7 +375,7 @@
 
         @if (fullCompleted)
         {
-            var resultText = $"{fullDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))} är en {fullFinalCorrect}.";
+            var resultText = $"{fullDate.ToString("d MMMM yyyy", SwedishCulture)} är en {fullFinalCorrect}.";
             <MudAlert Severity="@(fullAllCorrect ? Severity.Success : Severity.Warning)" Variant="Variant.Filled"
                       Class="mt-4 text-center">
                 @if (fullAllCorrect)
@@ -388,6 +397,22 @@
 }
 
 @code {
+    private const int NoDaySelected = 0;
+    private const int FirstDayOfMonth = 1;
+    private const int RandomMonthUpperBoundExclusive = 13;
+    private const int LeapYearCoinFlipUpperBoundExclusive = 2;
+    private const int RandomYearStart = 1800;
+    private const int RandomYearEndExclusive = 2200;
+    private const int RandomYearEndInclusive = RandomYearEndExclusive - 1;
+    private const string SelectDayPlaceholder = "Välj dag";
+    private const string SwedishOrdinalSuffix = ":e";
+    private const string SwedishSingleDayPrefix = "den ";
+    private const string SwedishListSeparator = ", ";
+    private const string SwedishFinalSeparator = " och ";
+
+    private static readonly System.Globalization.CultureInfo SwedishCulture = new("sv-SE");
+    private static readonly int[] SupportedCenturyYears = [1800, 1900, 2000, 2100];
+
     private enum TrainingMode { None, CenturyAnchor, YearDoomsday, MonthDoomsday, FullAlgorithm }
 
     private TrainingMode mode = TrainingMode.None;
@@ -413,7 +438,6 @@
     // Month
     private MonthDoomsdayInfo? monthInfo;
     private bool monthIsLeapYear;
-    private int monthCorrectDay;
     private int monthUserDay;
 
     // Full Algorithm
@@ -449,27 +473,25 @@
         switch (mode)
         {
             case TrainingMode.CenturyAnchor:
-                var centuries = new[] { 1800, 1900, 2000, 2100 };
-                centuryYear = centuries[_random.Next(centuries.Length)];
+                centuryYear = SupportedCenturyYears[_random.Next(SupportedCenturyYears.Length)];
                 centuryCorrectAnswer = CenturyAnchorCalculator.Calculate(centuryYear);
                 break;
 
             case TrainingMode.YearDoomsday:
-                yearToGuess = _random.Next(1800, 2200);
+                yearToGuess = _random.Next(RandomYearStart, RandomYearEndExclusive);
                 yearCenturyAnchor = CenturyAnchorCalculator.Calculate(yearToGuess);
                 yearCorrectAnswer = YearDoomsdayCalculator.Calculate(yearToGuess, yearCenturyAnchor);
                 break;
 
             case TrainingMode.MonthDoomsday:
-                var month = _random.Next(1, 13);
+                var month = _random.Next(FirstDayOfMonth, RandomMonthUpperBoundExclusive);
                 monthInfo = MonthDoomsdayProvider.GetInfoForMonth(month);
-                monthIsLeapYear = _random.Next(2) == 0;
-                monthCorrectDay = MonthDoomsdayProvider.GetDoomsdayForMonth(month, monthIsLeapYear);
-                monthUserDay = 0;
+                monthIsLeapYear = _random.Next(LeapYearCoinFlipUpperBoundExclusive) == 0;
+                monthUserDay = NoDaySelected;
                 break;
 
             case TrainingMode.FullAlgorithm:
-                fullDate = RandomDateGenerator.Generate(1800, 2199);
+                fullDate = RandomDateGenerator.Generate(RandomYearStart, RandomYearEndInclusive);
                 fullCenturyCorrect = CenturyAnchorCalculator.Calculate(fullDate.Year);
                 fullYearCorrect = YearDoomsdayCalculator.Calculate(fullDate.Year, fullCenturyCorrect);
                 fullMonthDayCorrect = MonthDoomsdayProvider.GetDoomsdayForMonth(fullDate.Month, LeapYearChecker.IsLeapYear(fullDate.Year));
@@ -477,7 +499,7 @@
                 fullStep = 0;
                 fullStepCenturyAnswer = null;
                 fullStepYearAnswer = null;
-                fullStepMonthDay = 0;
+                fullStepMonthDay = NoDaySelected;
                 fullStepFinalAnswer = null;
                 fullCompleted = false;
                 fullAllCorrect = true;
@@ -523,17 +545,22 @@
                 break;
 
             case 2:
-                if (fullStepMonthDay == 0)
+                if (fullStepMonthDay == NoDaySelected)
                 {
                     fullStepErrors[2] = "Ange ett datum.";
                     return;
                 }
-                if (fullStepMonthDay != fullMonthDayCorrect)
+                var isValidMonthAnswer = MonthDoomsdayProvider.IsValidDoomsdayDateForMonth(fullDate.Month, fullStepMonthDay, LeapYearChecker.IsLeapYear(fullDate.Year));
+                if (!isValidMonthAnswer)
                 {
-                    fullStepErrors[2] = $"Fel! Rätt svar: den {fullMonthDayCorrect}:e.";
+                    fullStepErrors[2] = $"Fel! Giltiga svar: {GetMonthDoomsdayAnswersText(fullDate.Month, LeapYearChecker.IsLeapYear(fullDate.Year))}.";
                     fullAllCorrect = false;
                 }
-                RecordAnswer(fullStepMonthDay == fullMonthDayCorrect);
+                else
+                {
+                    fullMonthDayCorrect = fullStepMonthDay;
+                }
+                RecordAnswer(isValidMonthAnswer);
                 fullStep = 3;
                 break;
 
@@ -577,14 +604,36 @@
 
     private void AnswerMonth()
     {
-        RecordAnswer(monthUserDay == monthCorrectDay);
+        if (monthInfo is null)
+            return;
+
+        RecordAnswer(MonthDoomsdayProvider.IsValidDoomsdayDateForMonth(monthInfo.Month, monthUserDay, monthIsLeapYear));
     }
 
-    private void HandleMonthKeyDown(KeyboardEventArgs e)
+    private static IEnumerable<int> GetDayOptions(int month, bool isLeapYear)
     {
-        if (e.Key == "Enter")
-            AnswerMonth();
+        return Enumerable.Range(FirstDayOfMonth, MonthDoomsdayProvider.GetDaysInMonth(month, isLeapYear));
     }
+
+    private static string GetMonthDoomsdayAnswersText(int month, bool isLeapYear)
+    {
+        return FormatDayList(MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(month, isLeapYear));
+    }
+
+    private static string FormatDayList(IReadOnlyList<int> days)
+    {
+        var formattedDays = days.Select(FormatOrdinalDay).ToArray();
+
+        return formattedDays.Length switch
+        {
+            0 => "",
+            1 => SwedishSingleDayPrefix + formattedDays[0],
+            2 => formattedDays[0] + SwedishFinalSeparator + formattedDays[1],
+            _ => string.Join(SwedishListSeparator, formattedDays[..^1]) + SwedishFinalSeparator + formattedDays[^1]
+        };
+    }
+
+    private static string FormatOrdinalDay(int day) => $"{day}{SwedishOrdinalSuffix}";
 
     private static string GetStepLabel(int step) => step switch
     {
