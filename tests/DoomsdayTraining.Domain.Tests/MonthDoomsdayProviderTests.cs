@@ -85,4 +85,37 @@ public class MonthDoomsdayProviderTests
                 $"Månad {month} ska ha en minnesregel");
         }
     }
+
+    [Theory]
+    [InlineData(3, false, new[] { 7, 14, 21, 28 })]
+    [InlineData(2, false, new[] { 7, 14, 21, 28 })]
+    [InlineData(2, true, new[] { 1, 8, 15, 22, 29 })]
+    public void GetValidDoomsdayDatesForMonth_ShouldReturnAllEquivalentDates(
+        int month,
+        bool isLeapYear,
+        int[] expectedDays)
+    {
+        var result = MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(month, isLeapYear);
+
+        result.Should().Equal(expectedDays);
+    }
+
+    [Theory]
+    [InlineData(3, 7, false, true)]
+    [InlineData(3, 14, false, true)]
+    [InlineData(3, 21, false, true)]
+    [InlineData(3, 28, false, true)]
+    [InlineData(3, 13, false, false)]
+    [InlineData(2, 29, false, false)]
+    [InlineData(2, 29, true, true)]
+    public void IsValidDoomsdayDateForMonth_ShouldValidateCandidateDay(
+        int month,
+        int day,
+        bool isLeapYear,
+        bool expectedResult)
+    {
+        var result = MonthDoomsdayProvider.IsValidDoomsdayDateForMonth(month, day, isLeapYear);
+
+        result.Should().Be(expectedResult);
+    }
 }

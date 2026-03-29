@@ -114,6 +114,52 @@
     </tbody>
 </MudSimpleTable>
 
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">🗓️ Alla Doomsday-datum per månad</MudText>
+<MudPaper Elevation="1" Class="pa-4 mb-4" Style="border-left: 4px solid var(--mud-palette-info); background: var(--mud-palette-background-gray, #f5f5f5);">
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Varje månad har <strong>4–5 datum</strong> som alla är Doomsday. Ju fler du memorerar, desto kortare
+        avstånd behöver du räkna! Tabellen nedan visar alla Doomsday-datum i varje månad.
+    </MudText>
+    <MudText Typo="Typo.body2">
+        💡 <strong>Tips:</strong> Läs igenom listan och <em>säg dem högt</em> — "3, 10, 17, 24, 31 januari" osv.
+        Gå sedan till <MudLink Href="practice/month-doomsday-drill">Månadsdrillningen</MudLink> och testa dig själv!
+    </MudText>
+</MudPaper>
+
+<MudSimpleTable Dense="true" Hover="true" Elevation="2" Class="mb-4">
+    <thead>
+        <tr><th>Månad</th><th>Alla Doomsday-datum</th><th>Antal</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var month in MonthDoomsdayProvider.GetAll())
+        {
+            var allDates = MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(month.Month, false);
+            <tr>
+                <td><strong>@month.MonthName</strong></td>
+                <td>@string.Join(", ", allDates.Select(d => $"{d}:e"))</td>
+                <td>@allDates.Count</td>
+            </tr>
+        }
+    </tbody>
+</MudSimpleTable>
+<MudExpansionPanels Class="mb-4" Elevation="2">
+    <MudExpansionPanel Text="Visa även för skottår (januari & februari)" MaxHeight="300">
+        <MudSimpleTable Dense="true" Hover="true" Elevation="0">
+            <thead><tr><th>Månad</th><th>Alla Doomsday-datum (skottår)</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>Januari (skottår)</strong></td>
+                    <td>@string.Join(", ", MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(1, true).Select(d => $"{d}:e"))</td>
+                </tr>
+                <tr>
+                    <td><strong>Februari (skottår)</strong></td>
+                    <td>@string.Join(", ", MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(2, true).Select(d => $"{d}:e"))</td>
+                </tr>
+            </tbody>
+        </MudSimpleTable>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
 <MudText Typo="Typo.h5" Class="mt-6 mb-3">Snabbtest: Kan du dem?</MudText>
 <MudPaper Elevation="2" Class="pa-4 mb-4">
     <MudText Typo="Typo.h6" Class="mb-3">🧪 Vilket datum är Doomsday i...?</MudText>
@@ -121,10 +167,9 @@
     <MudGrid Spacing="2">
         <MudItem xs="12" sm="4">
             <MudSelect @bind-Value="selectedMonth" Label="Välj månad" Variant="Variant.Outlined">
-                @for (int m = 1; m <= 12; m++)
+                @foreach (var monthInfo in MonthDoomsdayProvider.GetAll())
                 {
-                    var monthInfo = MonthDoomsdayProvider.GetInfoForMonth(m);
-                    <MudSelectItem Value="@m">@monthInfo.MonthName</MudSelectItem>
+                    <MudSelectItem Value="@monthInfo.Month">@monthInfo.MonthName</MudSelectItem>
                 }
             </MudSelect>
         </MudItem>

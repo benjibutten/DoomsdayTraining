@@ -13,10 +13,9 @@
         </MudItem>
         <MudItem xs="12" sm="4">
             <MudSelect @bind-Value="month" Label="Månad" Variant="Variant.Outlined">
-                @for (int m = 1; m <= 12; m++)
+                @foreach (var monthInfo in MonthDoomsdayProvider.GetAll())
                 {
-                    var info = MonthDoomsdayProvider.GetInfoForMonth(m);
-                    <MudSelectItem Value="@m">@m – @info.MonthName</MudSelectItem>
+                    <MudSelectItem Value="@monthInfo.Month">@monthInfo.Month – @monthInfo.MonthName</MudSelectItem>
                 }
             </MudSelect>
         </MudItem>

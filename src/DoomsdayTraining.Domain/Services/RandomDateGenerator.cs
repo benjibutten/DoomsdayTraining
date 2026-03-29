@@ -9,19 +9,30 @@ public static class RandomDateGenerator
 {
     private static readonly Random _random = new();
 
+    public const int DefaultMinYear = 1800;
+    public const int DefaultMaxYear = 2099;
+    public const int AllCenturiesMinYear = 1800;
+    public const int AllCenturiesMaxYear = 2199;
+    public const int ExtendedPracticeMinYear = 1600;
+    public const int ExtendedPracticeMaxYear = 2399;
+
+    private const int FirstMonth = 1;
+    private const int LastMonth = 12;
+    private const int FirstDayInMonth = 1;
+
     /// <summary>
     /// Genererar ett slumpmässigt datum inom angivet år-intervall.
     /// Standardintervallet täcker 1800–2099 för att ge variation i sekelankare.
     /// </summary>
-    /// <param name="minYear">Lägsta tillåtna år (standard: 1800).</param>
-    /// <param name="maxYear">Högsta tillåtna år (standard: 2099).</param>
+    /// <param name="minYear">Lägsta tillåtna år (standard: <see cref="DefaultMinYear"/>).</param>
+    /// <param name="maxYear">Högsta tillåtna år (standard: <see cref="DefaultMaxYear"/>).</param>
     /// <returns>Ett slumpmässigt datum.</returns>
-    public static DateOnly Generate(int minYear = 1800, int maxYear = 2099)
+    public static DateOnly Generate(int minYear = DefaultMinYear, int maxYear = DefaultMaxYear)
     {
         var year = _random.Next(minYear, maxYear + 1);
-        var month = _random.Next(1, 13);
+        var month = _random.Next(FirstMonth, LastMonth + 1);
         var daysInMonth = DateTime.DaysInMonth(year, month);
-        var day = _random.Next(1, daysInMonth + 1);
+        var day = _random.Next(FirstDayInMonth, daysInMonth + 1);
 
         return new DateOnly(year, month, day);
     }
@@ -45,11 +56,11 @@ public static class RandomDateGenerator
     /// <param name="minYear">Lägsta tillåtna år.</param>
     /// <param name="maxYear">Högsta tillåtna år.</param>
     /// <returns>Ett slumpmässigt datum i den angivna månaden.</returns>
-    public static DateOnly GenerateForMonth(int month, int minYear = 1800, int maxYear = 2099)
+    public static DateOnly GenerateForMonth(int month, int minYear = DefaultMinYear, int maxYear = DefaultMaxYear)
     {
         var year = _random.Next(minYear, maxYear + 1);
         var daysInMonth = DateTime.DaysInMonth(year, month);
-        var day = _random.Next(1, daysInMonth + 1);
+        var day = _random.Next(FirstDayInMonth, daysInMonth + 1);
 
         return new DateOnly(year, month, day);
     }

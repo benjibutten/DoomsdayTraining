@@ -13,18 +13,18 @@
         <MudGrid Spacing="2">
             <MudItem xs="12" sm="4">
                 <MudSelect @bind-Value="selectedPeriod" Label="Tidsperiod" Variant="Variant.Outlined">
-                    <MudSelectItem Value="@("2000")">2000-talet</MudSelectItem>
-                    <MudSelectItem Value="@("1900")">1900-talet</MudSelectItem>
-                    <MudSelectItem Value="@("2100")">2100-talet</MudSelectItem>
-                    <MudSelectItem Value="@("all")">Alla sekel (1800–2199)</MudSelectItem>
+                    <MudSelectItem Value="@Period2000">2000-talet</MudSelectItem>
+                    <MudSelectItem Value="@Period1900">1900-talet</MudSelectItem>
+                    <MudSelectItem Value="@Period2100">2100-talet</MudSelectItem>
+                    <MudSelectItem Value="@PeriodAll">Alla sekel (@RandomDateGenerator.AllCenturiesMinYear–@RandomDateGenerator.AllCenturiesMaxYear)</MudSelectItem>
                 </MudSelect>
             </MudItem>
             <MudItem xs="12" sm="4">
                 <MudSelect @bind-Value="durationSeconds" Label="Tidsgräns" Variant="Variant.Outlined">
-                    <MudSelectItem Value="30">30 sekunder</MudSelectItem>
-                    <MudSelectItem Value="60">1 minut</MudSelectItem>
-                    <MudSelectItem Value="120">2 minuter</MudSelectItem>
-                    <MudSelectItem Value="300">5 minuter</MudSelectItem>
+                    <MudSelectItem Value="@Duration30Seconds">30 sekunder</MudSelectItem>
+                    <MudSelectItem Value="@Duration60Seconds">1 minut</MudSelectItem>
+                    <MudSelectItem Value="@Duration120Seconds">2 minuter</MudSelectItem>
+                    <MudSelectItem Value="@Duration300Seconds">5 minuter</MudSelectItem>
                 </MudSelect>
             </MudItem>
         </MudGrid>
@@ -38,7 +38,7 @@ else if (sessionActive)
         <MudGrid Spacing="2">
             <MudItem xs="4">
                 <div class="text-center">
-                    <MudText Typo="Typo.h4" Color="@(remainingSeconds <= 10 ? Color.Error : Color.Primary)">@remainingSeconds<span style="font-size:0.6em;">s</span></MudText>
+                    <MudText Typo="Typo.h4" Color="@(remainingSeconds <= LowTimeWarningSeconds ? Color.Error : Color.Primary)">@remainingSeconds<span style="font-size:0.6em;">s</span></MudText>
                     <MudText Typo="Typo.caption">KVAR</MudText>
                 </div>
             </MudItem>
@@ -55,15 +55,15 @@ else if (sessionActive)
                 </div>
             </MudItem>
         </MudGrid>
-        <MudProgressLinear Value="@progressPercent" Color="@(remainingSeconds <= 10 ? Color.Error : Color.Primary)" Class="mt-2" />
+        <MudProgressLinear Value="@progressPercent" Color="@(remainingSeconds <= LowTimeWarningSeconds ? Color.Error : Color.Primary)" Class="mt-2" />
     </MudPaper>
 
     <MudPaper Elevation="4" Class="pa-4 pa-sm-6 text-center mx-auto mb-4" Style="max-width:520px; border-radius:16px;"
               @onkeydown="HandleKeyDown" tabindex="0" @key="questionKey">
         <MudText Typo="Typo.h3" Class="mud-text-primary mb-3" Style="font-variant-numeric: tabular-nums;">
-            @currentDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))
+            @currentDate.ToString("d MMMM yyyy", SwedishCulture)
         </MudText>
-        <MudText Typo="Typo.caption" Class="mb-3" Style="opacity:0.5;">Tangent 1–7 för snabbt svar</MudText>
+        <MudText Typo="Typo.caption" Class="mb-3" Style="opacity:0.5;">Tangent @WeekdayKeyMin–@WeekdayKeyMax för snabbt svar</MudText>
 
         @if (showFeedback)
         {
@@ -141,8 +141,26 @@ else if (sessionFinished)
 }
 
 @code {
-    private string selectedPeriod = "2000";
-    private int durationSeconds = 60;
+    private const string Period2000 = "2000";
+    private const string Period1900 = "1900";
+    private const string Period2100 = "2100";
+    private const string PeriodAll = "all";
+    private const int Duration30Seconds = 30;
+    private const int Duration60Seconds = 60;
+    private const int Duration120Seconds = 120;
+    private const int Duration300Seconds = 300;
+    private const int TimerTickIntervalMs = 1000;
+    private const int LowTimeWarningSeconds = 10;
+    private const int CorrectAnswerDelayMs = 300;
+    private const int WrongAnswerDelayMs = 800;
+    private const int WeekdayKeyMin = 1;
+    private const int WeekdayKeyMax = 7;
+    private const int WeekdayIndexOffset = 1;
+
+    private static readonly System.Globalization.CultureInfo SwedishCulture = new("sv-SE");
+
+    private string selectedPeriod = Period2000;
+    private int durationSeconds = Duration60Seconds;
     private bool sessionActive;
     private bool sessionFinished;
     private int questionKey;
@@ -171,7 +189,7 @@ else if (sessionFinished)
         GenerateNewDate();
 
         _timer?.Dispose();
-        _timer = new System.Threading.Timer(TimerTick, null, 1000, 1000);
+        _timer = new System.Threading.Timer(TimerTick, null, TimerTickIntervalMs, TimerTickIntervalMs);
     }
 
     private void TimerTick(object? state)
@@ -199,10 +217,10 @@ else if (sessionFinished)
     {
         currentDate = selectedPeriod switch
         {
-            "2000" => RandomDateGenerator.GenerateForCentury(2000),
-            "1900" => RandomDateGenerator.GenerateForCentury(1900),
-            "2100" => RandomDateGenerator.GenerateForCentury(2100),
-            _ => RandomDateGenerator.Generate(1800, 2199)
+            Period2000 => RandomDateGenerator.GenerateForCentury(2000),
+            Period1900 => RandomDateGenerator.GenerateForCentury(1900),
+            Period2100 => RandomDateGenerator.GenerateForCentury(2100),
+            _ => RandomDateGenerator.Generate(RandomDateGenerator.AllCenturiesMinYear, RandomDateGenerator.AllCenturiesMaxYear)
         };
         correctAnswer = DoomsdayAlgorithm.GetWeekday(currentDate);
         showFeedback = false;
@@ -224,7 +242,7 @@ else if (sessionFinished)
         showFeedback = true;
         StateHasChanged();
 
-        await Task.Delay(lastCorrect ? 300 : 800);
+        await Task.Delay(lastCorrect ? CorrectAnswerDelayMs : WrongAnswerDelayMs);
 
         if (sessionActive)
         {
@@ -235,9 +253,9 @@ else if (sessionFinished)
 
     private void HandleKeyDown(KeyboardEventArgs e)
     {
-        if (!showFeedback && sessionActive && int.TryParse(e.Key, out var num) && num >= 1 && num <= 7)
+        if (!showFeedback && sessionActive && int.TryParse(e.Key, out var num) && num >= WeekdayKeyMin && num <= WeekdayKeyMax)
         {
-            Answer((Weekday)(num - 1));
+            Answer((Weekday)(num - WeekdayIndexOffset));
         }
     }
 
