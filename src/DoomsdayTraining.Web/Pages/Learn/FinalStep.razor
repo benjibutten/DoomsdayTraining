@@ -95,7 +95,7 @@ Torsdag + 1 = Fredag ✓</MudText>
             <tr><td>Doomsday-referens i @exMInfo.MonthName</td><td>@exMInfo.Mnemonic</td><td><strong>@exDoomsdayRef/@exampleDate.Month = @exRes.YearDoomsday</strong></td></tr>
             <tr><td>Avstånd</td><td>@exampleDate.Day − @exDoomsdayRef = @exDiff dag(ar)</td><td><strong>@exDiff dagar @(exDiff >= 0 ? "framåt" : "bakåt")</strong></td></tr>
             <tr><td>Mod 7</td><td>@(Math.Abs(exDiff)) mod 7 = @exDiffMod</td><td><strong>@exDiffMod dag(ar)</strong></td></tr>
-            <tr><td>Slutresultat</td><td>@exRes.YearDoomsday + @(exDiff >= 0 ? "+" : "")@exDiff (mod 7)</td><td><strong>@exRes.Weekday ✓</strong></td></tr>
+            <tr><td>Slutresultat</td><td>@exRes.YearDoomsday @(exDiff >= 0 ? "+ " : "− ")@(Math.Abs(exDiff)) (mod 7)</td><td><strong>@exRes.Weekday ✓</strong></td></tr>
         </tbody>
     </MudSimpleTable>
     <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mt-3">
@@ -168,7 +168,7 @@ Torsdag + 1 = Fredag ✓</MudText>
     private DateTime? testDateTime = new DateTime(2024, 4, 19);
     private DoomsdayResult? result;
 
-    private static readonly (DateOnly Date, string Label)[] ExampleDates =
+    private readonly (DateOnly Date, string Label)[] ExampleDates =
     [
         (new DateOnly(2024, 4, 19), ""),
         (new DateOnly(2001, 9, 11), "9/11"),
@@ -177,7 +177,7 @@ Torsdag + 1 = Fredag ✓</MudText>
         (new DateOnly(2000,  1,  1), "Millennieskiftet"),
         (new DateOnly(1944,  6,  6), "D-dagen"),
         (new DateOnly(1912,  4, 15), "Titanic sjunker"),
-        (new DateOnly(2026,  3, 15), "Idag"),
+        (DateOnly.FromDateTime(DateTime.Today), "Idag"),
     ];
 
     private DateOnly exampleDate;

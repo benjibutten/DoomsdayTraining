@@ -17,6 +17,46 @@
         user-select: none;
         display: inline-block;
     }
+
+    /* ── Minnesträning ── */
+    @@keyframes memorize-glow {
+        0%, 100% { box-shadow: 0 0 8px rgba(33, 150, 243, 0.3); transform: scale(1); }
+        50%      { box-shadow: 0 0 24px rgba(33, 150, 243, 0.7); transform: scale(1.02); }
+    }
+    .memorize-banner {
+        animation: memorize-glow 0.7s ease-in-out 4;
+        border: 2px solid var(--mud-palette-info);
+        border-radius: 12px;
+        text-align: center;
+        position: absolute;
+        left: 0; right: 0;
+        bottom: 100%;
+        z-index: 10;
+    }
+    @@keyframes memorize-fadeout {
+        0%   { opacity: 1; }
+        100% { opacity: 0; }
+    }
+    .memorize-banner-hide {
+        animation: memorize-fadeout 0.4s ease forwards;
+        position: absolute;
+        left: 0; right: 0;
+        bottom: 100%;
+        z-index: 10;
+    }
+    .mem-val-blur {
+        filter: blur(5px);
+        user-select: none;
+        transition: filter 0.2s;
+        cursor: help;
+    }
+    .mem-val-blur:hover {
+        filter: blur(0);
+    }
+    .mem-forgotten {
+        text-decoration: line-through;
+        opacity: 0.5;
+    }
 </style>
 
 <PageTitle>Speed Run – Doomsday-Algoritmen</PageTitle>
@@ -34,21 +74,25 @@
         <MudPaper Elevation="2" Class="pa-4 mb-4" Style="border-radius:16px;">
             <MudText Typo="Typo.h6" Class="mb-3">⚙️ Svårighetsgrad</MudText>
             <div class="d-flex gap-2 justify-center flex-wrap mb-3">
-                <MudButton Variant="@(selectedDifficulty == "easy" ? Variant.Filled : Variant.Outlined)"
-                           Color="Color.Success" OnClick="@(() => selectedDifficulty = "easy")"
-                           Style="min-width:150px;">🟢 Nybörjare</MudButton>
-                <MudButton Variant="@(selectedDifficulty == "normal" ? Variant.Filled : Variant.Outlined)"
-                           Color="Color.Warning" OnClick="@(() => selectedDifficulty = "normal")"
-                           Style="min-width:150px;">🟡 Normal</MudButton>
-                <MudButton Variant="@(selectedDifficulty == "hard" ? Variant.Filled : Variant.Outlined)"
-                           Color="Color.Error" OnClick="@(() => selectedDifficulty = "hard")"
-                           Style="min-width:150px;">🔴 Expert</MudButton>
+                <MudButton Variant="@(selectedDifficulty == DifficultyEasy ? Variant.Filled : Variant.Outlined)"
+                           Color="Color.Success" OnClick="@(() => selectedDifficulty = DifficultyEasy)"
+                           Style="min-width:130px;">🟢 Nybörjare</MudButton>
+                <MudButton Variant="@(selectedDifficulty == DifficultyNormal ? Variant.Filled : Variant.Outlined)"
+                           Color="Color.Warning" OnClick="@(() => selectedDifficulty = DifficultyNormal)"
+                           Style="min-width:130px;">🟡 Normal</MudButton>
+                <MudButton Variant="@(selectedDifficulty == DifficultyHard ? Variant.Filled : Variant.Outlined)"
+                           Color="Color.Error" OnClick="@(() => selectedDifficulty = DifficultyHard)"
+                           Style="min-width:130px;">🔴 Svår</MudButton>
+                <MudButton Variant="@(selectedDifficulty == DifficultyExpert ? Variant.Filled : Variant.Outlined)"
+                           Color="@(selectedDifficulty == DifficultyExpert ? Color.Dark : Color.Default)" OnClick="@(() => selectedDifficulty = DifficultyExpert)"
+                           Style="min-width:130px;">💀 Expert</MudButton>
             </div>
             <MudText Typo="Typo.body2" Style="opacity:0.7;" Class="mb-2">
                 @(selectedDifficulty switch
                 {
-                    "easy" => "2000-talet. Ledtrådar vid varje steg. Perfekt för att lära sig.",
-                    "hard" => "Alla sekel 1600–2399. Inga ledtrådar. Ren huvudräkning.",
+                    DifficultyEasy => "2000-talet. Ledtrådar vid varje steg. Perfekt för att lära sig.",
+                    DifficultyHard => "Alla sekel 1600–2399. Inga ledtrådar. Ren huvudräkning.",
+                    DifficultyExpert => "Alla sekel 1600–2399. Frågor dolda — peek kostar poäng. Fler felalternativ.",
                     _ => "1800–2100 (FrOTS). Viss hjälp vid svåra steg."
                 })
             </MudText>
@@ -56,12 +100,28 @@
                 <MudText Typo="Typo.caption">
                     @(selectedDifficulty switch
                     {
-                        "easy" => "✓ Visar formler · ✓ Visar ledtrådar · ✓ Visar 12-tabell",
-                        "hard" => "✗ Inga formler · ✗ Inga ledtrådar · ✗ Bara frågan",
+                        DifficultyEasy => "✓ Visar formler · ✓ Visar ledtrådar · ✓ Visar 12-tabell",
+                        DifficultyHard => "✗ Inga formler · ✗ Inga ledtrådar · ✗ Bara frågan",
+                        DifficultyExpert => "✗ Dolda frågor · 👁 Peek kostar poäng · ✗ Fler felalternativ",
                         _ => "✓ Visar formler · ✗ Inga ledtrådar vid delsteg · ✓ Visar y-värde"
                     })
                 </MudText>
             </MudPaper>
+
+            <MudDivider Class="my-3" />
+            <div class="d-flex align-center gap-2 justify-center">
+                <MudSwitch @bind-Value="memoryTraining" Color="Color.Info" T="bool" Label="🧠 Minnesträning" />
+            </div>
+            <MudText Typo="Typo.caption" Style="opacity:0.6;" Class="text-center">
+                @if (memoryTraining)
+                {
+                    <text>Aktivt! Mellanresultat visas kort – sedan måste du minnas dem.</text>
+                }
+                else
+                {
+                    <text>Öva på att memorera mellanresultat som behövs i kommande steg.</text>
+                }
+            </MudText>
         </MudPaper>
 
         @if (highScorePoints > 0)
@@ -112,6 +172,10 @@ else if (gameActive)
         <div class="d-flex gap-1 mb-2 justify-center align-center" style="flex-wrap:nowrap; overflow-x:auto;">
             @foreach (var (label, idx) in PhaseLabels.Select((l, i) => (l, i)))
             {
+                @* Skip phases 8 (Δ) and 9 (m7) when expert OR when diff is 0 *@
+                if ((selectedDifficulty == DifficultyExpert || skipDistancePhases) && (idx == 8 || idx == 9))
+                    continue;
+
                 var done = currentPhase > idx;
                 var active = currentPhase == idx;
                 <MudChip T="string" Size="Size.Small"
@@ -137,6 +201,57 @@ else if (gameActive)
             </MudAlert>
         }
 
+        @* ═══════ MINNESTRÄNING: MEMORERA-FLASH (overlay) ═══════ *@
+        <div style="position:relative;">
+        @if (memoryTraining && showMemorizeFlash && (memorizeNewItems.Count > 0 || memorizeForgetItems.Count > 0))
+        {
+            <MudPaper @key="memorizeFlashKey" Elevation="3"
+                      Class="@("pa-3 mb-2 " + (memorizeFlashFading ? "memorize-banner-hide" : "memorize-banner"))">
+                @if (memorizeNewItems.Count > 0)
+                {
+                    <MudText Typo="Typo.subtitle2" Color="Color.Info" Class="mb-1">
+                        <strong>🧠 MEMORERA!</strong>
+                    </MudText>
+                    <div class="d-flex gap-2 flex-wrap justify-center">
+                        @foreach (var item in memorizeNewItems)
+                        {
+                            <MudChip T="string" Color="Color.Info" Variant="Variant.Filled" Size="Size.Medium"
+                                     Style="font-size:0.95rem;">
+                                @item.Label: <strong>@item.Value</strong>
+                            </MudChip>
+                        }
+                    </div>
+                }
+                @if (memorizeForgetItems.Count > 0)
+                {
+                    <MudText Typo="Typo.caption" Class="mt-2" Style="opacity:0.6;">
+                        ✓ Kan glömmas:
+                        @foreach (var item in memorizeForgetItems)
+                        {
+                            <span class="mem-forgotten mx-1">@item.Label</span>
+                        }
+                    </MudText>
+                }
+            </MudPaper>
+        }
+        </div>
+
+        @* ═══════ MINNESTRÄNING: MINNESLISTA ═══════ *@
+        @if (memoryTraining && activeMemoryItems.Count > 0 && !showDateComplete)
+        {
+            <div class="d-flex gap-1 mb-2 justify-center align-center flex-wrap">
+                <MudText Typo="Typo.caption" Style="opacity:0.5;">🧠</MudText>
+                @foreach (var item in activeMemoryItems)
+                {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                             Color="@(item.UsedThisStep ? Color.Warning : Color.Default)"
+                             Style="font-size:0.75rem;">
+                        @item.Label: <span class="mem-val-blur">@item.Value</span>
+                    </MudChip>
+                }
+            </div>
+        }
+
         @* ═══════════════════════════════════════════════════
              FRÅGE-PANELER FÖR VARJE DELFAS
            ═══════════════════════════════════════════════════ *@
@@ -146,8 +261,20 @@ else if (gameActive)
             @* ──── FAS 0: SKOTTÅRSKONTROLL ──── *@
             case 0:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">① Skottår: Är @currentDate.Year skottår?</MudText>
-                    @if (selectedDifficulty == "easy")
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>① Skottår?</text> }
+                        else
+                        { <text>① Skottår: Är @currentDate.Year skottår?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (selectedDifficulty == DifficultyEasy)
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                             Delbart med 4? @(currentDate.Year % 4 == 0 ? "Ja" : "Nej").
@@ -169,8 +296,20 @@ else if (gameActive)
             @* ──── FAS 1: SEKELANKARE ──── *@
             case 1:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">② Sekelankare: @(currentDate.Year / 100 * 100)-talet?</MudText>
-                    @if (selectedDifficulty != "hard")
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>② Sekelankare?</text> }
+                        else
+                        { <text>② Sekelankare: @(currentDate.Year / 100 * 100)-talet?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (!IsHardOrExpert)
                     {
                         @if (IsFrotsCentury(currentDate.Year))
                         {
@@ -201,8 +340,20 @@ else if (gameActive)
             @* ──── FAS 2: y ÷ 12 = kvot ──── *@
             case 2:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">③ @calcY ÷ 12 = ?</MudText>
-                    @if (selectedDifficulty == "easy")
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>③ Kvot (y ÷ 12)?</text> }
+                        else
+                        { <text>③ @calcY ÷ 12 = ?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (selectedDifficulty == DifficultyEasy)
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                             12-tabell: 0, 12, 24, 36, 48, 60, 72, 84, 96. Hur många 12:or ryms i @calcY?
@@ -223,21 +374,33 @@ else if (gameActive)
             @* ──── FAS 3: y mod 12 = rest ──── *@
             case 3:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">④ @calcY mod 12 = ?</MudText>
-                    @if (selectedDifficulty == "easy")
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>④ Rest (y mod 12)?</text> }
+                        else
+                        { <text>④ @calcY mod 12 = ?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (selectedDifficulty == DifficultyEasy)
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                             @calcY − (@calcQuotient × 12) = @calcY − @(calcQuotient * 12) = ?
                         </MudText>
                     }
-                    else if (selectedDifficulty == "normal")
+                    else if (selectedDifficulty == DifficultyNormal)
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                             @calcY − @(calcQuotient * 12) = ?
                         </MudText>
                     }
                     <div class="d-flex gap-2 flex-wrap justify-center">
-                        @foreach (var opt in GetRemainderOptions())
+                        @foreach (var opt in remainderOptions)
                         {
                             var v = opt;
                             <MudButton Variant="Variant.Filled" Color="Color.Tertiary" Size="Size.Medium"
@@ -251,15 +414,27 @@ else if (gameActive)
             @* ──── FAS 4: rest ÷ 4 = skottårsjustering ──── *@
             case 4:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑤ @calcRemainder ÷ 4 = ?</MudText>
-                    @if (selectedDifficulty == "easy")
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>⑤ Skottårsjustering?</text> }
+                        else
+                        { <text>⑤ @calcRemainder ÷ 4 = ?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (selectedDifficulty == DifficultyEasy)
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                             0–3 → 0 · 4–7 → 1 · 8–11 → 2
                         </MudText>
                     }
                     <div class="d-flex gap-3 justify-center">
-                        @for (var la = 0; la <= 2; la++)
+                        @for (var la = 0; la <= (IsHardOrExpert ? 3 : 2); la++)
                         {
                             var v = la;
                             <MudButton Variant="Variant.Filled" Color="Color.Tertiary" Size="Size.Large"
@@ -273,15 +448,27 @@ else if (gameActive)
             @* ──── FAS 5: SUMMA ──── *@
             case 5:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑥ Summa: @((int)calcCenturyAnchor) + @calcQuotient + @calcRemainder + @calcLeapAdj = ?</MudText>
-                    @if (selectedDifficulty == "easy")
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>⑥ Summa?</text> }
+                        else
+                        { <text>⑥ Summa: @((int)calcCenturyAnchor) + @calcQuotient + @calcRemainder + @calcLeapAdj = ?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (selectedDifficulty == DifficultyEasy)
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                             Ankare(@((int)calcCenturyAnchor)) + kvot(@calcQuotient) + rest(@calcRemainder) + skottår(@calcLeapAdj)
                         </MudText>
                     }
                     <div class="d-flex gap-2 flex-wrap justify-center">
-                        @foreach (var opt in GetSumOptions())
+                        @foreach (var opt in sumOptions)
                         {
                             var v = opt;
                             <MudButton Variant="Variant.Filled" Color="Color.Tertiary" Size="Size.Medium"
@@ -295,8 +482,20 @@ else if (gameActive)
             @* ──── FAS 6: SUMMA MOD 7 → ÅRETS DOOMSDAY ──── *@
             case 6:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑦ @calcYearTotal mod 7 = ? → Årets Doomsday</MudText>
-                    @if (selectedDifficulty == "easy")
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>⑦ Årets Doomsday?</text> }
+                        else
+                        { <text>⑦ @calcYearTotal mod 7 = ? → Årets Doomsday</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (selectedDifficulty == DifficultyEasy)
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                             @calcYearTotal ÷ 7 = @(calcYearTotal / 7) rest ?
@@ -317,8 +516,20 @@ else if (gameActive)
             @* ──── FAS 7: MÅNADENS DOOMSDAY-DATUM ──── *@
             case 7:
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑧ Doomsday-datum i @calcMonthInfo.MonthName?</MudText>
-                    @if (selectedDifficulty != "hard")
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>⑧ Månadens Doomsday?</text> }
+                        else
+                        { <text>⑧ Doomsday-datum i @calcMonthInfo.MonthName?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (!IsHardOrExpert)
                     {
                         @if (currentDate.Month <= 2)
                         {
@@ -326,7 +537,7 @@ else if (gameActive)
                                 @(calcIsLeapYear ? "⚠ Skottår!" : "Inte skottår.")
                             </MudText>
                         }
-                        @if (selectedDifficulty == "easy")
+                        @if (selectedDifficulty == DifficultyEasy)
                         {
                             <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                                 @GetMonthMnemonicHint()
@@ -334,7 +545,7 @@ else if (gameActive)
                         }
                     }
                     <div class="d-flex gap-2 flex-wrap justify-center">
-                        @foreach (var day in GetMonthDoomsdayOptions())
+                        @foreach (var day in monthDoomsdayOptions)
                         {
                             var d = day;
                             <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Medium"
@@ -350,15 +561,27 @@ else if (gameActive)
             {
                 var diff = currentDate.Day - calcDoomsdayInMonth;
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑨ Avstånd: @currentDate.Day − @calcDoomsdayInMonth = ?</MudText>
-                    @if (selectedDifficulty == "easy")
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>⑨ Avstånd?</text> }
+                        else
+                        { <text>⑨ Avstånd: @currentDate.Day − @calcDoomsdayInMonth = ?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (selectedDifficulty == DifficultyEasy)
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                             Dag @currentDate.Day minus Doomsday-referens @calcDoomsdayInMonth
                         </MudText>
                     }
                     <div class="d-flex gap-2 flex-wrap justify-center">
-                        @foreach (var opt in GetDiffOptions())
+                        @foreach (var opt in diffOptions)
                         {
                             var v = opt;
                             <MudButton Variant="Variant.Filled" Color="Color.Tertiary" Size="Size.Medium"
@@ -370,17 +593,66 @@ else if (gameActive)
                 break;
             }
 
-            @* ──── FAS 9: SLUTGILTIG VECKODAG ──── *@
+            @* ──── FAS 9: AVSTÅND MOD 7 ──── *@
             case 9:
+                <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>⑩ Mod 7?</text> }
+                        else
+                        { <text>⑩ @Math.Abs(calcDiff) mod 7 = ?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (selectedDifficulty == DifficultyEasy)
+                    {
+                        <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
+                            @Math.Abs(calcDiff) ÷ 7 = @(Math.Abs(calcDiff) / 7) rest ?
+                        </MudText>
+                    }
+                    <div class="d-flex gap-2 flex-wrap justify-center">
+                        @for (var i = 0; i <= 6; i++)
+                        {
+                            var v = i;
+                            <MudButton Variant="Variant.Filled" Color="Color.Tertiary" Size="Size.Medium"
+                                       OnClick="@(() => AnswerDiffMod7(v))" Disabled="answering"
+                                       Style="min-width:56px; min-height:48px; font-size:1.15rem; font-weight:bold;">@v</MudButton>
+                        }
+                    </div>
+                </MudPaper>
+                break;
+
+            @* ──── FAS 10: SLUTGILTIG VECKODAG ──── *@
+            case 10:
             {
                 var finalDiff = currentDate.Day - calcDoomsdayInMonth;
                 <MudPaper Elevation="2" Class="pa-4" Style="border-radius:12px;">
-                    <MudText Typo="Typo.h6" Class="mb-2">⑩ @currentDate.Day @calcMonthInfo.MonthName @currentDate.Year = ?</MudText>
-                    @if (selectedDifficulty != "hard")
+                    <MudText Typo="Typo.h6" Class="mb-2">
+                        @if (selectedDifficulty == DifficultyExpert && !phasePeeked)
+                        { <text>⑨ Räkna ut dag?</text> }
+                        else if (selectedDifficulty == DifficultyExpert)
+                        { <text>⑨ @currentDate.Day @calcMonthInfo.MonthName @currentDate.Year = ?</text> }
+                        else
+                        { <text>⑪ @currentDate.Day @calcMonthInfo.MonthName @currentDate.Year = ?</text> }
+                    </MudText>
+                    @if (ShowExpertPeekButton)
+                    {
+                        <div class="d-flex justify-center mb-2">
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekPhase"
+                                       StartIcon="@Icons.Material.Filled.Visibility">👁 Visa frågan (−@PeekCost p)</MudButton>
+                        </div>
+                    }
+                    @if (!IsHardOrExpert)
                     {
                         <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.6;">
                             Doomsday = @calcYearDoomsday · ref @(calcDoomsdayInMonth):e @calcMonthInfo.MonthName
                             · dag @currentDate.Day är @Math.Abs(finalDiff) dag(ar) @(finalDiff >= 0 ? "efter" : "före") referensen
+                            · mod 7 = @calcDiffMod7 dag(ar)
                         </MudText>
                     }
                     <div class="d-flex gap-2 flex-wrap justify-center">
@@ -421,21 +693,49 @@ else if (gameActive)
         }
 
         @* ═══════ SAMLADE SVAR DENNA RUNDA ═══════ *@
-        @if (currentPhase > 0 && selectedDifficulty != "hard")
+        @if (currentPhase > 0)
         {
-            <MudPaper Elevation="0" Class="pa-2 mt-2" Style="border-radius:8px; background:var(--mud-palette-background-gray,#f5f5f5); font-family:monospace; font-size:0.8rem; opacity:0.6;">
-                <span>@currentDate.Year</span>
-                @if (currentPhase > 0) { <span> · Skott=@(calcIsLeapYear ? "Ja" : "Nej")</span> }
-                @if (currentPhase > 1) { <span> · Ankare=@(calcCenturyAnchor)(@((int)calcCenturyAnchor))</span> }
-                @if (currentPhase > 1) { <span> · y=@calcY</span> }
-                @if (currentPhase > 2) { <span> · ÷12=@calcQuotient</span> }
-                @if (currentPhase > 3) { <span> · mod12=@calcRemainder</span> }
-                @if (currentPhase > 4) { <span> · ÷4=@calcLeapAdj</span> }
-                @if (currentPhase > 5) { <span> · Σ=@calcYearTotal</span> }
-                @if (currentPhase > 6) { <span> · Doom=@calcYearDoomsday</span> }
-                @if (currentPhase > 7) { <span> · Ref=@(calcDoomsdayInMonth):e</span> }
-                @if (currentPhase > 8) { <span> · Δ=@calcDiff</span> }
-            </MudPaper>
+            @if (!IsHardOrExpert)
+            {
+                <MudPaper Elevation="0" Class="pa-2 mt-2" Style="border-radius:8px; background:var(--mud-palette-background-gray,#f5f5f5); font-family:monospace; font-size:0.8rem; opacity:0.6;">
+                    <span>@currentDate.Year</span>
+                    @if (currentPhase > 0) { <span> · Skott=@(calcIsLeapYear ? "Ja" : "Nej")</span> }
+                    @if (currentPhase > 1) { <span> · Ankare=@(calcCenturyAnchor)(@((int)calcCenturyAnchor))</span> }
+                    @if (currentPhase > 1) { <span> · y=@calcY</span> }
+                    @if (currentPhase > 2) { <span> · ÷12=@calcQuotient</span> }
+                    @if (currentPhase > 3) { <span> · mod12=@calcRemainder</span> }
+                    @if (currentPhase > 4) { <span> · ÷4=@calcLeapAdj</span> }
+                    @if (currentPhase > 5) { <span> · Σ=@calcYearTotal</span> }
+                    @if (currentPhase > 6) { <span> · Doom=@calcYearDoomsday</span> }
+                    @if (currentPhase > 7) { <span> · Ref=@(calcDoomsdayInMonth):e</span> }
+                    @if (currentPhase > 8) { <span> · Δ=@calcDiff</span> }
+                    @if (currentPhase > 9) { <span> · m7=@calcDiffMod7</span> }
+                </MudPaper>
+            }
+            else if (!summaryPeeked)
+            {
+                <div class="d-flex justify-center mt-2">
+                    <MudButton Variant="Variant.Text" Color="Color.Warning" Size="Size.Small" OnClick="PeekSummary"
+                               StartIcon="@Icons.Material.Filled.Summarize">📝 Visa sammanfattning (−@SummaryPeekCost p)</MudButton>
+                </div>
+            }
+            else
+            {
+                <MudPaper Elevation="0" Class="pa-2 mt-2" Style="border-radius:8px; background:var(--mud-palette-background-gray,#f5f5f5); font-family:monospace; font-size:0.8rem; opacity:0.6;">
+                    <span>@currentDate.Year</span>
+                    @if (currentPhase > 0) { <span> · Skott=@(calcIsLeapYear ? "Ja" : "Nej")</span> }
+                    @if (currentPhase > 1) { <span> · Ankare=@(calcCenturyAnchor)(@((int)calcCenturyAnchor))</span> }
+                    @if (currentPhase > 1) { <span> · y=@calcY</span> }
+                    @if (currentPhase > 2) { <span> · ÷12=@calcQuotient</span> }
+                    @if (currentPhase > 3) { <span> · mod12=@calcRemainder</span> }
+                    @if (currentPhase > 4) { <span> · ÷4=@calcLeapAdj</span> }
+                    @if (currentPhase > 5) { <span> · Σ=@calcYearTotal</span> }
+                    @if (currentPhase > 6) { <span> · Doom=@calcYearDoomsday</span> }
+                    @if (currentPhase > 7) { <span> · Ref=@(calcDoomsdayInMonth):e</span> }
+                    @if (currentPhase > 8) { <span> · Δ=@calcDiff</span> }
+                    @if (currentPhase > 9) { <span> · m7=@calcDiffMod7</span> }
+                </MudPaper>
+            }
         }
     </div>
 }
@@ -475,6 +775,7 @@ else if (gameOver)
                         <tr><td>Årets Doomsday</td><td>@calcYearTotal mod 7 = @((int)calcYearDoomsday) → @calcYearDoomsday</td></tr>
                         <tr><td>Referensdatum</td><td>@calcDoomsdayInMonth/@currentDate.Month</td></tr>
                         <tr><td>Avstånd</td><td>@currentDate.Day − @calcDoomsdayInMonth = @calcDiff</td></tr>
+                        <tr><td>Mod 7</td><td>|@calcDiff| mod 7 = @calcDiffMod7</td></tr>
                         <tr><td>Slutdag</td><td>@calcFinalWeekday</td></tr>
                     </tbody>
                 </MudSimpleTable>
@@ -525,9 +826,9 @@ else if (gameOver)
 @code {
     private static readonly System.Globalization.CultureInfo svCulture = new("sv-SE");
 
-    // 10 phases: leap, anchor, q, r, leapAdj, sum, mod7, month, diff, finalDay
+    // 11 phases (0-10): leap, anchor, q, r, leapAdj, sum, mod7, month, diff, mod7, finalDay
     private static readonly string[] PhaseLabels =
-        ["①", "②", "÷12", "%12", "÷4", "Σ", "%7", "Mån", "Δ", "Dag"];
+        ["①", "②", "÷12", "%12", "÷4", "Σ", "%7", "Mån", "Δ", "m7", "Dag"];
 
     // ── Timing ──
     private const int StepFeedbackMs    = 800;   // hur länge "✅ Rätt!" syns efter varje delsteg
@@ -544,6 +845,7 @@ else if (gameOver)
     private const int PtsYearDoomsday   = 20;
     private const int PtsMonthDoomsday  = 15;
     private const int PtsDiff           = 10;
+    private const int PtsDiffMod7       = 10;
     private const int PtsFinalDay       = 25;
     private const int StreakBonusPerDate = 15;   // multiplié med streak och multiplier
 
@@ -552,9 +854,37 @@ else if (gameOver)
     private const int MaxQuotient       = 8;     // y ÷ 12 kan vara max 8 (y=99 → 8 r 3)
     private const int FrotsCenturyMin   = 18;    // sekeltal 18–21 = klassiska FrOTS
     private const int FrotsCenturyMax   = 21;
+    private const int DaysPerWeek       = 7;
+    private const int FirstDayInMonth   = 1;
+    private const int PhaseLeapYear = 0;
+    private const int PhaseCenturyAnchor = 1;
+    private const int PhaseQuotient = 2;
+    private const int PhaseRemainder = 3;
+    private const int PhaseLeapAdjustment = 4;
+    private const int PhaseYearTotal = 5;
+    private const int PhaseYearDoomsday = 6;
+    private const int PhaseMonthDoomsday = 7;
+    private const int PhaseDistance = 8;
+    private const int PhaseDistanceMod7 = 9;
+    private const int PhaseFinalDay = 10;
+    private const int EasyCenturyStartYear = 2000;
+    private const int NormalRangeMinYear = RandomDateGenerator.AllCenturiesMinYear;
+    private const int NormalRangeMaxYear = RandomDateGenerator.AllCenturiesMaxYear;
+    private const int ExtendedRangeMinYear = RandomDateGenerator.ExtendedPracticeMinYear;
+    private const int ExtendedRangeMaxYear = RandomDateGenerator.ExtendedPracticeMaxYear;
+
+    private const string DifficultyEasy = "easy";
+    private const string DifficultyNormal = "normal";
+    private const string DifficultyHard = "hard";
+    private const string DifficultyExpert = "expert";
+
+    private const string SwedishDayPrefix = "Den ";
+    private const string SwedishOrdinalSuffix = ":e";
+    private const string SwedishListSeparator = ", ";
 
     // ── Settings ──
-    private string selectedDifficulty = "normal";
+    private string selectedDifficulty = DifficultyNormal;
+    private bool memoryTraining;
 
     // ── Game state ──
     private bool gameActive;
@@ -572,9 +902,15 @@ else if (gameOver)
     private bool showDateComplete; // visas under DateCompleteMs när ett datum är klart
     private int lastStepPoints;
 
+    // ── Peek (Expert) ──
+    private bool phasePeeked;
+    private bool summaryPeeked;
+    private const int PeekCost = 10;
+    private const int SummaryPeekCost = 25;
+
     // ── Current date calculation ──
     private DateOnly currentDate;
-    private int currentPhase; // 0–9
+    private int currentPhase; // 0–10
     private bool calcIsLeapYear;
     private Weekday calcCenturyAnchor;
     private CenturyAnchorInfo calcCenturyInfo = null!;
@@ -583,8 +919,25 @@ else if (gameOver)
     private Weekday calcYearDoomsday;
     private MonthDoomsdayInfo calcMonthInfo = null!;
     private int calcDoomsdayInMonth;
-    private int calcDiff;
+    private int calcDiff, calcDiffMod7;
     private Weekday calcFinalWeekday;
+    private bool skipDistancePhases;
+    private int[] remainderOptions = [];
+    private int[] sumOptions = [];
+    private int[] monthDoomsdayOptions = [];
+    private int[] diffOptions = [];
+
+    // ── Memory training ──
+    private bool showMemorizeFlash;
+    private bool memorizeFlashFading;
+    private int memorizeFlashKey;
+    private const int MemorizeFlashMs = 3000;
+    private const int MemorizeFadeMs = 400;
+    private List<MemoryChipItem> activeMemoryItems = new();
+    private List<MemoryChipItem> memorizeNewItems = new();
+    private List<MemoryChipItem> memorizeForgetItems = new();
+
+    private record MemoryChipItem(string Label, string Value, bool UsedThisStep = false);
 
     // ── Game over info ──
     private int failedPhase;
@@ -622,12 +975,19 @@ else if (gameOver)
         currentPhase = 0;
         showDateComplete = false;
         answering = false;
+        phasePeeked = false;
+        summaryPeeked = false;
+        activeMemoryItems = new();
+        memorizeNewItems = new();
+        memorizeForgetItems = new();
+        showMemorizeFlash = false;
+        memorizeFlashFading = false;
 
         currentDate = selectedDifficulty switch
         {
-            "easy" => RandomDateGenerator.GenerateForCentury(2000),
-            "hard" => RandomDateGenerator.Generate(1600, 2399),
-            _ => RandomDateGenerator.Generate(1800, 2199)
+            DifficultyEasy => RandomDateGenerator.GenerateForCentury(EasyCenturyStartYear),
+            DifficultyHard or DifficultyExpert => RandomDateGenerator.Generate(ExtendedRangeMinYear, ExtendedRangeMaxYear),
+            _ => RandomDateGenerator.Generate(NormalRangeMinYear, NormalRangeMaxYear)
         };
 
         // Pre-calculate every value
@@ -646,7 +1006,10 @@ else if (gameOver)
         calcMonthInfo = MonthDoomsdayProvider.GetInfoForMonth(currentDate.Month);
         calcDoomsdayInMonth = MonthDoomsdayProvider.GetDoomsdayForMonth(currentDate.Month, calcIsLeapYear);
         calcDiff = currentDate.Day - calcDoomsdayInMonth;
+        calcDiffMod7 = NormalizeAbsoluteWeekDifference(calcDiff);
         calcFinalWeekday = WeekdayCalculator.Calculate(currentDate.Day, calcDoomsdayInMonth, calcYearDoomsday);
+        skipDistancePhases = false;
+        PreparePhaseOptions();
     }
 
     private async Task CorrectAnswer(int basePoints)
@@ -656,8 +1019,34 @@ else if (gameOver)
         totalPoints += lastStepPoints;
         feedbackAnimKey++;  // triggar CSS-animationen
         currentPhase++;
+        phasePeeked = false;
 
-        if (currentPhase > 9)
+        // Skip distance + mod7 phases: expert mode OR when target day IS the doomsday
+        if ((selectedDifficulty == DifficultyExpert || skipDistancePhases) && currentPhase == PhaseDistance)
+            currentPhase = PhaseFinalDay;
+
+        PreparePhaseOptions();
+
+        // Memory training: compute flash items for the new phase
+        if (memoryTraining && currentPhase <= PhaseFinalDay)
+        {
+            var newItems = GetMemoryItemsForPhase(currentPhase);
+            var oldLabels = activeMemoryItems.Select(x => x.Label).ToHashSet();
+            var newLabels = newItems.Select(x => x.Label).ToHashSet();
+            memorizeNewItems = newItems.Where(x => !oldLabels.Contains(x.Label)).ToList();
+            memorizeForgetItems = activeMemoryItems.Where(x => !newLabels.Contains(x.Label)).ToList();
+            activeMemoryItems = newItems;
+
+            if (memorizeNewItems.Count > 0 || memorizeForgetItems.Count > 0)
+            {
+                showMemorizeFlash = true;
+                memorizeFlashFading = false;
+                memorizeFlashKey++;
+                _ = HideMemorizeFlashAsync();
+            }
+        }
+
+        if (currentPhase > PhaseFinalDay)
         {
             answering = true;
             streak++;
@@ -710,7 +1099,7 @@ else if (gameOver)
         if (answer == calcIsLeapYear)
             await CorrectAnswer(PtsLeapYear);
         else
-            WrongAnswer(0, answer ? "Ja" : "Nej", calcIsLeapYear ? "Ja" : "Nej", GetLeapYearBrief());
+            WrongAnswer(PhaseLeapYear, answer ? "Ja" : "Nej", calcIsLeapYear ? "Ja" : "Nej", GetLeapYearBrief());
     }
 
     private async void AnswerCenturyAnchor(Weekday answer)
@@ -719,7 +1108,7 @@ else if (gameOver)
         if (answer == calcCenturyAnchor)
             await CorrectAnswer(IsFrotsCentury(currentDate.Year) ? PtsCenturyFrots : PtsCenturyFormula);
         else
-            WrongAnswer(1, $"{answer}", $"{calcCenturyAnchor}", calcCenturyInfo.Explanation);
+            WrongAnswer(PhaseCenturyAnchor, $"{answer}", $"{calcCenturyAnchor}", calcCenturyInfo.Explanation);
     }
 
     private async void AnswerQuotient(int answer)
@@ -728,7 +1117,7 @@ else if (gameOver)
         if (answer == calcQuotient)
             await CorrectAnswer(PtsQuotient);
         else
-            WrongAnswer(2, $"{answer}", $"{calcQuotient}",
+            WrongAnswer(PhaseQuotient, $"{answer}", $"{calcQuotient}",
                 $"{calcY} ÷ 12 = {calcQuotient} (närmsta 12:a under {calcY} = {calcQuotient * 12})");
     }
 
@@ -738,7 +1127,7 @@ else if (gameOver)
         if (answer == calcRemainder)
             await CorrectAnswer(PtsRemainder);
         else
-            WrongAnswer(3, $"{answer}", $"{calcRemainder}",
+            WrongAnswer(PhaseRemainder, $"{answer}", $"{calcRemainder}",
                 $"{calcY} − ({calcQuotient} × 12) = {calcY} − {calcQuotient * 12} = {calcRemainder}");
     }
 
@@ -748,7 +1137,7 @@ else if (gameOver)
         if (answer == calcLeapAdj)
             await CorrectAnswer(PtsLeapAdj);
         else
-            WrongAnswer(4, $"{answer}", $"{calcLeapAdj}",
+            WrongAnswer(PhaseLeapAdjustment, $"{answer}", $"{calcLeapAdj}",
                 $"{calcRemainder} ÷ 4 = {calcLeapAdj} (0–3→0, 4–7→1, 8–11→2)");
     }
 
@@ -758,7 +1147,7 @@ else if (gameOver)
         if (answer == calcYearTotal)
             await CorrectAnswer(PtsSum);
         else
-            WrongAnswer(5, $"{answer}", $"{calcYearTotal}",
+            WrongAnswer(PhaseYearTotal, $"{answer}", $"{calcYearTotal}",
                 $"{(int)calcCenturyAnchor} + {calcQuotient} + {calcRemainder} + {calcLeapAdj} = {calcYearTotal}");
     }
 
@@ -768,7 +1157,7 @@ else if (gameOver)
         if (answer == calcYearDoomsday)
             await CorrectAnswer(PtsYearDoomsday);
         else
-            WrongAnswer(6, $"{(int)answer} ({answer})", $"{(int)calcYearDoomsday} ({calcYearDoomsday})",
+            WrongAnswer(PhaseYearDoomsday, $"{(int)answer} ({answer})", $"{(int)calcYearDoomsday} ({calcYearDoomsday})",
                 $"{calcYearTotal} mod 7 = {(int)calcYearDoomsday} → {calcYearDoomsday}");
     }
 
@@ -776,9 +1165,20 @@ else if (gameOver)
     {
         if (answering) return;
         if (IsValidMonthDoomsdayAnswer(answer))
+        {
+            // Update reference to the date the user actually chose so subsequent
+            // distance/mod-7 steps are consistent with their selection.
+            calcDoomsdayInMonth = answer;
+            calcDiff = currentDate.Day - calcDoomsdayInMonth;
+            calcDiffMod7 = NormalizeAbsoluteWeekDifference(calcDiff);
+
+            // If the target day IS the doomsday, skip the redundant distance steps
+            skipDistancePhases = calcDiff == 0;
+
             await CorrectAnswer(PtsMonthDoomsday);
+        }
         else
-            WrongAnswer(7, $"Den {answer}:e", GetValidMonthDoomsdayAnswersText(),
+            WrongAnswer(PhaseMonthDoomsday, $"Den {answer}:e", GetValidMonthDoomsdayAnswersText(),
                 $"{calcMonthInfo.MonthName}: {calcMonthInfo.Mnemonic}");
     }
 
@@ -788,19 +1188,33 @@ else if (gameOver)
         if (answer == calcDiff)
             await CorrectAnswer(PtsDiff);
         else
-            WrongAnswer(8, $"{answer}", $"{calcDiff}",
+            WrongAnswer(PhaseDistance, $"{answer}", $"{calcDiff}",
                 $"{currentDate.Day} − {calcDoomsdayInMonth} = {calcDiff}");
+    }
+
+    private async void AnswerDiffMod7(int answer)
+    {
+        if (answering) return;
+        if (answer == calcDiffMod7)
+            await CorrectAnswer(PtsDiffMod7);
+        else
+            WrongAnswer(PhaseDistanceMod7, $"{answer}", $"{calcDiffMod7}",
+                $"|{calcDiff}| mod 7 = {Math.Abs(calcDiff)} mod 7 = {calcDiffMod7}");
     }
 
     private async void AnswerFinalDay(Weekday answer)
     {
         if (answering) return;
         if (answer == calcFinalWeekday)
-            await CorrectAnswer(PtsFinalDay);
+        {
+            var pts = (selectedDifficulty == DifficultyExpert || skipDistancePhases)
+                ? PtsDiff + PtsDiffMod7 + PtsFinalDay   // combined score when distance steps skipped
+                : PtsFinalDay;
+            await CorrectAnswer(pts);
+        }
         else
         {
-            var diffMod = ((calcDiff % 7) + 7) % 7;
-            WrongAnswer(9, $"{answer}", $"{calcFinalWeekday}",
+            WrongAnswer(PhaseFinalDay, $"{answer}", $"{calcFinalWeekday}",
                 $"{calcYearDoomsday}({(int)calcYearDoomsday}) + {calcDiff} dagar.\n" +
                 $"{(int)calcYearDoomsday} + {calcDiff} = {(int)calcYearDoomsday + calcDiff}, mod 7 = {(int)calcFinalWeekday} → {calcFinalWeekday}");
         }
@@ -810,61 +1224,133 @@ else if (gameOver)
     // OPTION GENERATORS – smarta val för varje fas
     // ═══════════════════════════════════════════════
 
+    private static readonly Random _rng = new();
+
+    private static T[] Shuffle<T>(T[] arr)
+    {
+        for (var i = arr.Length - 1; i > 0; i--)
+        {
+            var j = _rng.Next(i + 1);
+            (arr[i], arr[j]) = (arr[j], arr[i]);
+        }
+        return arr;
+    }
+
+    private void PreparePhaseOptions()
+    {
+        remainderOptions = currentPhase == PhaseRemainder ? GetRemainderOptions() : [];
+        sumOptions = currentPhase == PhaseYearTotal ? GetSumOptions() : [];
+        monthDoomsdayOptions = currentPhase == PhaseMonthDoomsday ? GetMonthDoomsdayOptions() : [];
+        diffOptions = currentPhase == PhaseDistance ? GetDiffOptions() : [];
+    }
+
     private int[] GetRemainderOptions()
     {
         var correct = calcRemainder;
         var options = new HashSet<int> { correct };
-        for (var i = 0; i <= 11; i += 2)
-            options.Add(i);
-        if (!options.Contains(correct)) options.Add(correct);
-        return options.OrderBy(x => x).ToArray();
+        if (IsHardOrExpert)
+        {
+            for (var i = 0; i <= 11; i++)
+                options.Add(i);
+        }
+        else
+        {
+            for (var i = 0; i <= 11; i += 2)
+                options.Add(i);
+        }
+        return Shuffle(options.OrderBy(x => x).ToArray());
     }
 
     private int[] GetSumOptions()
     {
         var correct = calcYearTotal;
         var options = new HashSet<int> { correct };
-        for (var delta = -3; delta <= 3; delta++)
+        var range = IsHardOrExpert ? 5 : 3;
+        for (var delta = -range; delta <= range; delta++)
         {
             var v = correct + delta;
             if (v >= 0) options.Add(v);
         }
-        if (correct >= 7) options.Add(correct - 7);
-        options.Add(correct + 7);
-        return options.Where(x => x >= 0).OrderBy(x => x).ToArray();
+        if (correct >= DaysPerWeek) options.Add(correct - DaysPerWeek);
+        options.Add(correct + DaysPerWeek);
+        if (IsHardOrExpert)
+        {
+            if (correct >= 12) options.Add(correct - 12);
+            options.Add(correct + 12);
+        }
+        return Shuffle(options.Where(x => x >= 0).OrderBy(x => x).ToArray());
     }
 
     private int[] GetMonthDoomsdayOptions()
     {
-        return currentDate.Month switch
+        var daysInMonth = MonthDoomsdayProvider.GetDaysInMonth(currentDate.Month, calcIsLeapYear);
+
+        var validSet = new HashSet<int>(MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(currentDate.Month, calcIsLeapYear));
+
+        var options = new HashSet<int>(validSet);
+
+        // Always add wrong nearby dates as distractors
+        int[] offsets = IsHardOrExpert ? [-3, -2, -1, 1, 2, 3] : [-2, -1, 1, 2];
+        foreach (var valid in validSet)
         {
-            1 => [3, 4],
-            2 => [28, 29],
-            3 => [7, 14, 21, 28],
-            4 => [4, 5, 6],
-            5 => [5, 9, 10],
-            6 => [6, 7, 8],
-            7 => [7, 11, 12],
-            8 => [8, 9, 10],
-            9 => [5, 6, 9],
-            10 => [10, 11, 12],
-            11 => [7, 8, 11],
-            12 => [12, 13, 14],
-            _ => [1]
+            foreach (var off in offsets)
+            {
+                var v = valid + off;
+                if (v >= FirstDayInMonth && v <= daysInMonth && !validSet.Contains(v))
+                    options.Add(v);
+            }
+        }
+
+        // Month-specific extra distractors (common confusions)
+        int[] extras = currentDate.Month switch
+        {
+            1 => [2, 5, 10],           // confuse with Feb or regular dates
+            2 => [26, 27],             // close to 28/29
+            3 => [3, 10, 17, 24],      // off-by-4 from 7,14,21,28
+            5 => [7, 12],              // confuse with 7-Eleven rule
+            7 => [4, 14],              // confuse with even-month rule
+            9 => [9, 12],              // confuse with month number
+            11 => [4, 11, 14],         // confuse with even-month rule
+            _ => []
         };
+        foreach (var e in extras)
+        {
+            if (e >= FirstDayInMonth && e <= daysInMonth && !validSet.Contains(e))
+                options.Add(e);
+        }
+
+        // Hard/expert: ensure even more spread
+        if (IsHardOrExpert)
+        {
+            foreach (var valid in validSet)
+            {
+                if (valid + DaysPerWeek <= daysInMonth && !validSet.Contains(valid + DaysPerWeek)) options.Add(valid + DaysPerWeek);
+                if (valid - DaysPerWeek >= FirstDayInMonth && !validSet.Contains(valid - DaysPerWeek)) options.Add(valid - DaysPerWeek);
+                if (valid + 4 <= daysInMonth) options.Add(valid + 4);
+                if (valid - 4 >= FirstDayInMonth) options.Add(valid - 4);
+            }
+        }
+
+        return Shuffle(options.OrderBy(x => x).ToArray());
     }
 
     private int[] GetDiffOptions()
     {
         var correct = calcDiff;
         var options = new HashSet<int> { correct };
-        for (var delta = -2; delta <= 2; delta++)
+        var range = IsHardOrExpert ? 4 : 2;
+        for (var delta = -range; delta <= range; delta++)
         {
             options.Add(correct + delta);
         }
         options.Add(-correct);
         if (correct != 0) options.Add(0);
-        return options.OrderBy(x => x).ToArray();
+        if (IsHardOrExpert)
+        {
+            options.Add(correct + DaysPerWeek);
+            options.Add(correct - DaysPerWeek);
+        }
+        return Shuffle(options.OrderBy(x => x).ToArray());
     }
 
     // ═══════════════════════════════════════════════
@@ -879,23 +1365,14 @@ else if (gameOver)
 
     private bool IsValidMonthDoomsdayAnswer(int day)
     {
-        if (day < 1 || day > DateTime.DaysInMonth(currentDate.Year, currentDate.Month))
-            return false;
-
-        var delta = day - calcDoomsdayInMonth;
-        return ((delta % 7) + 7) % 7 == 0;
+        return MonthDoomsdayProvider.IsValidDoomsdayDateForMonth(currentDate.Month, day, calcIsLeapYear);
     }
 
     private string GetValidMonthDoomsdayAnswersText()
     {
-        var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
-        var validDays = Enumerable.Range(1, daysInMonth)
-            .Where(IsValidMonthDoomsdayAnswer)
-            .ToArray();
+        var validDays = MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(currentDate.Month, calcIsLeapYear);
 
-        return validDays.Length == 1
-            ? $"Den {validDays[0]}:e"
-            : string.Join(", ", validDays.Select(day => $"Den {day}:e"));
+        return string.Join(SwedishListSeparator, validDays.Select(FormatOrdinalDay));
     }
 
     private static string GetPhaseLabel(int phase) => phase switch
@@ -909,7 +1386,8 @@ else if (gameOver)
         6 => "⑦ Årets Doomsday (mod 7)",
         7 => "⑧ Månadens Doomsday-datum",
         8 => "⑨ Avstånd",
-        9 => "⑩ Slutgiltig veckodag",
+        9 => "⑩ Avstånd mod 7",
+        10 => "⑪ Slutgiltig veckodag",
         _ => ""
     };
 
@@ -939,6 +1417,16 @@ else if (gameOver)
         _  => ""
     };
 
+    private static int NormalizeAbsoluteWeekDifference(int difference)
+    {
+        return Math.Abs(difference) % DaysPerWeek;
+    }
+
+    private static string FormatOrdinalDay(int day)
+    {
+        return $"{SwedishDayPrefix}{day}{SwedishOrdinalSuffix}";
+    }
+
     private string GetMotivationText()
     {
         if (streak >= 20) return "🏆 Otroligt! Du är en Doomsday-mästare!";
@@ -949,4 +1437,93 @@ else if (gameOver)
         if (totalStepsCorrect >= 5) return "Bra start! Varje försök bygger minnet.";
         return "Ge inte upp! Det blir lättare ju mer du övar.";
     }
+
+    // ═══════════════════════════════════════════════
+    // MEMORY TRAINING
+    // ═══════════════════════════════════════════════
+
+    private List<MemoryChipItem> GetMemoryItemsForPhase(int phase)
+    {
+        var items = new List<MemoryChipItem>();
+        bool isExpert = selectedDifficulty == DifficultyExpert;
+
+        // Leap year: needed at phase 7 for Jan/Feb month doomsday
+        if (currentDate.Month <= 2 && phase >= PhaseCenturyAnchor && phase <= PhaseMonthDoomsday)
+            items.Add(new("Skottår", calcIsLeapYear ? "Ja" : "Nej", phase == PhaseMonthDoomsday));
+
+        // Century anchor number: needed at phase 5 (sum)
+        if (phase >= PhaseQuotient && phase <= PhaseYearTotal)
+            items.Add(new("Ankare", $"{(int)calcCenturyAnchor}", phase == PhaseYearTotal));
+
+        // Quotient: needed at phase 5 (sum)
+        if (phase >= PhaseRemainder && phase <= PhaseYearTotal)
+            items.Add(new("Kvot", $"{calcQuotient}", phase == PhaseYearTotal));
+
+        // Remainder: needed at phases 4 (leap adj) and 5 (sum)
+        if (phase >= PhaseLeapAdjustment && phase <= PhaseYearTotal)
+            items.Add(new("Rest", $"{calcRemainder}", phase == PhaseYearTotal));
+
+        // Leap adjustment: needed at phase 5 (sum) – only visible at phase 5
+        if (phase == PhaseYearTotal)
+            items.Add(new("÷4", $"{calcLeapAdj}", true));
+
+        // Sum: needed at phase 6 (mod 7)
+        if (phase == PhaseYearDoomsday)
+            items.Add(new("Summa", $"{calcYearTotal}", true));
+
+        // Year doomsday: needed at phase 10 (final day) – longest carry!
+        if (phase >= PhaseMonthDoomsday && phase <= PhaseFinalDay)
+            items.Add(new("Doom", $"{calcYearDoomsday}", phase == PhaseFinalDay));
+
+        // Month doomsday ref: needed at phase 8 (distance), or expert phase 10
+        if (phase == PhaseDistance || (isExpert && phase == PhaseFinalDay))
+            items.Add(new("Ref", $"{calcDoomsdayInMonth}", true));
+
+        // Diff: needed at phase 9 (mod 7)
+        if (phase == PhaseDistanceMod7)
+            items.Add(new("Δ", $"{calcDiff}", true));
+
+        // DiffMod7: needed at phase 10 (final day)
+        if (phase == PhaseFinalDay && !isExpert)
+            items.Add(new("m7", $"{calcDiffMod7}", true));
+
+        return items;
+    }
+
+    private async Task HideMemorizeFlashAsync()
+    {
+        await Task.Delay(MemorizeFlashMs);
+        memorizeFlashFading = true;
+        StateHasChanged();
+        await Task.Delay(MemorizeFadeMs);
+        showMemorizeFlash = false;
+        memorizeFlashFading = false;
+        StateHasChanged();
+    }
+
+    // ═══════════════════════════════════════════════
+    // PEEK (Expert)
+    // ═══════════════════════════════════════════════
+
+    private bool IsHardOrExpert => selectedDifficulty is DifficultyHard or DifficultyExpert;
+    private bool ShowExpertPeekButton => selectedDifficulty == DifficultyExpert && !phasePeeked;
+
+    private void PeekPhase()
+    {
+        if (!phasePeeked)
+        {
+            phasePeeked = true;
+            totalPoints = Math.Max(0, totalPoints - PeekCost);
+        }
+    }
+
+    private void PeekSummary()
+    {
+        if (!summaryPeeked)
+        {
+            summaryPeeked = true;
+            totalPoints = Math.Max(0, totalPoints - SummaryPeekCost);
+        }
+    }
 }
+

@@ -31,79 +31,86 @@ namespace DoomsdayTraining.Domain.Services;
 /// </summary>
 public static class MonthDoomsdayProvider
 {
+    private const int FirstDayOfMonth = 1;
+    private const int DaysPerWeek = 7;
+    private const int RepresentativeCommonYear = 2023;
+    private const int RepresentativeLeapYear = 2024;
+
+    private static readonly IReadOnlyList<MonthDoomsdayInfo> AllMonths =
+    [
+        new MonthDoomsdayInfo
+        {
+            Month = 1, MonthName = "Januari", Day = 3, LeapYearDay = 4,
+            Mnemonic = "3 januari (eller 4 januari vid skottår). " +
+                       "Tänk: skottår = en extra dag, så 3+1 = 4."
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 2, MonthName = "Februari", Day = 28, LeapYearDay = 29,
+            Mnemonic = "Sista dagen i februari (28 eller 29 vid skottår). " +
+                       "Den sista februari alltid doomsdagen!"
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 3, MonthName = "Mars", Day = 7,
+            Mnemonic = "7 mars (även 14 mars, 21 mars, 28 mars). " +
+                       "Multiplar av 7 i mars! 0 mars = sista feb = också Doomsday."
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 4, MonthName = "April", Day = 4,
+            Mnemonic = "4/4 – April den fjärde! Jämn månad = samma tal."
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 5, MonthName = "Maj", Day = 9,
+            Mnemonic = "9/5 – \"Jag jobbar 9 till 5\" (9-to-5)."
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 6, MonthName = "Juni", Day = 6,
+            Mnemonic = "6/6 – Juni den sjätte! Jämn månad = samma tal."
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 7, MonthName = "Juli", Day = 11,
+            Mnemonic = "7/11 – \"7-Eleven\"! Som minilivsbutiken."
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 8, MonthName = "Augusti", Day = 8,
+            Mnemonic = "8/8 – Augusti den åttonde! Jämn månad = samma tal."
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 9, MonthName = "September", Day = 5,
+            Mnemonic = "5/9 – \"Jag jobbar 9 till 5\" – spegelvänden! (5-9 bakvänt)."
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 10, MonthName = "Oktober", Day = 10,
+            Mnemonic = "10/10 – Oktober den tionde! Jämn månad = samma tal."
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 11, MonthName = "November", Day = 7,
+            Mnemonic = "11/7 – \"7-Eleven\" bakvänt! (7-11 → 11/7)."
+        },
+        new MonthDoomsdayInfo
+        {
+            Month = 12, MonthName = "December", Day = 12,
+            Mnemonic = "12/12 – December den tolfte! Jämn månad = samma tal."
+        }
+    ];
+
     /// <summary>
     /// Hämtar Doomsday-referensinformation för alla 12 månader.
     /// Innehåller datum, minnesregler och skottårsundantag.
     /// </summary>
     /// <returns>En lista med 12 <see cref="MonthDoomsdayInfo"/>-objekt.</returns>
-    public static List<MonthDoomsdayInfo> GetAll()
+    public static IReadOnlyList<MonthDoomsdayInfo> GetAll()
     {
-        return
-        [
-            new MonthDoomsdayInfo
-            {
-                Month = 1, MonthName = "Januari", Day = 3, LeapYearDay = 4,
-                Mnemonic = "3 januari (eller 4 januari vid skottår). " +
-                           "Tänk: skottår = en extra dag, så 3+1 = 4."
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 2, MonthName = "Februari", Day = 28, LeapYearDay = 29,
-                Mnemonic = "Sista dagen i februari (28 eller 29 vid skottår). " +
-                           "Den sista februari alltid doomsdagen!"
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 3, MonthName = "Mars", Day = 7,
-                Mnemonic = "7 mars (även 14 mars, 21 mars, 28 mars). " +
-                           "Multiplar av 7 i mars! 0 mars = sista feb = också Doomsday."
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 4, MonthName = "April", Day = 4,
-                Mnemonic = "4/4 – April den fjärde! Jämn månad = samma tal."
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 5, MonthName = "Maj", Day = 9,
-                Mnemonic = "9/5 – \"Jag jobbar 9 till 5\" (9-to-5)."
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 6, MonthName = "Juni", Day = 6,
-                Mnemonic = "6/6 – Juni den sjätte! Jämn månad = samma tal."
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 7, MonthName = "Juli", Day = 11,
-                Mnemonic = "7/11 – \"7-Eleven\"! Som minilivsbutiken."
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 8, MonthName = "Augusti", Day = 8,
-                Mnemonic = "8/8 – Augusti den åttonde! Jämn månad = samma tal."
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 9, MonthName = "September", Day = 5,
-                Mnemonic = "5/9 – \"Jag jobbar 9 till 5\" – spegelvänden! (5-9 bakvänt)."
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 10, MonthName = "Oktober", Day = 10,
-                Mnemonic = "10/10 – Oktober den tionde! Jämn månad = samma tal."
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 11, MonthName = "November", Day = 7,
-                Mnemonic = "11/7 – \"7-Eleven\" bakvänt! (7-11 → 11/7)."
-            },
-            new MonthDoomsdayInfo
-            {
-                Month = 12, MonthName = "December", Day = 12,
-                Mnemonic = "12/12 – December den tolfte! Jämn månad = samma tal."
-            }
-        ];
+        return AllMonths;
     }
 
     /// <summary>
@@ -115,7 +122,7 @@ public static class MonthDoomsdayProvider
     /// <returns>Doomsday-referensdagen i månaden.</returns>
     public static int GetDoomsdayForMonth(int month, bool isLeapYear)
     {
-        var info = GetAll().First(m => m.Month == month);
+        var info = GetInfoForMonth(month);
 
         // Januari och februari har speciella skottårsdatum
         if (isLeapYear && info.LeapYearDay.HasValue)
@@ -125,12 +132,61 @@ public static class MonthDoomsdayProvider
     }
 
     /// <summary>
+    /// Hämtar alla giltiga datum i månaden som infaller på årets Doomsday.
+    /// </summary>
+    /// <param name="month">Månadsnummer (1–12).</param>
+    /// <param name="isLeapYear">Om det aktuella året är ett skottår.</param>
+    /// <returns>Alla giltiga Doomsday-datum i månaden.</returns>
+    public static IReadOnlyList<int> GetValidDoomsdayDatesForMonth(int month, bool isLeapYear)
+    {
+        var canonicalDay = GetDoomsdayForMonth(month, isLeapYear);
+        var daysInMonth = GetDaysInMonth(month, isLeapYear);
+
+        return Enumerable.Range(FirstDayOfMonth, daysInMonth)
+            .Where(day => NormalizeDifference(day - canonicalDay) == 0)
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Avgör om ett datum i månaden är ett giltigt Doomsday-datum.
+    /// </summary>
+    /// <param name="month">Månadsnummer (1–12).</param>
+    /// <param name="day">Dag i månaden.</param>
+    /// <param name="isLeapYear">Om det aktuella året är ett skottår.</param>
+    /// <returns><c>true</c> om dagen är ett giltigt Doomsday-datum för månaden.</returns>
+    public static bool IsValidDoomsdayDateForMonth(int month, int day, bool isLeapYear)
+    {
+        if (day < FirstDayOfMonth || day > GetDaysInMonth(month, isLeapYear))
+            return false;
+
+        var canonicalDay = GetDoomsdayForMonth(month, isLeapYear);
+        return NormalizeDifference(day - canonicalDay) == 0;
+    }
+
+    /// <summary>
+    /// Hämtar antal dagar i en månad för vanligt år respektive skottår.
+    /// </summary>
+    /// <param name="month">Månadsnummer (1–12).</param>
+    /// <param name="isLeapYear">Om månaden ska tolkas i ett skottår.</param>
+    /// <returns>Antal dagar i månaden.</returns>
+    public static int GetDaysInMonth(int month, bool isLeapYear)
+    {
+        var representativeYear = isLeapYear ? RepresentativeLeapYear : RepresentativeCommonYear;
+        return DateTime.DaysInMonth(representativeYear, month);
+    }
+
+    /// <summary>
     /// Hämtar information för en specifik månad.
     /// </summary>
     /// <param name="month">Månadsnummer (1–12).</param>
     /// <returns>Doomsday-information för månaden.</returns>
     public static MonthDoomsdayInfo GetInfoForMonth(int month)
     {
-        return GetAll().First(m => m.Month == month);
+        return AllMonths.Single(m => m.Month == month);
+    }
+
+    private static int NormalizeDifference(int difference)
+    {
+        return ((difference % DaysPerWeek) + DaysPerWeek) % DaysPerWeek;
     }
 }

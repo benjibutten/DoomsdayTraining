@@ -12,10 +12,10 @@
     <MudPaper Elevation="2" Class="pa-4">
         <MudText Typo="Typo.h6" Class="mb-3">⚙️ Inställningar</MudText>
         <MudSelect @bind-Value="selectedPeriod" Label="Tidsperiod" Variant="Variant.Outlined" Style="max-width:300px;" Class="mb-3">
-            <MudSelectItem Value="@("2000")">2000-talet (enklast)</MudSelectItem>
-            <MudSelectItem Value="@("1900")">1900-talet</MudSelectItem>
-            <MudSelectItem Value="@("2100")">2100-talet</MudSelectItem>
-            <MudSelectItem Value="@("all")">Alla sekel (1800–2199)</MudSelectItem>
+            <MudSelectItem Value="@Period2000">2000-talet (enklast)</MudSelectItem>
+            <MudSelectItem Value="@Period1900">1900-talet</MudSelectItem>
+            <MudSelectItem Value="@Period2100">2100-talet</MudSelectItem>
+            <MudSelectItem Value="@PeriodAll">Alla sekel (@RandomDateGenerator.AllCenturiesMinYear–@RandomDateGenerator.AllCenturiesMaxYear)</MudSelectItem>
         </MudSelect>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large" OnClick="StartSession"
                    StartIcon="@Icons.Material.Filled.RocketLaunch">Starta övning</MudButton>
@@ -59,7 +59,7 @@ else
         }
     </MudGrid>
 
-    @if (currentStreak >= 3)
+    @if (currentStreak >= StreakAlertThreshold)
     {
         <MudAlert Severity="Severity.Success" Variant="Variant.Text" Dense="true" Class="mb-2">
             🔥 @currentStreak rätt i rad!
@@ -69,7 +69,7 @@ else
     @if (recentResults.Count > 0)
     {
         <div class="d-flex gap-1 flex-wrap mb-3">
-            @foreach (var r in recentResults.TakeLast(20))
+            @foreach (var r in recentResults.TakeLast(RecentResultWindow))
             {
                 <MudIcon Icon="@Icons.Material.Filled.Circle" Size="Size.Small"
                          Color="@(r ? Color.Success : Color.Error)" />
@@ -80,9 +80,9 @@ else
     <MudPaper @ref="_cardRef" Elevation="4" Class="pa-4 pa-sm-6 text-center mx-auto mb-4" Style="max-width:520px; border-radius:16px;" @key="currentDate"
               @onkeydown="HandleKeyDown" tabindex="0">
         <MudText Typo="Typo.h4" Class="mud-text-primary mb-2" Style="font-variant-numeric: tabular-nums;">
-            @currentDate.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))
+            @currentDate.ToString("d MMMM yyyy", SwedishCulture)
         </MudText>
-        <MudText Typo="Typo.body2" Class="mb-4">Vilken veckodag är detta? <span style="opacity:0.5;">(tangent 1–7)</span></MudText>
+        <MudText Typo="Typo.body2" Class="mb-4">Vilken veckodag är detta? <span style="opacity:0.5;">(tangent @WeekdayKeyMin–@WeekdayKeyMax)</span></MudText>
 
         @if (hasAnswered)
         {
@@ -91,12 +91,13 @@ else
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
                     i++;
+                    var optionNumber = i;
                     var color = day == correctAnswer ? Color.Success
                               : (day == userAnswer && !wasCorrect) ? Color.Error
                               : Color.Default;
                     var variant = (day == correctAnswer || (day == userAnswer && !wasCorrect)) ? Variant.Filled : Variant.Outlined;
                     <MudItem xs="4" sm="3">
-                        <MudButton FullWidth="true" Variant="@variant" Color="@color" Disabled="true" Size="Size.Small">@i. @day</MudButton>
+                        <MudButton FullWidth="true" Variant="@variant" Color="@color" Disabled="true" Size="Size.Small">@optionNumber. @day</MudButton>
                     </MudItem>
                 }
             </MudGrid>
@@ -145,9 +146,10 @@ else
                 @foreach (Weekday day in Enum.GetValues<Weekday>())
                 {
                     j++;
+                    var optionNumber = j;
                     var d = day;
                     <MudItem xs="4" sm="3">
-                        <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => Answer(d)" Size="Size.Small">@j. @d</MudButton>
+                        <MudButton FullWidth="true" Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => Answer(d)" Size="Size.Small">@optionNumber. @d</MudButton>
                     </MudItem>
                 }
             </MudGrid>
@@ -161,7 +163,19 @@ else
 }
 
 @code {
-    private string selectedPeriod = "2000";
+    private const string Period2000 = "2000";
+    private const string Period1900 = "1900";
+    private const string Period2100 = "2100";
+    private const string PeriodAll = "all";
+    private const int WeekdayKeyMin = 1;
+    private const int WeekdayKeyMax = 7;
+    private const int WeekdayIndexOffset = 1;
+    private const int StreakAlertThreshold = 3;
+    private const int RecentResultWindow = 20;
+
+    private static readonly System.Globalization.CultureInfo SwedishCulture = new("sv-SE");
+
+    private string selectedPeriod = Period2000;
     private bool sessionStarted;
     private DateOnly currentDate;
     private Weekday correctAnswer;
@@ -201,9 +215,9 @@ else
     {
         if (!hasAnswered)
         {
-            if (int.TryParse(e.Key, out var num) && num >= 1 && num <= 7)
+            if (int.TryParse(e.Key, out var num) && num >= WeekdayKeyMin && num <= WeekdayKeyMax)
             {
-                Answer((Weekday)(num - 1));
+                Answer((Weekday)(num - WeekdayIndexOffset));
             }
         }
         else
@@ -231,10 +245,10 @@ else
     {
         currentDate = selectedPeriod switch
         {
-            "2000" => RandomDateGenerator.GenerateForCentury(2000),
-            "1900" => RandomDateGenerator.GenerateForCentury(1900),
-            "2100" => RandomDateGenerator.GenerateForCentury(2100),
-            _ => RandomDateGenerator.Generate(1800, 2199)
+            Period2000 => RandomDateGenerator.GenerateForCentury(2000),
+            Period1900 => RandomDateGenerator.GenerateForCentury(1900),
+            Period2100 => RandomDateGenerator.GenerateForCentury(2100),
+            _ => RandomDateGenerator.Generate(RandomDateGenerator.AllCenturiesMinYear, RandomDateGenerator.AllCenturiesMaxYear)
         };
         correctAnswer = DoomsdayAlgorithm.GetWeekday(currentDate);
         hasAnswered = false;

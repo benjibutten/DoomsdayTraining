@@ -15,10 +15,9 @@
             </MudItem>
             <MudItem xs="12" sm="4">
                 <MudSelect @bind-Value="inputMonth" Label="Månad" Variant="Variant.Outlined">
-                    @for (int m = 1; m <= 12; m++)
+                    @foreach (var monthInfo in MonthDoomsdayProvider.GetAll())
                     {
-                        var info = MonthDoomsdayProvider.GetInfoForMonth(m);
-                        <MudSelectItem Value="@m">@m – @info.MonthName</MudSelectItem>
+                        <MudSelectItem Value="@monthInfo.Month">@monthInfo.Month – @monthInfo.MonthName</MudSelectItem>
                     }
                 </MudSelect>
             </MudItem>
@@ -379,12 +378,15 @@ else
                     <span>(Obs: det är <strong>inte</strong> skottår.)</span>
                 }
             </MudText>
+            <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:0.7;">
+                Alla datum i månaden som ligger 7 dagar isär med Doomsday är giltiga svar.
+            </MudText>
 
             @if (!step4Revealed)
             {
                 <MudText Typo="Typo.body2" Class="mb-2">Välj rätt dag:</MudText>
                 <div class="d-flex gap-2 flex-wrap mb-3">
-                    @foreach (var day in new[] { 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 28, 29 })
+                    @foreach (var day in GetStep4DayOptions())
                     {
                         var d = day;
                         <MudButton Variant="@(step4UserDay == d ? Variant.Filled : Variant.Outlined)"
@@ -396,12 +398,18 @@ else
             }
             else
             {
-                @if (step4UserDay > 0)
+                @if (step4UserDay > NoDaySelected)
                 {
-                    var isCorrect = step4UserDay == doomsdayInMonth;
+                    var isCorrect = IsCurrentMonthDoomsdayAnswer(step4UserDay);
                     <MudAlert Severity="@(isCorrect ? Severity.Success : Severity.Error)" Variant="Variant.Outlined" Dense="true" Class="mb-2">
-                        @(isCorrect ? "✅ Rätt!" : $"❌ Du svarade {step4UserDay}.")
-                        Doomsday i @monthInfo.MonthName = den <strong>@(doomsdayInMonth):e</strong>.
+                        @if (isCorrect)
+                        {
+                            <span>✅ Rätt! I @monthInfo.MonthName fungerar <strong>@GetMonthDoomsdayAnswersText()</strong> som Doomsday-datum.</span>
+                        }
+                        else
+                        {
+                            <span>❌ Du svarade @step4UserDay. Giltiga svar: <strong>@GetMonthDoomsdayAnswersText()</strong>.</span>
+                        }
                     </MudAlert>
                 }
 
@@ -533,18 +541,18 @@ else
                     <tr><td>Skottår?</td><td><strong>@(isLeapYear ? "Ja ✓" : "Nej")</strong></td><td>@(step1UserAnswer.HasValue ? (step1UserAnswer == isLeapYear ? "✅" : "❌") : "–")</td></tr>
                     <tr><td>Sekelankare</td><td><strong>@centuryAnchor</strong></td><td>@(step2UserAnswer.HasValue ? (step2UserAnswer == centuryAnchor ? "✅" : "❌") : "–")</td></tr>
                     <tr><td>Årets Doomsday</td><td><strong>@yearDoomsday</strong></td><td>@(step3UserAnswer.HasValue ? (step3UserAnswer == yearDoomsday ? "✅" : "❌") : "–")</td></tr>
-                    <tr><td>Referensdatum</td><td><strong>@doomsdayInMonth:e @monthInfo.MonthName</strong></td><td>@(step4UserDay > 0 ? (step4UserDay == doomsdayInMonth ? "✅" : "❌") : "–")</td></tr>
+                    <tr><td>Referensdatum</td><td><strong>@doomsdayInMonth:e @monthInfo.MonthName</strong></td><td>@(step4UserDay > NoDaySelected ? (IsCurrentMonthDoomsdayAnswer(step4UserDay) ? "✅" : "❌") : "–")</td></tr>
                     <tr><td>Slutgiltig veckodag</td><td><strong>@finalWeekday</strong></td><td>@(step5UserAnswer.HasValue ? (step5UserAnswer == finalWeekday ? "✅" : "❌") : "–")</td></tr>
                 </tbody>
             </MudSimpleTable>
 
             @{
                 var totalAnswered = (step1UserAnswer.HasValue ? 1 : 0) + (step2UserAnswer.HasValue ? 1 : 0) +
-                    (step3UserAnswer.HasValue ? 1 : 0) + (step4UserDay > 0 ? 1 : 0) + (step5UserAnswer.HasValue ? 1 : 0);
+                    (step3UserAnswer.HasValue ? 1 : 0) + (step4UserDay > NoDaySelected ? 1 : 0) + (step5UserAnswer.HasValue ? 1 : 0);
                 var totalCorrect = (step1UserAnswer.HasValue && step1UserAnswer == isLeapYear ? 1 : 0) +
                     (step2UserAnswer.HasValue && step2UserAnswer == centuryAnchor ? 1 : 0) +
                     (step3UserAnswer.HasValue && step3UserAnswer == yearDoomsday ? 1 : 0) +
-                    (step4UserDay == doomsdayInMonth ? 1 : 0) +
+                    (step4UserDay > NoDaySelected && IsCurrentMonthDoomsdayAnswer(step4UserDay) ? 1 : 0) +
                     (step5UserAnswer.HasValue && step5UserAnswer == finalWeekday ? 1 : 0);
             }
 
@@ -578,13 +586,23 @@ else
 }
 
 @code {
+    private const int DefaultInputYear = 2024;
+    private const int DefaultInputMonth = 7;
+    private const int DefaultInputDay = 20;
+    private const int NoDaySelected = 0;
+    private const string SwedishOrdinalSuffix = ":e";
+    private const string SwedishSingleDayPrefix = "den ";
+    private const string SwedishListSeparator = ", ";
+    private const string SwedishFinalSeparator = " och ";
+
     private static readonly System.Globalization.CultureInfo svCulture = new("sv-SE");
     private static readonly string[] StepLabels = ["Skottår", "Sekelankare", "Årets Doomsday", "Månadsdatum", "Slutresultat"];
+    private static readonly int[] Step4CandidateDays = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 28, 29];
 
     // Input
-    private int inputYear = 2024;
-    private int inputMonth = 7;
-    private int inputDay = 20;
+    private int inputYear = DefaultInputYear;
+    private int inputMonth = DefaultInputMonth;
+    private int inputDay = DefaultInputDay;
     private string? errorMessage;
 
     // State
@@ -674,7 +692,7 @@ else
         step1UserAnswer = null;
         step2UserAnswer = null;
         step3UserAnswer = null;
-        step4UserDay = 0;
+        step4UserDay = NoDaySelected;
         step5UserAnswer = null;
         scratchQuotient = null;
         scratchRemainder = null;
@@ -719,7 +737,12 @@ else
     {
         step4UserDay = day;
         step4Revealed = true;
-        if (day == doomsdayInMonth) NextStep();
+        if (IsCurrentMonthDoomsdayAnswer(day))
+        {
+            doomsdayInMonth = day;
+            finalWeekday = WeekdayCalculator.Calculate(date.Day, doomsdayInMonth, yearDoomsday);
+            NextStep();
+        }
     }
 
     private void SelectStep5Answer(Weekday day)
@@ -793,4 +816,43 @@ else
             _ => ""
         };
     }
+
+    private bool IsCurrentMonthDoomsdayAnswer(int day)
+    {
+        return MonthDoomsdayProvider.IsValidDoomsdayDateForMonth(date.Month, day, isLeapYear);
+    }
+
+    private IReadOnlyList<int> GetCurrentMonthDoomsdayDays()
+    {
+        return MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(date.Month, isLeapYear);
+    }
+
+    private int[] GetStep4DayOptions()
+    {
+        var maxDay = MonthDoomsdayProvider.GetDaysInMonth(date.Month, isLeapYear);
+
+        return Step4CandidateDays
+            .Concat(GetCurrentMonthDoomsdayDays())
+            .Where(day => day >= 1 && day <= maxDay)
+            .Distinct()
+            .OrderBy(day => day)
+            .ToArray();
+    }
+
+    private string GetMonthDoomsdayAnswersText()
+    {
+        var formattedDays = GetCurrentMonthDoomsdayDays()
+            .Select(FormatOrdinalDay)
+            .ToArray();
+
+        return formattedDays.Length switch
+        {
+            0 => "",
+            1 => SwedishSingleDayPrefix + formattedDays[0],
+            2 => formattedDays[0] + SwedishFinalSeparator + formattedDays[1],
+            _ => string.Join(SwedishListSeparator, formattedDays[..^1]) + SwedishFinalSeparator + formattedDays[^1]
+        };
+    }
+
+    private static string FormatOrdinalDay(int day) => $"{day}{SwedishOrdinalSuffix}";
 }

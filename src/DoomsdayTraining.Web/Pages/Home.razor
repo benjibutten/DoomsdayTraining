@@ -5,14 +5,68 @@
 <MudText Typo="Typo.h4" GutterBottom="true">🗓️ Doomsday-Algoritmen</MudText>
 <MudText Typo="Typo.subtitle1" Class="mb-4">Lär dig räkna ut vilken veckodag <strong>vilket datum som helst</strong> infaller på – helt i huvudet!</MudText>
 
-<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
-    <strong>Vad är Doomsday-algoritmen?</strong><br />
-    En genial metod uppfunnen av matematikern <strong>John Horton Conway</strong> som gör det möjligt att
-    bestämma veckodagen för valfritt datum genom enkel huvudräkning. Med övning kan du svara på under 10 sekunder!
-</MudAlert>
+<MudText Typo="Typo.h5" Class="mb-3">Öva</MudText>
+<MudGrid Spacing="3">
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%; border: 2px solid var(--mud-palette-error);" @onclick='() => NavigateTo("practice/speed-run")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🔥</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Speed Run</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Varje delberäkning steg för steg. Fel svar = Game Over. Hur långt klarar du dig?</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("practice/flashcards")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🃏</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Flashcards</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Slumpmässiga datum – gissa veckodagen så snabbt du kan!</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%; border: 2px solid var(--mud-palette-secondary);" @onclick='() => NavigateTo("practice/speed-drill")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">⏱️</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Snabbövning</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Tävla mot klockan – hur många klarar du på en minut?</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%; border: 2px solid var(--mud-palette-primary);" @onclick='() => NavigateTo("practice/guided-simulator")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🎓</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Guidad simulator</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Få hjälp genom varje steg med förklaringar, liknelser och tips – som en privatlektionscoach!</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("practice/step-trainer")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🧩</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Steg-för-steg</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Öva delmoment separat, eller kör hela algoritmen steg för steg.</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("calculator")'>
+            <MudCardContent>
+                <MudText Typo="Typo.h3" Align="Align.Center">🔢</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">Kalkylator</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Ange valfritt datum och se hela beräkningen steg för steg.</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
 
-<MudText Typo="Typo.h5" Class="mt-6 mb-3">Algoritmens fyra steg</MudText>
-<MudText Typo="Typo.body1" Class="mb-4">Hela algoritmen bygger på fyra logiska steg som du lär dig ett i taget:</MudText>
+<MudText Typo="Typo.h5" Class="mt-6 mb-3">Lär dig algoritmen</MudText>
+<MudText Typo="Typo.body1" Class="mb-4">
+    En genial metod av matematikern <strong>John Horton Conway</strong> – fyra steg som du lär dig ett i taget:
+</MudText>
 
 <MudGrid Spacing="3">
     <MudItem xs="12" sm="6">
@@ -48,64 +102,6 @@
                 <MudText Typo="Typo.h3" Align="Align.Center">🎯</MudText>
                 <MudText Typo="Typo.h6" Align="Align.Center">4. Räkna fram</MudText>
                 <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Räkna avståndet från närmaste Doomsday-datum till ditt måldatum. Klart!</MudText>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-</MudGrid>
-
-<MudText Typo="Typo.h5" Class="mt-6 mb-3">Börja öva direkt</MudText>
-<MudGrid Spacing="3">
-    <MudItem xs="12" sm="6" md="4">
-        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%; border: 2px solid var(--mud-palette-primary);" @onclick='() => NavigateTo("practice/guided-simulator")'>
-            <MudCardContent>
-                <MudText Typo="Typo.h3" Align="Align.Center">🎓</MudText>
-                <MudText Typo="Typo.h6" Align="Align.Center">Guidad simulator</MudText>
-                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Få hjälp genom varje steg med förklaringar, liknelser och tips – som en privatlektionscoach!</MudText>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-    <MudItem xs="12" sm="6" md="4">
-        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("practice/flashcards")'>
-            <MudCardContent>
-                <MudText Typo="Typo.h3" Align="Align.Center">🃏</MudText>
-                <MudText Typo="Typo.h6" Align="Align.Center">Flashcards</MudText>
-                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Slumpmässiga datum – gissa veckodagen så snabbt du kan!</MudText>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-    <MudItem xs="12" sm="6" md="4">
-        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("practice/step-trainer")'>
-            <MudCardContent>
-                <MudText Typo="Typo.h3" Align="Align.Center">🧩</MudText>
-                <MudText Typo="Typo.h6" Align="Align.Center">Steg-för-steg</MudText>
-                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Öva delmoment separat, eller kör hela algoritmen steg för steg.</MudText>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-    <MudItem xs="12" sm="6" md="4">
-        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%; border: 2px solid var(--mud-palette-secondary);" @onclick='() => NavigateTo("practice/speed-drill")'>
-            <MudCardContent>
-                <MudText Typo="Typo.h3" Align="Align.Center">⏱️</MudText>
-                <MudText Typo="Typo.h6" Align="Align.Center">Snabbövning</MudText>
-                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Tävla mot klockan – hur många klarar du på en minut?</MudText>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-    <MudItem xs="12" sm="6" md="4">
-        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%; border: 2px solid var(--mud-palette-error);" @onclick='() => NavigateTo("practice/speed-run")'>
-            <MudCardContent>
-                <MudText Typo="Typo.h3" Align="Align.Center">🔥</MudText>
-                <MudText Typo="Typo.h6" Align="Align.Center">Speed Run</MudText>
-                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Varje delberäkning steg för steg. Fel svar = Game Over. Hur långt klarar du dig?</MudText>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-    <MudItem xs="12" sm="6" md="4">
-        <MudCard Elevation="2" Class="cursor-pointer" Style="height:100%;" @onclick='() => NavigateTo("calculator")'>
-            <MudCardContent>
-                <MudText Typo="Typo.h3" Align="Align.Center">🔢</MudText>
-                <MudText Typo="Typo.h6" Align="Align.Center">Kalkylator</MudText>
-                <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">Ange valfritt datum och se hela beräkningen steg för steg.</MudText>
             </MudCardContent>
         </MudCard>
     </MudItem>

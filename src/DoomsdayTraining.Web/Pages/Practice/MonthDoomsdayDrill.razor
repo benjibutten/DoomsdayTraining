@@ -1,0 +1,357 @@
+@page "/practice/month-doomsday-drill"
+
+<PageTitle>Månadsdrillning – Doomsday-Algoritmen</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">🗓️ Månadsdrillning</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">
+    Lär dig alla Doomsday-datum i varje månad. Ju fler datum du kan utantill, desto snabbare räknar du!
+</MudText>
+
+<MudPaper Elevation="2" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-3">⚙️ Välj övningsläge</MudText>
+    <div class="d-flex gap-2 flex-wrap">
+        <MudButton Variant="@(drillMode == DrillMode.AllDates ? Variant.Filled : Variant.Outlined)"
+                   Color="Color.Primary" OnClick="() => SetMode(DrillMode.AllDates)"
+                   StartIcon="@Icons.Material.Filled.Checklist" Size="Size.Small">Vilka datum?</MudButton>
+        <MudButton Variant="@(drillMode == DrillMode.YesNo ? Variant.Filled : Variant.Outlined)"
+                   Color="Color.Primary" OnClick="() => SetMode(DrillMode.YesNo)"
+                   StartIcon="@Icons.Material.Filled.QuestionMark" Size="Size.Small">Doomsday eller inte?</MudButton>
+        <MudButton Variant="@(drillMode == DrillMode.ReferenceList ? Variant.Filled : Variant.Outlined)"
+                   Color="Color.Secondary" OnClick="() => SetMode(DrillMode.ReferenceList)"
+                   StartIcon="@Icons.Material.Filled.ListAlt" Size="Size.Small">Referenslista</MudButton>
+    </div>
+</MudPaper>
+
+@if (drillMode == DrillMode.AllDates || drillMode == DrillMode.YesNo)
+{
+    <MudGrid Spacing="2" Class="mb-3">
+        <MudItem xs="4" sm="2">
+            <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                <MudText Typo="Typo.h5">@totalAnswered</MudText>
+                <MudText Typo="Typo.caption">SVAR</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4" sm="2">
+            <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                <MudText Typo="Typo.h5" Color="Color.Success">@totalCorrect</MudText>
+                <MudText Typo="Typo.caption">RÄTT</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4" sm="2">
+            <MudPaper Elevation="1" Class="pa-2 pa-sm-3 text-center">
+                <MudText Typo="Typo.h5">@(totalAnswered > 0 ? $"{(int)(totalCorrect * 100.0 / totalAnswered)}%" : "–")</MudText>
+                <MudText Typo="Typo.caption">TRÄFFSÄKERHET</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @if (streak.Count > 0)
+    {
+        <div class="d-flex gap-1 flex-wrap mb-3">
+            @foreach (var r in streak.TakeLast(20))
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Circle" Size="Size.Small"
+                         Color="@(r ? Color.Success : Color.Error)" />
+            }
+        </div>
+    }
+}
+
+@* ──── VILKA DATUM? ──── *@
+@if (drillMode == DrillMode.AllDates)
+{
+    <MudPaper Elevation="4" Class="pa-4 pa-sm-6 text-center mx-auto mb-4" Style="max-width:560px; border-radius:16px;" @key="questionKey">
+        <MudText Typo="Typo.body2" Class="mb-1">Markera alla Doomsday-datum i...</MudText>
+        <MudText Typo="Typo.h3" Color="Color.Primary" Class="mb-2">@allDatesMonthName</MudText>
+        @if (allDatesShowLeap)
+        {
+            <MudText Typo="Typo.body2" Class="mb-3">(skottår)</MudText>
+        }
+        else if (allDatesMonth is 1 or 2)
+        {
+            <MudText Typo="Typo.body2" Class="mb-3">(vanligt år)</MudText>
+        }
+
+        @if (!allDatesSubmitted)
+        {
+            <div class="d-flex gap-1 flex-wrap justify-center mb-3">
+                @foreach (var day in allDatesDays)
+                {
+                    var d = day;
+                    var isSelected = allDatesSelected.Contains(d);
+                    <MudButton Variant="@(isSelected ? Variant.Filled : Variant.Outlined)"
+                               Color="@(isSelected ? Color.Primary : Color.Default)"
+                               OnClick="() => ToggleDay(d)"
+                               Size="Size.Small"
+                               Style="min-width:48px;">@d</MudButton>
+                }
+            </div>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitAllDates"
+                       Disabled="@(allDatesSelected.Count == 0)"
+                       EndIcon="@Icons.Material.Filled.Check">Kontrollera</MudButton>
+        }
+        else
+        {
+            <div class="d-flex gap-1 flex-wrap justify-center mb-3">
+                @foreach (var day in allDatesDays)
+                {
+                    var d = day;
+                    var isCorrect = allDatesCorrectDays.Contains(d);
+                    var wasSelected = allDatesSelected.Contains(d);
+                    var color = isCorrect && wasSelected ? Color.Success
+                              : isCorrect && !wasSelected ? Color.Warning
+                              : !isCorrect && wasSelected ? Color.Error
+                              : Color.Default;
+                    var variant = (isCorrect || wasSelected) ? Variant.Filled : Variant.Outlined;
+                    <MudButton Variant="@variant" Color="@color" Disabled="true"
+                               Size="Size.Small" Style="min-width:48px;">@d</MudButton>
+                }
+            </div>
+
+            @if (allDatesWasCorrect)
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">
+                    ✅ Perfekt! Alla @allDatesCorrectDays.Count Doomsday-datum i @allDatesMonthName: <strong>@FormatDayList(allDatesCorrectDays)</strong>
+                </MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-3">
+                    ❌ Inte helt rätt. Doomsday-datum i @allDatesMonthName: <strong>@FormatDayList(allDatesCorrectDays)</strong>
+                </MudAlert>
+            }
+
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-3 text-left">
+                💡 @MonthDoomsdayProvider.GetInfoForMonth(allDatesMonth).Mnemonic
+            </MudAlert>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextQuestion"
+                       EndIcon="@Icons.Material.Filled.ArrowForward">Nästa</MudButton>
+        }
+    </MudPaper>
+}
+
+@* ──── DOOMSDAY ELLER INTE? ──── *@
+@if (drillMode == DrillMode.YesNo)
+{
+    <MudPaper Elevation="4" Class="pa-4 pa-sm-6 text-center mx-auto mb-4" Style="max-width:520px; border-radius:16px;" @key="questionKey">
+        <MudText Typo="Typo.body2" Class="mb-1">Är detta ett Doomsday-datum?</MudText>
+        <MudText Typo="Typo.h3" Color="Color.Primary" Class="mb-2">@yesNoDay @yesNoMonthName</MudText>
+        @if (yesNoShowLeap)
+        {
+            <MudText Typo="Typo.body2" Class="mb-3">(skottår)</MudText>
+        }
+        else if (yesNoMonth is 1 or 2)
+        {
+            <MudText Typo="Typo.body2" Class="mb-3">(vanligt år)</MudText>
+        }
+
+        @if (!yesNoAnswered)
+        {
+            <div class="d-flex gap-3 justify-center">
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="() => AnswerYesNo(true)"
+                           StartIcon="@Icons.Material.Filled.Check" Size="Size.Large">Ja, Doomsday!</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => AnswerYesNo(false)"
+                           StartIcon="@Icons.Material.Filled.Close" Size="Size.Large">Nej</MudButton>
+            </div>
+        }
+        else
+        {
+            @if (yesNoWasCorrect)
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Class="mb-3">
+                    ✅ Rätt! @yesNoDay @yesNoMonthName är @(yesNoCorrectAnswer ? "ett Doomsday-datum" : "INTE ett Doomsday-datum").
+                </MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-3">
+                    ❌ Fel! @yesNoDay @yesNoMonthName är @(yesNoCorrectAnswer ? "ett Doomsday-datum" : "INTE ett Doomsday-datum").
+                </MudAlert>
+            }
+
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-3 text-left">
+                Alla Doomsday-datum i @yesNoMonthName: <strong>@FormatDayList(MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(yesNoMonth, yesNoShowLeap))</strong><br />
+                💡 @MonthDoomsdayProvider.GetInfoForMonth(yesNoMonth).Mnemonic
+            </MudAlert>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextQuestion"
+                       EndIcon="@Icons.Material.Filled.ArrowForward">Nästa</MudButton>
+        }
+    </MudPaper>
+}
+
+@* ──── REFERENSLISTA ──── *@
+@if (drillMode == DrillMode.ReferenceList)
+{
+    <MudPaper Elevation="2" Class="pa-4 mb-4">
+        <MudText Typo="Typo.h6" Class="mb-3">📖 Alla Doomsday-datum per månad</MudText>
+        <MudText Typo="Typo.body2" Class="mb-3">
+            Läs igenom och säg dem högt. Varje rad med datum delar samma veckodag (Doomsday) under ett givet år.
+        </MudText>
+        <MudSimpleTable Dense="true" Hover="true" Elevation="0">
+            <thead>
+                <tr><th>Månad</th><th>Doomsday-datum</th><th>Minnesregel</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var month in MonthDoomsdayProvider.GetAll())
+                {
+                    var allDates = MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(month.Month, false);
+                    <tr>
+                        <td><strong>@month.MonthName</strong></td>
+                        <td Style="font-family:monospace; font-size:1.05rem; letter-spacing:0.5px;">
+                            @string.Join(" · ", allDates)
+                        </td>
+                        <td>@month.Mnemonic</td>
+                    </tr>
+                }
+            </tbody>
+        </MudSimpleTable>
+    </MudPaper>
+
+    <MudExpansionPanels Class="mb-4" Elevation="2">
+        <MudExpansionPanel Text="Visa för skottår (januari & februari)" MaxHeight="200">
+            <MudSimpleTable Dense="true" Hover="true" Elevation="0">
+                <thead><tr><th>Månad</th><th>Doomsday-datum (skottår)</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Januari (skottår)</strong></td>
+                        <td Style="font-family:monospace;">@string.Join(" · ", MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(1, true))</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Februari (skottår)</strong></td>
+                        <td Style="font-family:monospace;">@string.Join(" · ", MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(2, true))</td>
+                    </tr>
+                </tbody>
+            </MudSimpleTable>
+        </MudExpansionPanel>
+    </MudExpansionPanels>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+        <strong>Tips för att lära sig snabbt:</strong><br />
+        1. Börja med de jämna månaderna — 4, 11, 18, 25 (april) osv. Mönstret är alltid +7.<br />
+        2. Lär dig "startdatumet" per månad (minnesreglerna ovan), sedan kan du alltid generera resten genom +7 / −7.<br />
+        3. Byt till <strong>"Doomsday eller inte?"</strong>-läget ovan för snabb igenkänningsträning!
+    </MudAlert>
+}
+
+@code {
+    private enum DrillMode { None, AllDates, YesNo, ReferenceList }
+
+    private DrillMode drillMode = DrillMode.None;
+    private int questionKey;
+    private int totalAnswered;
+    private int totalCorrect;
+    private List<bool> streak = [];
+
+    // ── Vilka datum? ──
+    private int allDatesMonth;
+    private string allDatesMonthName = "";
+    private bool allDatesShowLeap;
+    private List<int> allDatesDays = [];
+    private HashSet<int> allDatesSelected = [];
+    private IReadOnlyList<int> allDatesCorrectDays = [];
+    private bool allDatesSubmitted;
+    private bool allDatesWasCorrect;
+
+    // ── Doomsday eller inte? ──
+    private int yesNoMonth;
+    private string yesNoMonthName = "";
+    private int yesNoDay;
+    private bool yesNoShowLeap;
+    private bool yesNoCorrectAnswer;
+    private bool yesNoAnswered;
+    private bool yesNoWasCorrect;
+
+    private void SetMode(DrillMode mode)
+    {
+        drillMode = mode;
+        totalAnswered = 0;
+        totalCorrect = 0;
+        streak.Clear();
+        NextQuestion();
+    }
+
+    private void NextQuestion()
+    {
+        questionKey++;
+
+        if (drillMode == DrillMode.AllDates)
+            PrepareAllDates();
+        else if (drillMode == DrillMode.YesNo)
+            PrepareYesNo();
+    }
+
+    // ── Vilka datum? ──
+    private void PrepareAllDates()
+    {
+        allDatesMonth = Random.Shared.Next(1, 13);
+        var info = MonthDoomsdayProvider.GetInfoForMonth(allDatesMonth);
+        allDatesMonthName = info.MonthName;
+        allDatesShowLeap = allDatesMonth is 1 or 2 && Random.Shared.Next(2) == 0;
+        allDatesCorrectDays = MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(allDatesMonth, allDatesShowLeap);
+
+        // Show all days in month, in rows of 7
+        var daysInMonth = MonthDoomsdayProvider.GetDaysInMonth(allDatesMonth, allDatesShowLeap);
+        allDatesDays = Enumerable.Range(1, daysInMonth).ToList();
+        allDatesSelected = [];
+        allDatesSubmitted = false;
+        allDatesWasCorrect = false;
+    }
+
+    private void ToggleDay(int day)
+    {
+        if (!allDatesSelected.Remove(day))
+            allDatesSelected.Add(day);
+    }
+
+    private void SubmitAllDates()
+    {
+        allDatesSubmitted = true;
+        allDatesWasCorrect = allDatesSelected.SetEquals(allDatesCorrectDays);
+        totalAnswered++;
+        if (allDatesWasCorrect) totalCorrect++;
+        streak.Add(allDatesWasCorrect);
+    }
+
+    // ── Doomsday eller inte? ──
+    private void PrepareYesNo()
+    {
+        yesNoMonth = Random.Shared.Next(1, 13);
+        var info = MonthDoomsdayProvider.GetInfoForMonth(yesNoMonth);
+        yesNoMonthName = info.MonthName;
+        yesNoShowLeap = yesNoMonth is 1 or 2 && Random.Shared.Next(2) == 0;
+        var daysInMonth = MonthDoomsdayProvider.GetDaysInMonth(yesNoMonth, yesNoShowLeap);
+
+        // ~50% chance of showing a doomsday date
+        if (Random.Shared.Next(2) == 0)
+        {
+            var valid = MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(yesNoMonth, yesNoShowLeap);
+            yesNoDay = valid[Random.Shared.Next(valid.Count)];
+        }
+        else
+        {
+            // Pick a non-doomsday date
+            var valid = MonthDoomsdayProvider.GetValidDoomsdayDatesForMonth(yesNoMonth, yesNoShowLeap);
+            var validSet = new HashSet<int>(valid);
+            var nonDoomsday = Enumerable.Range(1, daysInMonth).Where(d => !validSet.Contains(d)).ToArray();
+            yesNoDay = nonDoomsday[Random.Shared.Next(nonDoomsday.Length)];
+        }
+
+        yesNoCorrectAnswer = MonthDoomsdayProvider.IsValidDoomsdayDateForMonth(yesNoMonth, yesNoDay, yesNoShowLeap);
+        yesNoAnswered = false;
+        yesNoWasCorrect = false;
+    }
+
+    private void AnswerYesNo(bool answer)
+    {
+        yesNoAnswered = true;
+        yesNoWasCorrect = answer == yesNoCorrectAnswer;
+        totalAnswered++;
+        if (yesNoWasCorrect) totalCorrect++;
+        streak.Add(yesNoWasCorrect);
+    }
+
+    private static string FormatDayList(IReadOnlyList<int> days)
+    {
+        return string.Join(", ", days.Select(d => $"{d}:e"));
+    }
+}
